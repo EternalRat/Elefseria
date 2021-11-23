@@ -54,7 +54,7 @@ module.exports = class ReactionRoleModule extends BaseModule {
 	 * @returns {Boolean} weither it's a command from this module or not 
 	 */
 	isAModuleCommand(name) {
-		return this.commands.has(name);
+		return this.commands.has(name) || this.aliases.has(name);
 	}
 
 	/**

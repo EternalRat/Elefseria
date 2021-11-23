@@ -15,7 +15,7 @@ module.exports = class KickCommand extends BaseCommand {
 	 * @param {Message} msg 
 	 * @param {Array} args 
 	 */
-	run(client, msg, args) {
+	async run(client, msg, args) {
 		var embedColor = '#ffffff'
 		var missingArgsEmbed = new MessageEmbed() // Creates the embed thats sent if the command isnt run right
 				.setColor(embedColor)
@@ -23,29 +23,28 @@ module.exports = class KickCommand extends BaseCommand {
 				.setTitle("Missing arguments")
 				.setDescription(`Usage: \`${process.env.DISCORD_BOT_PREFIX}${this.name} ${this.usage}\``)
 				.setTimestamp();
-
-		let kUser = msg.guild.member(msg.mentions.users.first()) || msg.guild.members.cache.get(args[0]);
-		if (!kUser) return msg.channel.send(missingArgsEmbed);
-		if (msg.guild.member(msg.author).roles.highest.position <= kUser.roles.highest.position) return msg.channel.send("You can't kick this member");
+		let kUser = (await msg.guild.members.fetch(msg.mentions.users.first())) || msg.guild.members.cache.find(m => m.id === args[0])
+		if (!kUser) return msg.channel.send({embeds: [missingArgsEmbed]});
+		if (msg.guild.members.cache.get(msg.author.id).roles.highest.position <= kUser.roles.highest.position) return msg.channel.send("You can't kick this member");
 		msg.delete().catch();
 		let kReason = args.slice(1).join(" ");
-		if (!kReason) return msg.channel.send(missingArgsEmbed)
+		if (!kReason) return msg.channel.send({embeds: [missingArgsEmbed]})
 
 		const kick2 = new MessageEmbed()
-				.setTitle("You've been kicked !")
-				.setAuthor(msg.author.username, msg.author.avatarURL())
-				.setDescription(`Reason :\n\`\`\`${args.slice(1).join(' ')}\`\`\``)
-		kUser.send(kick2).then(function() {
-				const kickEmbed = new MessageEmbed()
-						.setDescription("☆━━━━━━☆ Kick ☆━━━━━━☆")
-						.setColor("#ff0000")
-						.addField("Kicked user:", `${kUser} - ${kUser.id}`)
-						.addField("Kicked by:", `<@${msg.author.id}> - ${msg.author.id}`)
-						.addField("Kicked in:", msg.channel)
-						.addField("Time:", parseZone(msg.createdAt).format("dddd Do MMMM in YYYY, HH:mm:ss"))
-						.addField("Reason:", kReason);
-				msg.guild.member(kUser).kick(kReason);
-				msg.channel.send(kickEmbed)
+			.setTitle("You've been kicked !")
+			.setAuthor(msg.author.username, msg.author.avatarURL())
+			.setDescription(`Reason :\n\`\`\`${args.slice(1).join(' ')}\`\`\``)
+		kUser.send({embeds: [kick2]}).then(() => {
+			const kickEmbed = new MessageEmbed()
+				.setDescription("☆━━━━━━☆ Kick ☆━━━━━━☆")
+				.setColor("#ff0000")
+				.addField("Kicked user:", `${kUser} - ${kUser.id}`)
+				.addField("Kicked by:", `<@${msg.author.id}> - ${msg.author.id}`)
+				.addField("Kicked in:", `${msg.channel}`)
+				.addField("Time:", parseZone(msg.createdAt).format("dddd Do MMMM in YYYY, HH:mm:ss"))
+				.addField("Reason:", kReason);
+			kUser.kick(kReason);
+			msg.channel.send({embeds: [kickEmbed]})
 		})
 	}
 }
