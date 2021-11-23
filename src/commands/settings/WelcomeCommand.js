@@ -1,6 +1,6 @@
 const PermissionGuard = require('../../utils/PermissionGuard');
 const BaseCommand = require('../../utils/structures/BaseCommand');
-const channels = require("../../utils/database/model/channels");
+const channels = require("../../utils/database/models/channels");
 const { Client, Message } = require('discord.js');
 
 module.exports = class WelcomeCommand extends BaseCommand {

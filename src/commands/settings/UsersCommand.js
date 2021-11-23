@@ -1,5 +1,5 @@
 const BaseCommand = require('../../utils/structures/BaseCommand');
-const UsersChannel = require("../../utils/database/model/userscount");
+const UsersChannel = require("../../utils/database/models/userscount");
 const { Client, Message } = require('discord.js');
 const PermissionGuard = require('../../utils/PermissionGuard');
 

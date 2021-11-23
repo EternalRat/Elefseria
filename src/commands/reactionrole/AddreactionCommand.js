@@ -1,7 +1,7 @@
 const BaseCommand = require('../../utils/structures/BaseCommand');
 const PermissionGuard = require("../../utils/PermissionGuard");
 const { MessageCollector } = require('discord.js');
-const MessageModel = require("../../utils/database/model/models")
+const MessageModel = require("../../utils/database/models/reactionrole")
 
 module.exports = class AddreactionCommand extends BaseCommand {
   constructor() {

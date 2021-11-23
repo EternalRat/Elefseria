@@ -1,7 +1,7 @@
 const BaseEvent = require("../../utils/structures/BaseEvent");
 const {MessageEmbed, Client, GuildMember} = require("discord.js")
-const UsersChannel = require("../../utils/database/model/userscount");
-const channels = require("../../utils/database/model/channels");
+const UsersChannel = require("../../utils/database/models/userscount");
+const channels = require("../../utils/database/models/channels");
 
 module.exports = class GuildMemberAddEvent extends BaseEvent {
   constructor() {

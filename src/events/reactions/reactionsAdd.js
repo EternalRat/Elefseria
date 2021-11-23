@@ -1,5 +1,5 @@
 const { Client, MessageReaction, GuildMember, User } = require('discord.js');
-const MessageModel = require('../../utils/database/model/models');
+const MessageModel = require('../../utils/database/models/reactionrole');
 const BaseEvent = require("../../utils/structures/BaseEvent");
 
 module.exports = class MessageReactionAddEvent extends BaseEvent {

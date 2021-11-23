@@ -10,7 +10,7 @@ const TicketModule = require('./modules/TicketModule.Js');
 const { registerEvents } = require('./utils/registry');
 const client = new Client({
 	intents: [
-		Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES
+		Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS
 	], partials: [
 		"GUILD_MEMBER",
 		"USER",
@@ -30,6 +30,10 @@ const client = new Client({
 		new SettingsModule(),
 		new TicketModule()
 	]);
+	client.mutes = require("./utils/json/mute.json");
+	client.cachedMessageReactions = new Map();
+	client.events = new Map();
+	client.cooldown = new Map();
 	client.events = new Map();
 	client.prefix = process.env.DISCORD_BOT_PREFIX;
 	var i = 0;

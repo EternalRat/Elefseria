@@ -1,8 +1,8 @@
-const Giveaway = require("../database/models/giveaway")
+const Giveaway = require("./database/models/giveaway")
 const schedule = require("node-schedule")
 const moment = require("moment")
 const ms = require("ms");
-const { Message } = require("discord.js");
+const { Client, Message, TextChannel } = require("discord.js");
 
 async function saveGiveaway(response) {
     const {
@@ -23,12 +23,16 @@ async function saveGiveaway(response) {
     return giveaway.save();
 }
 
+/**
+ * @param {Client} client
+ * @param {Array} giveaways
+ */
 async function scheduleGiveaways(client, giveaways) {
     for (let i = 0; i < giveaways.length; i++) {
         const {channelId, messageId, endsOn, HostId, winners} = giveaways[i];
         schedule.scheduleJob(new Date(endsOn), async() => {
-            const channel = client.channels.cache.get(channelId)
-            if (channel) {
+            const channel = TextChannel.bind(client.channels.cache.get(channelId));
+            if (channel && typeof(channel) === TextChannel) {
                 const message = await channel.messages.fetch(messageId);
                 if (message) {
                     const {embeds, reactions} = message;

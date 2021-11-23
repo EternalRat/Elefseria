@@ -1,9 +1,9 @@
 require('dotenv').config();
 const PermissionGuard = require('../../utils/PermissionGuard');
 const BaseCommand = require('../../utils/structures/BaseCommand');
-const WarnModel = require("../../utils/database/model/warnmodel")
-const OldWarnModel = require("../../utils/database/model/oldwarnmodel")
-const NbrWarnModel = require("../../utils/database/model/nbrwarn")
+const WarnModel = require("../../utils/database/models/warnmodel")
+const OldWarnModel = require("../../utils/database/models/oldwarnmodel")
+const NbrWarnModel = require("../../utils/database/models/nbrwarn")
 const { MessageEmbed, Client, Message } = require("discord.js");
 
 module.exports = class WarnCommand extends BaseCommand {
