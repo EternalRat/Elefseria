@@ -1,6 +1,6 @@
 const BaseCommand = require('../../utils/structures/BaseCommand');
 const PermissionGuard = require('../../utils/PermissionGuard');
-const { MessageEmbed, Message, Client } = require("discord.js");
+const { MessageEmbed, Message, Client, TextChannel } = require("discord.js");
 const fs = require("fs");
 const ms = require("ms")
 require('dotenv').config();
@@ -17,7 +17,7 @@ module.exports = class MuteCommand extends BaseCommand {
 	 * @param {Array} args 
 	 */
 	async run(client, msg, args) {
-		let target = msg.guild.member(msg.mentions.users.first()) || msg.guild.members.cache.get(args[0])
+		let target = (await msg.guild.members.fetch(msg.mentions.users.first())) || msg.guild.members.cache.find(m => m.id === args[0]);
 		var embedColor = '#ffffff'
 		var missingArgsEmbed = new MessageEmbed()
 			.setColor(embedColor)
@@ -25,34 +25,37 @@ module.exports = class MuteCommand extends BaseCommand {
 			.setTitle("Missing arguments")
 			.setDescription(`Usage: \`${process.env.DISCORD_BOT_PREFIX}${this.name} ${this.usage}\``)
 			.setTimestamp();
-		if (!target) return msg.channel.send(missingArgsEmbed)
+		if (!target) return msg.channel.send({embeds: [missingArgsEmbed]})
 		msg.delete().catch()
-		if (msg.guild.member(msg.author).roles.highest.position <= target.roles.highest.position) return msg.channel.send("That person can't be kicked!");
+		if (msg.guild.members.cache.get(msg.author.id).roles.highest.position <= target.roles.highest.position) return msg.channel.send("That person can't be kicked!");
 		let role = msg.guild.roles.cache.find(r => r.name === "Muted");
 		if (!role) {
 			try {
 				role = await msg.guild.roles.create({
-					data: {
-						name: "Muted",
-						color: "#000000",
-						permissions: []
-					}
+					name: "Muted",
+					color: "#000000",
+					permissions: []
 				});
-				msg.guild.channels.cache.forEach(async (channel, id) => {
-					channel.updateOverwrite(role, {
-						deny: ['SEND_MESSAGES', 'ADD_REACTIONS', 'SPEAK']
-					});
-				});
+				msg.guild.channels.fetch().then(channels => {
+					channels.forEach(channel => {
+						channel.permissionOverwrites.edit(role, {
+							'SEND_MESSAGES': false,
+							'ADD_REACTIONS': false,
+							'SPEAK': false
+						});
+					})
+				})
 			} catch (e) {
 				console.log(e.stack);
 			}
 		}
 		if(target.roles.cache.has(role.id)) return msg.channel.send("This user is already muted")
 		var time;
-		time = !args[1] ? ms("999d") : ms(args[1])
+		time = !args[1] ? ms("0s") : ms(args[1])
 		client.mutes[target.id] = {
 			guild: msg.guild.id,
-			time: Date.now() + time
+			time: Date.now() + time,
+			infinite: time === 0 ? true : false
 		}
 		await target.roles.add(role);
 

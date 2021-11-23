@@ -18,16 +18,19 @@ module.exports = class ReadyEvent extends BaseEvent {
 		client.user.setActivity("Elefseria On Top", { type: 'STREAMING' });
 		setInterval(async () => {
 			for (let i in client.mutes) {
+				let isInfinite = client.mutes[i].infinite
 				let time = client.mutes[i].time
 				let guildID = client.mutes[i].guild
 				let guild = await client.guilds.fetch(guildID)
-				if (!guild.members.cache.has(i)) {
+				if (isInfinite === true)
+					continue;
+				let member = await guild.members.fetch(i)
+				if (!member) {
 					delete client.mutes[i]
 					fs.writeFile("./src/utils/json/mute.json", JSON.stringify(client.mutes), err => {
 						if (err) throw err
 					})
 				}
-				let member = await guild.members.fetch(i)
 				let mutedRole = guild.roles.cache.find(r => r.name === "Muted")
 				if (!mutedRole) continue
 				if (Date.now() > time) {

@@ -18,7 +18,7 @@ module.exports = class WarnsCommand extends BaseCommand {
    * @param {Array} args 
    */
   async run(client, msg, args) {
-    let target = msg.guild.member(msg.mentions.users.first()) || msg.guild.members.cache.get(args[0]);
+    let target = (await msg.guild.members.fetch(msg.mentions.users.first())) || msg.guild.members.cache.find(m => m.id === args[0]);
     var embedColor = '#ffffff';
     var missingArgsEmbed = new MessageEmbed()
         .setColor(embedColor)
@@ -26,7 +26,7 @@ module.exports = class WarnsCommand extends BaseCommand {
         .setTitle("Missing arguments")
         .setDescription(`Usage: \`${process.env.DISCORD_BOT_PREFIX}${this.name} ${this.usage}\``)
         .setTimestamp();
-    if (!target) return msg.channel.send(missingArgsEmbed);
+    if (!target) return msg.channel.send({embeds: [missingArgsEmbed]});
     let user = await WarnModel.findOne({ userId : target.id, guildId: msg.guild.id });
     let oldUser = await OldWarnModel.findOne({ userId : target.id, guildId: msg.guild.id });
     if (!user) {

@@ -24,11 +24,11 @@ module.exports = class DelwarnCommand extends BaseCommand {
 			.setDescription(`Usage: \`${process.env.DISCORD_BOT_PREFIX}${this.name} ${this.usage}\``)
 			.setTimestamp();
 		if (args.length !== 1) {
-			msg.channel.send(missingArgsEmbed);
+			msg.channel.send({embeds: [missingArgsEmbed]});
 			return;
 		}
-		let warnId = `${args[0]}`
-		let allUser = await WarnModel.find({ guildId: msg.guild.id })
+		let warnId = `${args[0]}`;
+		let allUser = await WarnModel.find({ guildId: msg.guild.id });
 		let finaluser;
 		for (const user of allUser) {
 			if (user.Reason.get(warnId)) {
@@ -38,27 +38,27 @@ module.exports = class DelwarnCommand extends BaseCommand {
 		}
 		if (!finaluser)
 			return msg.channel.send("This warnId has any correspondance");
-		let userId = finaluser.get("userId")
-		let guildId = finaluser.get("guildId")
+		let userId = finaluser.get("userId");
+		let guildId = finaluser.get("guildId");
 		let Count = finaluser.get("Count");
 		Count--;
-		let Reason = new Map()
+		let Reason = new Map();
 		let loop = 1;
 		let i = 0;
 		finaluser.Reason.forEach((key, value) => {
-				if (value === warnId)
-						loop = 0;
-				else if (value !== warnId)
-						Reason.set(value, key)
-				if (loop === 1)
-						i++
+			if (value === warnId)
+				loop = 0;
+			else if (value !== warnId)
+				Reason.set(value, key);
+			if (loop === 1)
+				i++;
 		});
 		let userTag = new Array()
 		finaluser.userTag.forEach(value => {
-				userTag.push(value)
-		})
+			userTag.push(value);
+		});
 		userTag.splice(i, 1);
-		await finaluser.deleteOne()
+		await finaluser.deleteOne();
 		let newUser = new WarnModel({
 				userId,
 				guildId,
@@ -66,7 +66,7 @@ module.exports = class DelwarnCommand extends BaseCommand {
 				Reason,
 				userTag
 		});
-		newUser.save().catch(err=>console.log(err))
+		newUser.save().catch(err=>console.log(err));
 		msg.channel.send("👌");
 	}
 }
