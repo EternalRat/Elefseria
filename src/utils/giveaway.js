@@ -3,6 +3,7 @@ const schedule = require("node-schedule")
 const moment = require("moment")
 const ms = require("ms");
 const { Client, Message, TextChannel } = require("discord.js");
+let jobMap = {}
 
 async function saveGiveaway(response) {
     const {
@@ -27,18 +28,19 @@ async function saveGiveaway(response) {
  * @param {Client} client
  * @param {Array} giveaways
  */
+
 async function scheduleGiveaways(client, giveaways) {
     for (let i = 0; i < giveaways.length; i++) {
         const {channelId, messageId, endsOn, HostId, winners} = giveaways[i];
-        schedule.scheduleJob(new Date(endsOn), async() => {
-            const channel = TextChannel.bind(client.channels.cache.get(channelId));
-            if (channel && typeof(channel) === TextChannel) {
+        jobMap[messageId] = schedule.scheduleJob(new Date(endsOn), async() => {
+            const channel = client.channels.cache.get(channelId);
+            if (channel) {
                 const message = await channel.messages.fetch(messageId);
                 if (message) {
                     const {embeds, reactions} = message;
                     const reaction = reactions.cache.get('🎉');
                     const users = await reaction.users.fetch();
-                    const entries = users.filter(user => !user.bot).array();
+                    const entries = users.filter(user => !user.bot);
                     if (embeds.length === 1) {
                         let give = await Giveaway.findOne({ messageId: messageId })
                         const embed = embeds[0];
@@ -46,7 +48,7 @@ async function scheduleGiveaways(client, giveaways) {
                         winner = winner.map(user => user.toString());
                         embed.setDescription(`**WINNERS(S):\n${winner.join('\n')}**\nHosted by: ${message.guild.members.cache.get(HostId)}`)
                         embed.setFooter(`Ended at • ${moment.parseZone(moment.now()).format("dddd Do MMMM in YYYY, HH:mm:ss")}`)
-                        await message.edit(embed);
+                        await message.edit({content:'🎉 **GIVEAWAY ENDED** 🎉', embeds:[embed]});
                         channel.send(`**WINNER(S) ${winner.join(', ')}** ! You won the **${give.get("prize")}** !\nhttps://discordapp.com/channels/${give.get("guildId")}/${give.get("channelId")}/${give.get("messageId")}`)
                     }
                 }
@@ -70,7 +72,7 @@ async function rerollGiveaways(messageId, msg) {
             const {embeds, reactions} = message;
             const reaction = reactions.cache.get('🎉');
             const users = await reaction.users.fetch();
-            const entries = users.filter(user => !user.bot).array();
+            const entries = users.filter(user => !user.bot);
             if (embeds.length === 1) {
                 let give = await Giveaway.findOne({ messageId: messageId })
                 const embed = embeds[0];
@@ -107,20 +109,21 @@ async function editGiveaways(messageId, response, msg, client) {
         Hosted by: ${message.guild.members.cache.get(giveaway.get("HostId"))}`
     );
     embeds[0].setFooter(`Ends at • ${moment.parseZone(ends).format("dddd Do MMMM in YYYY, HH:mm:ss")}`)
-    message.edit("🎉 **GIVEAWAY ENDED** 🎉", embeds[0]);
-    return giveaway.save();
+    message.edit({content:"🎉 **GIVEAWAY ** 🎉", embeds: embeds});
+    scheduleGiveaways(client, giveaway.save());
+    return giveaway;
 }
 
 function determineWinners(users, max) {
-    if (users.length <= max) return users;
+    if (users.size <= max) return users;
     const numbers = new Set();
     const winnersArray = [];
     let i = 0;
     while (i < max) {
-        const random = Math.floor(Math.random() * users.length);
-        const selected = users[random];
+        const random = Math.floor(Math.random() * users.size);
+        const selected = users.at(random);
         if (!numbers.has(random)) {
-            winnersArray.push(selected);
+            winnersArray.push(selected.username);
             i++;
         }
     }
