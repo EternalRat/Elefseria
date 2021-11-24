@@ -3,7 +3,7 @@ const schedule = require("node-schedule")
 const moment = require("moment")
 const ms = require("ms");
 const { Client, Message, TextChannel } = require("discord.js");
-let jobMap = {}
+let jobMap = new Map()
 
 async function saveGiveaway(response) {
     const {
@@ -32,7 +32,7 @@ async function saveGiveaway(response) {
 async function scheduleGiveaways(client, giveaways) {
     for (let i = 0; i < giveaways.length; i++) {
         const {channelId, messageId, endsOn, HostId, winners} = giveaways[i];
-        jobMap[messageId] = schedule.scheduleJob(new Date(endsOn), async() => {
+        jobMap.set(messageId, schedule.scheduleJob(new Date(endsOn), async() => {
             const channel = client.channels.cache.get(channelId);
             if (channel) {
                 const message = await channel.messages.fetch(messageId);
@@ -50,10 +50,11 @@ async function scheduleGiveaways(client, giveaways) {
                         embed.setFooter(`Ended at • ${moment.parseZone(moment.now()).format("dddd Do MMMM in YYYY, HH:mm:ss")}`)
                         await message.edit({content:'🎉 **GIVEAWAY ENDED** 🎉', embeds:[embed]});
                         channel.send(`**WINNER(S) ${winner.join(', ')}** ! You won the **${give.get("prize")}** !\nhttps://discordapp.com/channels/${give.get("guildId")}/${give.get("channelId")}/${give.get("messageId")}`)
+                        jobMap.delete(messageId)
                     }
                 }
             }
-        })
+        }))
     }
 }
 
@@ -110,7 +111,7 @@ async function editGiveaways(messageId, response, msg, client) {
     );
     embeds[0].setFooter(`Ends at • ${moment.parseZone(ends).format("dddd Do MMMM in YYYY, HH:mm:ss")}`)
     message.edit({content:"🎉 **GIVEAWAY ** 🎉", embeds: embeds});
-    scheduleGiveaways(client, giveaway.save());
+    jobMap.get(messageId).reschedule(ends);
     return giveaway;
 }
 
