@@ -84,7 +84,7 @@ async function rerollGiveaways(messageId, msg) {
                 const embed = embeds[0];
                 let winner = determineWinners(entries, give.get("winners"));
                 winner = winner.map(user => user.toString());
-                if (winner.length === 0)
+                if (winner.length !== 0)
                     channel.send(`**WINNER(S) ${winner.join(', ')}** ! You won the **${give.get("prize")}** !\nhttps://discordapp.com/channels/${give.get("guildId")}/${give.get("channelId")}/${give.get("messageId")}`)
             }
         }
