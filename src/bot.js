@@ -2,11 +2,11 @@ require('dotenv').config();
 const { Client, Intents } = require('discord.js');
 const FunModule = require('./modules/FunModule');
 const GiveawayModule = require('./modules/GiveawayModule');
-const ModerationModule = require('./modules/ModerationModule.Js');
+const ModerationModule = require('./modules/ModerationModule');
 const ReactionRoleModule = require('./modules/ReactionRoleModule');
-const SecurityModule = require('./modules/SecurityModule.Js');
+const SecurityModule = require('./modules/SecurityModule');
 const SettingsModule = require('./modules/SettingsModule');
-const TicketModule = require('./modules/TicketModule.Js');
+const TicketModule = require('./modules/TicketModule');
 const { registerEvents } = require('./utils/registry');
 const client = new Client({
 	intents: [
