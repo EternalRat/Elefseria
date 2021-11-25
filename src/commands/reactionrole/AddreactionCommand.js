@@ -20,7 +20,7 @@ module.exports = class AddreactionCommand extends BaseCommand {
 					let exp = await msg.channel.send("Please provide all of the emoji names with the role name, one by one, separated with a comma.\ne.g: snapchat,snapchat, where the emoji name comes first, role name comes second.\n\
 					Once you're done, just type '?done' and it'll be fine!");
 					let collector = new MessageCollector(msg.channel, {filter: msgCollectorFilter.bind(null, msg), time: 10000});
-					let emojiRoleMappings = new Map();
+					let emojiRoleMappings = {};
 					collector.on('collect', msg => {
 						let { cache } = msg.guild.emojis;
 						if(msg.content.toLowerCase() === '?done') {
@@ -48,8 +48,7 @@ module.exports = class AddreactionCommand extends BaseCommand {
 						}
 						fetchedMessage.react(emoji)
 								.catch(err => console.log(err));
-						emojiRoleMappings.set(emoji.id, role.id);
-            			console.log(emojiRoleMappings)
+						emojiRoleMappings[emoji.id] = role.id;
 						msg.delete({timeout:3500});
 					});
 					collector.on('end', async (collected, reason) => {
