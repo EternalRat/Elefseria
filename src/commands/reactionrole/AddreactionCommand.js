@@ -58,7 +58,6 @@ module.exports = class AddreactionCommand extends BaseCommand {
 							if(findMsgDocument) {
 								msg.channel.send("A role reaction set up exists for this message already...");
 							} else {
-								console.log("Setup messageModel")
 								let dbMsgModel = new MessageModel({
 									messageId: fetchedMessage.id,
 									emojiRoleMappings: emojiRoleMappings
