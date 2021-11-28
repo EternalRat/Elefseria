@@ -18,14 +18,19 @@ module.exports = class VerifyCommand extends BaseCommand {
 	async run(client, message, args) {
 		var guild = message.guild
 		let people = new Array()
-		let members = await guild.members.fetch()
-		members.filter(member => !member.user.bot).forEach(member => {
-			let findBan = blacklist.findOne({userId: member.id})
-			if (findBan) people.push(member.user.username)
-			console.log("Avant", people)
-		});
-		console.log("Apres", people)
-		if (people.length === 0) return message.channel.send(`No one on this server is blacklist in the bbd. You're safe.`)
-		message.channel.send(`${people} are all the member who are in the bdd, be careful with them!`)
+		let getLastKeyInMap = (map) => [...map][map.size-1][0];
+		guild.members.fetch().then(members => {
+			var findPeople = new Promise((resolve, reject) => {
+				members.filter(member => !member.user.bot).forEach(async (member, key, map) => {
+					let findBan = await blacklist.findOne({userId: member.id})
+					if (findBan) people.push(member.user.username)
+					if (getLastKeyInMap(map) === key) resolve();
+				});
+			});
+			findPeople.then(() => {
+				if (people.length === 0) return message.channel.send(`No one on this server is blacklist. You're safe.`)
+				message.channel.send(`${people.join(', ')} ${people.length === 1 ? 'is' : 'are all'} blacklisted, be careful with ${people.length === 1 ? 'him' : 'them'}!`)
+			});
+		}).catch(err => console.log(err));
 	}
 }
