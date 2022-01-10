@@ -1,5 +1,17 @@
+const PermissionGuard = require('../PermissionGuard')
 module.exports = class BaseCommand {
-  constructor(name = String, category = String, aliases = String, cooldown = Number, guildOnly = Boolean, description = String, usage = String, permissions) {
+  /**
+   * 
+   * @param {String} name 
+   * @param {String} category 
+   * @param {Array<String>} aliases 
+   * @param {Number} cooldown 
+   * @param {Boolean} guildOnly 
+   * @param {String} description 
+   * @param {String} usage 
+   * @param {PermissionGuard} permissions 
+   */
+  constructor(name, category, aliases, cooldown, guildOnly, description, usage, permissions) {
     this.name = name;
     this.category = category;
     this.aliases = aliases;
