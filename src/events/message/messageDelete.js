@@ -24,6 +24,6 @@ module.exports = class MessageDeleteEvent extends BaseEvent {
             .addField("Old message:", msg.cleanContent)
             .setTimestamp()
             .setFooter(client.user.username, client.user.displayAvatarURL())
-        channel.send(embed)
+        channel.send({embeds: [embed]})
     }
 }
