@@ -14,7 +14,7 @@ module.exports = class TranscriptCommand extends BaseCommand {
    * @param {Message} message 
    * @param {Array} args 
    */
-  run(client, message, args) {
+  async run(client, message, args) {
     if (args.length !== 1 && args.length !== 2) return;
     let [cmd, ...arg] = args.join(' ').trim().split(/\s+/)
     let ticket = new Ticket();
@@ -23,7 +23,7 @@ module.exports = class TranscriptCommand extends BaseCommand {
     } else if (cmd === "close") {
       ticket.closeTicket(message);
     } else if (cmd === "add") {
-      ticket.addPersonTicket(message, arg)
+      await ticket.addPersonTicket(message, arg)
     } else if (cmd === "create") {
       ticket.createTicket(msg)
     }

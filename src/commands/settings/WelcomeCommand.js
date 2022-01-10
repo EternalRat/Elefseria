@@ -16,8 +16,8 @@ module.exports = class WelcomeCommand extends BaseCommand {
    */
   async run(client, msg, args) {
     let existing = await channels.findOne({guildId: msg.guild.id})
-    let guildId = msg.guild.id
-    let channelWelcId = msg.mentions.channels.first().id
+    let guildId = msg.guild.id;
+    let channelWelcId = msg.mentions.channels.first() ? msg.mentions.channels.first().id : args[0];
     if (!channelWelcId) return;
     if (!existing) {
       let newWc = new channels({
@@ -29,8 +29,8 @@ module.exports = class WelcomeCommand extends BaseCommand {
       return msg.channel.send("The welcome channel has been successfully configured")
     }
     await msg.channel.send("Do you want to change the channel ? Type yes or no");
-    const response = await msg.channel.awaitMessages(m => m.author.id === msg.author.id,
-      {max: 1, time: 30000, errors: ['time'] });
+    const filter = (m) => m.author.id === msg.author.id;
+		const response = await msg.channel.awaitMessages({ filter, max: 1, time: 30_000, errors: ['time'] });
     if (response.first().content === "yes") {
       existing.set("channelWelcId", channelWelcId)
       existing.save().catch(err=>console.log(err))

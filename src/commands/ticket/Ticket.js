@@ -10,12 +10,9 @@ module.exports = class Ticket {
      * @param {Message} msg 
      */
     closeTicket(msg) {
-        msg.channel.overwritePermissions([
-            {
-                id: msg.guild.id,
-                deny: ["VIEW_CHANNEL"]
-            }
-        ])
+        msg.channel.permissionOverwrites.edit(msg.guild.id, {
+                "VIEW_CHANNEL": false
+        });
     }
 
     /**
@@ -40,13 +37,15 @@ module.exports = class Ticket {
     /**
      * 
      * @param {Message} msg 
+     * @param {Array<String>} args
      */
-    addPersonTicket(msg, args) {
-        let member = msg.guild.member(msg.mentions.users.first()) || msg.guild.member(args[0])
-
+    async addPersonTicket(msg, args) {
+        console.log("test", args);
+        let member = (await msg.guild.members.fetch(msg.mentions.users.first())) || msg.guild.members.cache.find(m => m.id === args[0])
+        console.log("test", member);
         if (!member) return;
-        msg.channel.updateOverwrite(member, {
+        msg.channel.permissionOverwrites.edit(member, {
             VIEW_CHANNEL: true
-        })
+        });
     }
 }
