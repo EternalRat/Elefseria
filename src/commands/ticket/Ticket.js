@@ -33,13 +33,6 @@ module.exports = class Ticket {
         newTranscript.doTranscript(this.msg.channel.messages).then(() => newTranscript.createFile());
     }
 
-    /**TODO
-     * A FAIRE
-     */
-    createTicket() {
-
-    }
-
     /**
      * 
      * @param {Array<String>} args 
@@ -50,6 +43,19 @@ module.exports = class Ticket {
         if (!member) return;
         this.msg.channel.updateOverwrite(member, {
             VIEW_CHANNEL: true
+        })
+    }
+
+    /**
+     * 
+     * @param {Array<String>} args 
+     */
+    removePersonTicket(args) {
+        let member = this.msg.guild.member(this.msg.mentions.users.first()) || this.msg.guild.member(args[0])
+
+        if (!member) return;
+        this.msg.channel.updateOverwrite(member, {
+            VIEW_CHANNEL: false
         })
     }
 }

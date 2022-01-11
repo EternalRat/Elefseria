@@ -24,8 +24,8 @@ module.exports = class TicketCommand extends BaseCommand {
       ticket.closeTicket();
     } else if (cmd === "add") {
       ticket.addPersonTicket(arg)
-    } else if (cmd === "create") {
-      ticket.createTicket()
+    } else if (cmd === "remove") {
+      ticket.removePersonTicket(arg);
     }
   }
 }
