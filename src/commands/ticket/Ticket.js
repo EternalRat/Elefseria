@@ -41,7 +41,7 @@ module.exports = class Ticket {
         let member = this.msg.guild.member(this.msg.mentions.users.first()) || this.msg.guild.member(args[0])
 
         if (!member) return;
-        this.msg.channel.updateOverwrite(member, {
+        this.msg.channel.permissionOverwrites.edit(member, {
             VIEW_CHANNEL: true
         })
     }
@@ -54,7 +54,7 @@ module.exports = class Ticket {
         let member = this.msg.guild.member(this.msg.mentions.users.first()) || this.msg.guild.member(args[0])
 
         if (!member) return;
-        this.msg.channel.updateOverwrite(member, {
+        this.msg.channel.permissionOverwrites.edit(member, {
             VIEW_CHANNEL: false
         })
     }
