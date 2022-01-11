@@ -43,7 +43,7 @@ module.exports = class ManageTicketCommand extends BaseCommand {
         .setAuthor(message.author.username, message.author.displayAvatarURL())
         .setThumbnail(message.guild.iconURL())
         .setTimestamp();
-      message.guild.channels.cache.get(response.channelId).send(ticketEmbed).then(msg => {
+      message.guild.channels.cache.get(response.channelId).send({embeds: [ticketEmbed]}).then(msg => {
         newChannel.set("messageId", msg.id);
         msg.react("📩")
         newChannel.save();
@@ -64,8 +64,8 @@ async function getResponses(message) {
 
   for (let i = 0; i < prompts.length; i++) {
       await message.channel.send(prompts[i]);
-      const response = await message.channel.awaitMessages(m => m.author.id === message.author.id,
-          {max: 1, time: 600000, errors: ['time'] });
+      const filter = (m) => m.author.id === message.author.id;
+      const response = await message.channel.awaitMessages({ filter, max: 1, time: 30_000, errors: ['time'] });
       const { content } = response.first();
       if (i === 0)
         if (message.guild.channels.cache.has(content))
