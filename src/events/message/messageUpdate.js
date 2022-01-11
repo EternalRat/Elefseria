@@ -15,9 +15,8 @@ module.exports = class MessageupdateEvent extends BaseEvent {
     async run (client, oldMsg, newMsg) {
         if (!newMsg) return;
         if (!newMsg.author) return;
-        if (newMsg.channel.type !== "text" || newMsg.cleanContent === oldMsg.cleanContent) return;
-        if (newMsg.cleanContent.length > 1024 || oldMsg.cleanContent.length > 1024) return;
-        if (!newMsg.guild.iconURL()) return;
+        if (newMsg.channel.type !== "GUILD_TEXT" || newMsg.cleanContent === oldMsg.cleanContent) return;
+        if (newMsg.cleanContent.length > 1024 || (oldMsg.cleanContent && oldMsg.cleanContent.length > 1024)) return;
         let channel = newMsg.guild.channels.cache.find(ch => ch.name === "msgs-logs");
         if (!channel) return;
         const embed = new MessageEmbed()
@@ -26,13 +25,13 @@ module.exports = class MessageupdateEvent extends BaseEvent {
             .setThumbnail(newMsg.guild.iconURL())
             .addFields({
                 name:"Old message:",
-                value:oldMsg.cleanContent
+                value:oldMsg.cleanContent ? oldMsg.cleanContent : "Couldn't retrieve the old message."
             }, {
                 name:"New message:",
                 value:newMsg.cleanContent
             })
             .setTimestamp()
             .setFooter(client.user.username, client.user.displayAvatarURL())
-        channel.send(embed);
+        channel.send({embeds: [embed]});
     }
 }

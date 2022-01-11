@@ -52,8 +52,8 @@ async function create_giveaway(client, args, message) {
 					Winners: ${response.winners}
 					Hosted by: ${message.guild.members.cache.get(response.HostId)}`
 				)
-				.setFooter(`Ends at • ${moment.parseZone(new Date(Date.now() + ms(response.duration) + ms("1h"))).format("dddd Do MMMM in YYYY, HH:mm:ss")}`)
-			const giveawayMsg = await message.guild.channels.cache.get(channel.id).send("<@&818143833308266536>\n🎉 **GIVEAWAY** 🎉", giveawayEmbed)
+				.setFooter(`Ends at • ${moment.parseZone(new Date(Date.now() + ms(response.duration))).format("dddd Do MMMM in YYYY, HH:mm:ss")}`)
+			const giveawayMsg = await message.guild.channels.cache.get(channel.id).send({content: "🎉 **GIVEAWAY** 🎉", embeds: [giveawayEmbed]})
 			await giveawayMsg.react('🎉');
 			response.messageId = giveawayMsg.id;
 			response.guildId = giveawayMsg.guild.id;

@@ -55,12 +55,12 @@ async function getResponses(message) {
 
   for (let i = 0; i < questions.length; i++) {
       await message.channel.send(questions[i]);
-      const response = await message.channel.awaitMessages(m => m.author.id === message.author.id,
-          {max: 1, time: 600000, errors: ['time'] });
+      const filter = (m) => m.author.id === message.author.id;
+      const response = await message.channel.awaitMessages({ filter, max: 1, time: 30_000, errors: ['time'] });
       const { content } = response.first();
       if (i === 0)
         if (validType.includes(content.toLowerCase()))
-          responses.type = content;
+          responses.type = content.toLowerCase();
         else {
           message.channel.send("Entrée invalide pour le type de salon")
           return null;

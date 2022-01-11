@@ -15,9 +15,9 @@ module.exports = class GiveawaychannelCommand extends BaseCommand {
    * @param {Array} args 
    */
   async run(client, msg, args) {
-      let existing = await channels.findOne({guildId: msg.guild.id})
-      let guildId = msg.guild.id
-      let channelGBId = msg.mentions.channels.first().id
+      let existing = await channels.findOne({guildId: msg.guild.id});
+      let guildId = msg.guild.id;
+      let channelGBId = msg.mentions.channels.first() ? msg.mentions.channels.first().id : args[0];
       if (!channelGBId) return;
       if (!existing) {
         let newWc = new channels({
@@ -29,8 +29,8 @@ module.exports = class GiveawaychannelCommand extends BaseCommand {
         return msg.channel.send("The goodbye channel has been successfully configured")
       }
       await msg.channel.send("Do you want to change the channel ? Type yes or no");
-      const response = await msg.channel.awaitMessages(m => m.author.id === msg.author.id,
-        {max: 1, time: 30000, errors: ['time'] });
+      const filter = (m) => m.author.id === msg.author.id;
+		  const response = await msg.channel.awaitMessages({ filter, max: 1, time: 30_000, errors: ['time'] });
       if (response.first().content === "yes") {
         existing.set("channelGBId", channelGBId)
         existing.save().catch(err=>console.log(err))
