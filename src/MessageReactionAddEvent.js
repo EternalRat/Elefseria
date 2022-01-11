@@ -1,8 +1,8 @@
 // https://discord.js.org/#/docs/main/stable/class/Client?scrollTo=e-messageReactionAdd
 const { Client, MessageReaction, User, MessageEmbed } = require('discord.js');
-const BaseEvent = require('../../utils/structures/BaseEvent');
-const ticketChannel = require("../../utils/database/models/ticket");
-const TranscriptTicket = require('../../utils/transcriptTicket');
+const BaseEvent = require('./utils/structures/BaseEvent');
+const ticketChannel = require("./utils/database/models/ticket");
+const TranscriptTicket = require('./utils/transcriptTicket');
 
 module.exports = class MessageReactionAddEvent extends BaseEvent {
 	constructor() {
