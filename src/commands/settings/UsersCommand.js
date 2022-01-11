@@ -1,6 +1,6 @@
 const BaseCommand = require('../../utils/structures/BaseCommand');
 const UsersChannel = require("../../utils/database/models/userscount");
-const { Client, Message } = require('discord.js');
+const { Client, Message, Guild, TextChannel } = require('discord.js');
 const PermissionGuard = require('../../utils/PermissionGuard');
 
 module.exports = class UsersCommand extends BaseCommand {
@@ -23,13 +23,20 @@ module.exports = class UsersCommand extends BaseCommand {
   }
 }
 
+/**
+ * 
+ * @param {Array<String>} args 
+ * @param {Guild} guild 
+ * @param {TextChannel} channel 
+ * @param {Message} msg 
+ */
 async function create_giveaway(args, guild, channel, msg) {
   const chann = await UsersChannel.findOne({ guildId: guild.id })
   if (chann) {
     channel.send("The users channel has already been set")
   } else {
     let nbr = guild.memberCount
-    msg.guild.channels.create(`👨 Users count : ${nbr} 👨`, {type: "voice"}).then(ch => {
+    msg.guild.channels.create(`👨 Users count : ${nbr} 👨`, {type: "GUILD_VOICE"}).then(ch => {
       let dbChannel = new UsersChannel({
         guildId: guild.id,
         channelId: ch.id

@@ -14,7 +14,7 @@ module.exports = class TicketCommand extends BaseCommand {
    * @param {Message} message 
    * @param {Array} args 
    */
-  run(client, message, args) {
+  async run(client, message, args) {
     if (args.length !== 1 && args.length !== 2) return;
     let [cmd, ...arg] = args.join(' ').trim().split(/\s+/)
     let ticket = new Ticket(message);
@@ -23,9 +23,9 @@ module.exports = class TicketCommand extends BaseCommand {
     } else if (cmd === "close") {
       ticket.closeTicket();
     } else if (cmd === "add") {
-      ticket.addPersonTicket(arg)
+      await ticket.addPersonTicket(arg)
     } else if (cmd === "remove") {
-      ticket.removePersonTicket(arg);
+      await ticket.removePersonTicket(arg);
     }
   }
 }

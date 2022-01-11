@@ -65,7 +65,7 @@ async function getResponses(message) {
   for (let i = 0; i < prompts.length; i++) {
       await message.channel.send(prompts[i]);
       const filter = (m) => m.author.id === message.author.id;
-      const response = await message.channel.awaitMessages({ filter, max: 1, time: 30_000, errors: ['time'] });
+		  const response = await message.channel.awaitMessages({ filter, max: 1, time: 30_000, errors: ['time'] });
       const { content } = response.first();
       if (i === 0)
         if (message.guild.channels.cache.has(content))

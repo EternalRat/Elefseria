@@ -47,7 +47,6 @@ module.exports = class TranscriptTicket {
      * Create the html file
      */
     createFile() {
-        console.log(this.content);
         var html_content = `<!DOCTYPE html>
 <html>
     <head>

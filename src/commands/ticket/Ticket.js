@@ -3,24 +3,18 @@ const TranscriptTicket = require('../../utils/transcriptTicket');
 
 module.exports = class Ticket {
 
-    /**
-     * 
-     * @param {Message} msg 
-     */
     constructor(msg){
         this.msg = msg;
     }
 
     /**
      * 
+     * @param {Message} msg 
      */
     closeTicket() {
-        this.msg.channel.overwritePermissions([
-            {
-                id: this.msg.guild.id,
-                deny: ["VIEW_CHANNEL"]
-            }
-        ])
+        this.msg.channel.permissionOverwrites.edit(this.msg.guild.id, {
+                "VIEW_CHANNEL": false
+        });
     }
 
     /**
@@ -37,25 +31,25 @@ module.exports = class Ticket {
      * 
      * @param {Array<String>} args 
      */
-    addPersonTicket(args) {
-        let member = this.msg.guild.member(this.msg.mentions.users.first()) || this.msg.guild.member(args[0])
-
-        if (!member) return;
-        this.msg.channel.permissionOverwrites.edit(member, {
-            VIEW_CHANNEL: true
-        })
-    }
-
-    /**
-     * 
-     * @param {Array<String>} args 
-     */
-    removePersonTicket(args) {
-        let member = this.msg.guild.member(this.msg.mentions.users.first()) || this.msg.guild.member(args[0])
+    async removePersonTicket(args) {
+        let member = (await msg.guild.members.fetch(msg.mentions.users.first())) || msg.guild.members.cache.find(m => m.id === args[0])
 
         if (!member) return;
         this.msg.channel.permissionOverwrites.edit(member, {
             VIEW_CHANNEL: false
         })
+    }
+  
+    /*
+     * @param {Message} msg 
+     * @param {Array<String>} args
+     */
+    async addPersonTicket(args) {
+        let member = (await this.msg.guild.members.fetch(this.msg.mentions.users.first())) || this.msg.guild.members.cache.find(m => m.id === args[0])
+
+        if (!member) return;
+        this.msg.channel.permissionOverwrites.edit(member, {
+            VIEW_CHANNEL: true
+        });
     }
 }
