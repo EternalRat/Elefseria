@@ -25,7 +25,7 @@ module.exports = class WoiceStateUpdateEvent extends BaseEvent {
         Son ID : ${newState.member.user.id}`)
         .setColor("BLUE")
         .setTimestamp()
-      channelAudio.send(voiceEmbed)
+      channelAudio.send({embeds: [voiceEmbed]});
       return;
     }
     if (oldState.channel) {
@@ -36,7 +36,7 @@ module.exports = class WoiceStateUpdateEvent extends BaseEvent {
       Son ID : ${oldState.member.user.id}`)
         .setColor("RED")
         .setTimestamp()
-      channelAudio.send(voiceEmbed)
+      channelAudio.send({embeds: [voiceEmbed]})
     }
   }
 }

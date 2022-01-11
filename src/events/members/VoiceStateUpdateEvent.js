@@ -22,7 +22,7 @@ module.exports = class WoiceStateUpdateEvent extends BaseEvent {
       if (newState.channel.id === channelAudio.get("normalChannelId")) {
         let memberName = newState.member.user.username;
         newState.guild.channels.create(`${memberName}`, {
-          type: "voice",
+          type: "GUILD_VOICE",
           parent: newState.channel.parent
         }).then(channel => {
           client.voiceChannel.set(channel.id, newState.member.user.id)
@@ -32,65 +32,33 @@ module.exports = class WoiceStateUpdateEvent extends BaseEvent {
         if (!newState.member.roles.cache.find(r => r.id === "780779857276567563" || r.permissions.has("MANAGE_CHANNELS"))) return newState.setChannel(null);
         let memberName = newState.member.user.username;
         newState.guild.channels.create(`${memberName}`, {
-          type: "voice",
+          type: "GUILD_VOICE",
           parent: newState.channel.parent
         }).then(channel => {
-          channel.updateOverwrite(oldState.member.user.id, {
+          channel.permissionOverwrites.edit(oldState.member.user.id, {
             MUTE_MEMBERS: true,
             VIEW_CHANNEL: true,
             CONNECT: true,
             MOVE_MEMBERS: true
-          })
-          channel.updateOverwrite("715292370358370366", {
-            VIEW_CHANNEL: true,
-            CONNECT: true
-          })
-          channel.updateOverwrite("780779857276567563", {
-            CONNECT: false
-          })
-          channel.updateOverwrite("715328266595991552", {
-            CONNECT: false
-          })
-          channel.updateOverwrite("715292381393715281", {
-            CONNECT: false
-          })
-          channel.updateOverwrite(client.user.id, {
+          });
+          channel.permissionOverwrites.edit(client.user.id, {
             MANAGE_CHANNELS: true,
             VIEW_CHANNEL: true,
             CONNECT: true,
             MOVE_MEMBERS: true
-          })
+          });
           newState.guild.channels.create(`Waiting room for ${memberName}`, {
             type: "voice",
             parent: newState.channel.parent
           }).then(ch => {
-            ch.updateOverwrite(oldState.member.user.id, {
+            ch.permissionOverwrites.edit(oldState.member.user.id, {
               MOVE_MEMBERS: true
-            })
-            ch.updateOverwrite("715292370358370366", {
-              VIEW_CHANNEL: true,
-              CONNECT: true
-            })
-            ch.updateOverwrite("780779857276567563", {
-              CONNECT: true,
-              SPEAK: false,
-              CREATE_INSTANT_INVITE: false
-            })
-            ch.updateOverwrite("715328266595991552", {
-              CONNECT: true,
-              SPEAK: false,
-              CREATE_INSTANT_INVITE: false
-            })
-            ch.updateOverwrite("715292381393715281", {
-              CONNECT: true,
-              SPEAK: false,
-              CREATE_INSTANT_INVITE: false
-            })
-            ch.updateOverwrite(client.user.id, {
+            });
+            ch.permissionOverwrites.edit(client.user.id, {
               MANAGE_CHANNELS: true,
               CONNECT: true,
               MOVE_MEMBERS: true
-            })
+            });
             client.premiumChannel.set(channel.id, {userId: oldState.member.user.id, waitRoom: ch.id});
           })
           newState.setChannel(channel);
