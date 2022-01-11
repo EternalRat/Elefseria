@@ -18,7 +18,7 @@ module.exports = class WarnCommand extends BaseCommand {
      * @param {Array} args 
      */
     async run(client, msg, args) {
-        let target = msg.guild.member(msg.mentions.users.first()) || msg.guild.members.cache.get(args[0]);
+        let target = (await msg.guild.members.fetch(msg.mentions.users.first())) || msg.guild.members.cache.find(m => m.id === args[0]);
         var embedColor = '#ffffff';
         var missingArgsEmbed = new MessageEmbed()
             .setColor(embedColor)
@@ -26,8 +26,8 @@ module.exports = class WarnCommand extends BaseCommand {
             .setTitle("Missing arguments")
             .setDescription(`Usage: \`${process.env.DISCORD_BOT_PREFIX}${this.name} ${this.usage}\``)
             .setTimestamp();
-        if (!target) return msg.channel.send(missingArgsEmbed);
-        if (msg.guild.member(msg.author).roles.highest.position <= target.roles.highest.position) return msg.channel.send("You can't warn this user");
+        if (!target) return msg.channel.send({embeds: [missingArgsEmbed]});
+        if (msg.guild.members.cache.get(msg.author.id).roles.highest.position <= target.roles.highest.position) return msg.channel.send("You can't warn this user");
         let wReason = new Map();
         let user = await WarnModel.findOne({ userId: target.id, guildId: msg.guild.id });
         let oldUser = await OldWarnModel.findOne({ userId: target.id, guildId: msg.guild.id });
@@ -67,7 +67,7 @@ module.exports = class WarnCommand extends BaseCommand {
                 .setTitle("You've been warned !")
                 .setAuthor(msg.author.username, msg.author.avatarURL())
                 .setDescription(`Reason :\n\`\`\`${args.slice(1).join(' ')}\`\`\``)
-            target.send(warnE)
+            target.send({embeds: [warnE]})
             return;
         }
         saveDB(user, args, msg, Count)
@@ -77,7 +77,7 @@ module.exports = class WarnCommand extends BaseCommand {
             .setTitle("You've been warned !")
             .setAuthor(msg.author.username, msg.author.avatarURL())
             .setDescription(`Reason :\n\`\`\`${args.slice(1).join(' ')}\`\`\``)
-        target.send(warnE)
+        target.send({embeds: [warnE]})
     }
 }
 

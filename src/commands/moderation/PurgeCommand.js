@@ -14,17 +14,17 @@ module.exports = class PurgeCommand extends BaseCommand {
 	 * @param {Array} args 
 	 */
 	async run(client, msg, args) {
-		const user = msg.mentions.users.first() || msg.guild.member(args[0]);
+		const user = msg.mentions.users.first() || msg.guild.members.cache.find(m => m.id === args[0]);
 		let amount = !!parseInt(args[0]) ? parseInt(args[0]) + 1 : parseInt(args[1]) + 1
 		if (!amount) return amount = 20
 		msg.channel.messages.fetch({
 		limit: amount,
 		}).then((messages) => {
-				if (user) {
-						const filterBy = user ? user.id : client.user.id;
-						messages = messages.filter(m => m.author.id === filterBy).array().slice(0, amount);
-				}
-				msg.channel.bulkDelete(messages).catch(error => console.log(error.stack));
+			if (user) {
+				const filterBy = user ? user.id : client.user.id;
+				messages = messages.filter(m => m.author.id === filterBy).array().slice(0, amount);
+			}
+			msg.channel.bulkDelete(messages).catch(error => console.log(error.stack));
 		});
 	}
 }

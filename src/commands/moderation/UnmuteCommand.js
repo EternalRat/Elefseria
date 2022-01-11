@@ -23,8 +23,8 @@ module.exports = class UnmuteCommand extends BaseCommand {
       .setTitle("Missing arguments")
       .setDescription(`Usage: \`${process.env.DISCORD_BOT_PREFIX}${this.name} ${this.usage}\``)
       .setTimestamp();
-    let toMute = msg.guild.member(msg.mentions.users.first()) || msg.guild.members.cache.get(args[0]);
-    if (!toMute) return msg.channel.send(missingArgsEmbed);
+    let toMute = (await msg.guild.members.fetch(msg.mentions.users.first())) || msg.guild.members.cache.find(m => m.id === args[0]);
+    if (!toMute) return msg.channel.send({embeds: [missingArgsEmbed]});
     msg.delete().catch();
     let role = msg.guild.roles.cache.find(r => r.name === "Muted");
     if (!role || !toMute.roles.cache.has(role.id)) return msg.channel.send("Done!");

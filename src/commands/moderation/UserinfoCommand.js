@@ -14,8 +14,8 @@ module.exports = class UserinfoCommand extends BaseCommand {
    * @param {Message} msg 
    * @param {Array} args 
    */
-  run(client, msg, args) {
-    const target = msg.guild.member(msg.mentions.users.first()) || msg.guild.member(args[0]) || msg.guild.member(msg.author)
+  async run(client, msg, args) {
+    const target = (await msg.guild.members.fetch(msg.mentions.users.first())) || msg.guild.members.cache.find(m => m.id === args[0]);
     let userInfo = new MessageEmbed()
         .setColor("RANDOM")
         .setTitle("Information about an user")
@@ -24,11 +24,11 @@ module.exports = class UserinfoCommand extends BaseCommand {
         .addField("ID:", `${target.user.id}`, true)
         .addField("Account creation date:", parseZone(target.user.createdAt).format("dddd Do MMMM in YYYY, HH:mm:ss"))
         .addField("Joined the:", parseZone(target.joinedAt).format("dddd Do MMMM in YYYY, HH:mm:ss"))
-        .addField("Status:", target.user.presence.activities[0] ? target.user.presence.activities[0].state : "Any custom status set")
+        .addField("Status:", target.presence ? target.presence.activities[0].state : "Any custom status set")
         .addField("Roles:", target.roles.cache.map(r => r.name).join(', '), true)
         .addField("Bot?!", `${target.user.bot}`, true)
         .setFooter(`Copyright - ${client.user.username}`, client.user.displayAvatarURL() + '?size=2048')
-    msg.channel.send(userInfo)
+    msg.channel.send({embeds: [userInfo]})
 
   }
 }

@@ -37,11 +37,16 @@ module.exports = class TopwarnsCommand extends BaseCommand {
     else if (choice === "old")
       topWarn(msg, oldTop10)
     else
-      msg.channel.send(missingArgsEmbed)
+      msg.channel.send({embeds: [missingArgsEmbed]})
   }
 }
 
-async function topWarn(msg = Message, top10 = Document)
+/**
+ * 
+ * @param {Message} msg 
+ * @param {Document} top10 
+ */
+async function topWarn(msg, top10)
 {
     let info = '# - Warns - User\n'
     let i = 0
@@ -59,5 +64,5 @@ async function topWarn(msg = Message, top10 = Document)
         }
     })
     embed.setDescription(`\`\`\`${info}\`\`\``)
-    msg.channel.send(embed)
+    msg.channel.send({embeds: [embed]})
 }
