@@ -1,5 +1,6 @@
 const BaseEvent = require('../../utils/structures/BaseEvent');
 const { Client, Message } = require('discord.js');
+const BaseModule = require('../../utils/structures/BaseModule');
 
 module.exports = class MessageEvent extends BaseEvent {
 	constructor() {
@@ -15,15 +16,15 @@ module.exports = class MessageEvent extends BaseEvent {
 		if (message.author.bot) return;
 		if (message.content.startsWith(client.prefix)) {
 			const [cmdName, ...cmdArgs] = message.content.slice(client.prefix.length).trim().split(/\s+/);
-			for (var module of client.modules) {
-				if (!module.isAModuleCommand(cmdName))
+			for (var mod of client.modules) {
+				if (!mod.isAModuleCommand(cmdName))
 					continue;
-				let isThisModuleEnabled = await module.isThisModuleEnabled(message.guild.id);
+				let isThisModuleEnabled = await mod.isThisModuleEnabled(message.guild.id);
 				if (!isThisModuleEnabled) {
-					message.channel.send(`Le module \`${module.name}\` n'est pas activé !`);
+					message.channel.send(`Le module \`${mod.name}\` n'est pas activé !`);
 					return;
 				}
-				module.runCommand(cmdName, client, message, cmdArgs);
+				mod.runCommand(cmdName, client, message, cmdArgs);
 				return;
 			}
 		}

@@ -39,7 +39,7 @@ module.exports = class ConfigCommand extends BaseCommand {
         })
         .setAuthor(message.author.username, message.author.avatarURL())
         .setThumbnail(message.guild.iconURL())
-      return message.channel.send(embed)
+      return message.channel.send({embeds: [embed]})
     }
     if (args.length != 2) return message.channel.send("Specify raidmode/blacklist/time/people and another args.")
     let param = args[0]
