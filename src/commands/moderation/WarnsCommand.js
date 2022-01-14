@@ -2,7 +2,7 @@ const { Seewarn } = require('../../utils/seewarn');
 require('dotenv').config();
 const PermissionGuard = require('../../utils/PermissionGuard');
 const BaseCommand = require('../../utils/structures/BaseCommand');
-const WarnModel = require("../../utils/database/models/warnmodel")
+const WarnModel = require("../../utils/database/models/warn")
 const OldWarnModel = require("../../utils/database/models/oldwarnmodel")
 const { MessageEmbed, Message, Client } = require("discord.js")
 
