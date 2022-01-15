@@ -8,7 +8,8 @@ const moduleConfig = new mongoose.Schema({
 	securityState: {type: Boolean},
 	settingsState: {type: Boolean},
 	ticketState: {type: Boolean},
-	voiceState: {type: Boolean}
+	voiceState: {type: Boolean},
+	levelingState: {type: Boolean}
 })
 
 const ModuleConfig = module.exports = mongoose.model("moduleconfig", moduleConfig);

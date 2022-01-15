@@ -18,8 +18,7 @@ module.exports = class OldwarnsCommand extends BaseCommand {
 	 * @param {Array} args 
 	 */
 	async run(client, msg, args) {
-		let target = msg.guild.member(msg.mentions.users.first()) || msg.guild.members.cache.get(args[0]);
-		var embedColor = '#ffffff';
+		let target = await msg.guild.members.fetch(msg.mentions.users.first() || args[0]);		var embedColor = '#ffffff';
 		var missingArgsEmbed = new MessageEmbed()
 				.setColor(embedColor)
 				.setAuthor(msg.author.username, msg.author.avatarURL())

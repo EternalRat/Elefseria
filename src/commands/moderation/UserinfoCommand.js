@@ -15,7 +15,7 @@ module.exports = class UserinfoCommand extends BaseCommand {
    * @param {Array} args 
    */
   async run(client, msg, args) {
-    const target = (await msg.guild.members.fetch(msg.mentions.users.first())) || msg.guild.members.cache.find(m => m.id === args[0]);
+		let target = await msg.guild.members.fetch(msg.mentions.users.first() || args[0]);		var embedColor = '#ffffff';
     let userInfo = new MessageEmbed()
         .setColor("RANDOM")
         .setTitle("Information about an user")

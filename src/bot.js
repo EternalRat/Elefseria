@@ -2,6 +2,7 @@ require('dotenv').config();
 const { Client, Intents } = require('discord.js');
 const FunModule = require('./modules/FunModule');
 const GiveawayModule = require('./modules/GiveawayModule');
+const LevelingModule = require('./modules/LevelingModule');
 const ModerationModule = require('./modules/ModerationModule');
 const ReactionRoleModule = require('./modules/ReactionRoleModule');
 const SecurityModule = require('./modules/SecurityModule');
@@ -15,17 +16,27 @@ const client = new Client({
 		Intents.FLAGS.GUILD_MESSAGES,
 		Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
 		Intents.FLAGS.GUILD_MEMBERS,
-		Intents.FLAGS.GUILD_VOICE_STATES
+		Intents.FLAGS.GUILD_VOICE_STATES,
+		Intents.FLAGS.GUILD_BANS
 	], partials: [
 		"GUILD_MEMBER",
 		"USER",
 		"MESSAGE",
-		"REACTION"
-	]
+		"REACTION",
+		"CHANNEL"
+	],
+	allowedMentions: {
+		parse: [
+			'users',
+			'roles',
+			'everyone'
+		],
+		repliedUser: true
+	}
 });
 
 (async () => {
-	const paths = new Array("fun", "giveaway", "moderation", "reactionrole", "security", "settings", "ticket", "voice");
+	const paths = new Array("fun", "giveaway", "moderation", "reactionrole", "security", "settings", "ticket", "voice", "leveling");
 	client.modules = new Set([
 		new FunModule(),
 		new GiveawayModule(),
@@ -34,7 +45,8 @@ const client = new Client({
 		new SecurityModule(),
 		new SettingsModule(),
 		new TicketModule(),
-		new VoiceModule()
+		new VoiceModule(),
+		new LevelingModule()
 	]);
 	client.mutes = require("./utils/json/mute.json");
 	client.cachedMessageReactions = new Map();

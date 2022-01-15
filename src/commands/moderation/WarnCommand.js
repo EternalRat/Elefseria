@@ -18,7 +18,7 @@ module.exports = class WarnCommand extends BaseCommand {
      * @param {Array} args 
      */
     async run(client, msg, args) {
-        let target = (await msg.guild.members.fetch(msg.mentions.users.first())) || msg.guild.members.cache.find(m => m.id === args[0]);
+		let target = await msg.guild.members.fetch(msg.mentions.users.first() || args[0]);		var embedColor = '#ffffff';
         var embedColor = '#ffffff';
         var missingArgsEmbed = new MessageEmbed()
             .setColor(embedColor)
