@@ -1,7 +1,7 @@
 require('dotenv').config();
 const PermissionGuard = require('../../utils/PermissionGuard');
 const BaseCommand = require('../../utils/structures/BaseCommand');
-const WarnModel = require("../../utils/database/models/warnmodel")
+const WarnModel = require("../../utils/database/models/warn")
 const OldWarnModel = require("../../utils/database/models/oldwarnmodel")
 const NbrWarnModel = require("../../utils/database/models/nbrwarn")
 const { MessageEmbed, Client, Message } = require("discord.js");
@@ -18,7 +18,7 @@ module.exports = class WarnCommand extends BaseCommand {
      * @param {Array} args 
      */
     async run(client, msg, args) {
-        let target = (await msg.guild.members.fetch(msg.mentions.users.first())) || msg.guild.members.cache.find(m => m.id === args[0]);
+		let target = await msg.guild.members.fetch(msg.mentions.users.first() || args[0]);		var embedColor = '#ffffff';
         var embedColor = '#ffffff';
         var missingArgsEmbed = new MessageEmbed()
             .setColor(embedColor)

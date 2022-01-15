@@ -25,7 +25,7 @@ module.exports = class BanCommand extends BaseCommand {
 			.setTimestamp();
 		let pattern = /[0-9]{18}/
 		if (msg.mentions.users.first() || msg.guild.members.cache.find(m => m.id === args[0])) {
-			let bUser = (await msg.guild.members.fetch(msg.mentions.users.first())) || msg.guild.members.cache.find(m => m.id === args[0])
+			let bUser = await msg.guild.members.fetch(msg.mentions.users.first() || args[0]);
 			if (msg.guild.members.cache.get(msg.author.id).roles.highest.position <= bUser.roles.highest.position) return msg.channel.send("That person can't be banned!");
 			let bReason = args.slice(1).join(" ");
 			if (!bReason) return msg.channel.send({embeds: [missingArgsEmbed]})

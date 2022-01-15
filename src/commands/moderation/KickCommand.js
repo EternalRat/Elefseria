@@ -23,7 +23,7 @@ module.exports = class KickCommand extends BaseCommand {
 				.setTitle("Missing arguments")
 				.setDescription(`Usage: \`${process.env.DISCORD_BOT_PREFIX}${this.name} ${this.usage}\``)
 				.setTimestamp();
-		let kUser = (await msg.guild.members.fetch(msg.mentions.users.first())) || msg.guild.members.cache.find(m => m.id === args[0])
+		let kUser = await msg.guild.members.fetch(msg.mentions.users.first() || args[0]);
 		if (!kUser) return msg.channel.send({embeds: [missingArgsEmbed]});
 		if (msg.guild.members.cache.get(msg.author.id).roles.highest.position <= kUser.roles.highest.position) return msg.channel.send("You can't kick this member");
 		msg.delete().catch();
