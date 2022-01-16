@@ -3,7 +3,6 @@ const {MessageEmbed, GuildMember, Client} = require("discord.js")
 const UsersChannel = require("../../utils/database/models/userscount");
 const channels = require("../../utils/database/models/channels");
 const warnmodel = require('../../utils/database/models/warn');
-const OldWarnModel = require("../../utils/database/models/oldwarnmodel");
 
 module.exports = class GuildMemberRemoveEvent extends BaseEvent {
   constructor() {
@@ -36,7 +35,6 @@ module.exports = class GuildMemberRemoveEvent extends BaseEvent {
     }
     let warned = await warnmodel.findOne({userId: member.user.id});
     if (warned) {
-      OldWarnModel.remove(warned);
       warnmodel.remove(warned);
     }
   }

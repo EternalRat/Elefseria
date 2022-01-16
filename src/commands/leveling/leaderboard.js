@@ -27,7 +27,7 @@ module.exports = class Leaderboard extends BaseCommand {
         const linkBtn = new MessageActionRow().addComponents(
             new MessageButton()
                 .setLabel("See the leaderboard")
-                .setURL(`https://localhost:3000/${msg.guild.id}`)
+                .setURL(`https://localhost:3000/leaderboard/${msg.guild.id}`)
                 .setStyle("LINK")
         );
         var desc = '';

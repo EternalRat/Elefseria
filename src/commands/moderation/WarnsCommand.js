@@ -3,7 +3,6 @@ require('dotenv').config();
 const PermissionGuard = require('../../utils/PermissionGuard');
 const BaseCommand = require('../../utils/structures/BaseCommand');
 const WarnModel = require("../../utils/database/models/warn")
-const OldWarnModel = require("../../utils/database/models/oldwarnmodel")
 const { MessageEmbed, Message, Client } = require("discord.js")
 
 module.exports = class WarnsCommand extends BaseCommand {
@@ -33,6 +32,6 @@ module.exports = class WarnsCommand extends BaseCommand {
         msg.channel.send(`There is any warn for ${target.user.tag}`);
         return;
     }
-    Seewarn(user, oldUser, msg, target, "Actual", "Old")
+    Seewarn(user, msg, target)
   }
 }

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 const moduleConfig = new mongoose.Schema({
-	guildId: {type: String},
+	guildId: {type: String, unique: true},
 	funState: {type: Boolean},
 	giveawayState: {type: Boolean},
 	moderationState: {type: Boolean},
@@ -12,4 +12,4 @@ const moduleConfig = new mongoose.Schema({
 	levelingState: {type: Boolean}
 })
 
-const ModuleConfig = module.exports = mongoose.model("moduleconfig", moduleConfig);
+module.exports = mongoose.model("moduleconfig", moduleConfig);

@@ -3,6 +3,7 @@ const db = require("../../utils/database/database");
 const { Client } = require('discord.js');
 const fs = require("fs")
 const ModuleConfig = require("../../utils/database/models/moduleconfig");
+const guildInvites = require('../../utils/database/models/guildInvites');
 
 module.exports = class ReadyEvent extends BaseEvent {
 	constructor() {
@@ -15,7 +16,34 @@ module.exports = class ReadyEvent extends BaseEvent {
 	 */
 	async run (client) {
 		console.log(client.user.tag + ' has logged in.');
-		client.user.setActivity("Elefseria On Top", { type: 'STREAMING' });
+		client.user.setPresence({ activities: [{ name: 'Elefseria On Top', type: 'STREAMING', url: "https://twitch.tv/eternalrat" }] });
+		(await client.guilds.fetch()).forEach(clientGuild => {
+			clientGuild.fetch().then(guild => {
+				guild.invites.fetch().then(async invites => {
+					const invMap = new Map();
+					invites.forEach((inv) => {
+						invMap.set(inv.code, {
+							userId: inv.inviter.id,
+							uses: inv.uses,
+							temp: inv.temporary,
+							expires: inv.temporary ? inv.expiresTimestamp : -1
+						});
+					});
+					const guildInvite = await guildInvites.findOneAndUpdate({
+						guildId: guild.id
+					}, {
+						invites: invMap
+					});
+					if (!guildInvite) {
+						guildInvite = await guildInvites.create({
+							guildId: guild.id,
+							invites: invMap
+						});
+					}
+					guildInvite.save();
+				});
+			});
+		});
 		setInterval(async () => {
 			for (let i in client.mutes) {
 				let isInfinite = client.mutes[i].infinite

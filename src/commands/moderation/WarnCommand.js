@@ -2,7 +2,6 @@ require('dotenv').config();
 const PermissionGuard = require('../../utils/PermissionGuard');
 const BaseCommand = require('../../utils/structures/BaseCommand');
 const WarnModel = require("../../utils/database/models/warn")
-const OldWarnModel = require("../../utils/database/models/oldwarnmodel")
 const NbrWarnModel = require("../../utils/database/models/nbrwarn")
 const { MessageEmbed, Client, Message } = require("discord.js");
 
@@ -30,7 +29,6 @@ module.exports = class WarnCommand extends BaseCommand {
         if (msg.guild.members.cache.get(msg.author.id).roles.highest.position <= target.roles.highest.position) return msg.channel.send("You can't warn this user");
         let wReason = new Map();
         let user = await WarnModel.findOne({ userId: target.id, guildId: msg.guild.id });
-        let oldUser = await OldWarnModel.findOne({ userId: target.id, guildId: msg.guild.id });
         let Count = await NbrWarnModel.findOne({ Id: client.user.id });
         if (!Count) {
             let newCount = new NbrWarnModel({
@@ -53,15 +51,7 @@ module.exports = class WarnCommand extends BaseCommand {
                 Reason: wReason,
                 userTag: [msg.author.tag]
             });
-            let oldwarn = new OldWarnModel({
-                userId: target.id,
-                guildId: msg.guild.id,
-                Count: 1,
-                Reason: wReason,
-                userTag: [msg.author.tag]
-            });
             warn.save().catch(err => console.log(err));
-            oldwarn.save().catch(err => console.log(err))
             msg.channel.send(`⚠️ Warned ${target.user.tag}`);
             const warnE = new MessageEmbed()
                 .setTitle("You've been warned !")
@@ -71,7 +61,6 @@ module.exports = class WarnCommand extends BaseCommand {
             return;
         }
         saveDB(user, args, msg, Count)
-        saveDB(oldUser, args, msg, Count)
         msg.channel.send(`⚠️ Warned ${target.user.tag}`);
         const warnE = new MessageEmbed()
             .setTitle("You've been warned !")
