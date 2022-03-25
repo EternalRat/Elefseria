@@ -13,7 +13,7 @@ module.exports = class InviteCreateEvent extends BaseEvent {
      * @param {Invite} inv
 	 */
 	async run (client, inv) {
-        const invMap = new Map();
+        let invMap = new Map();
         const guildInvite = await guildInvites.findOne({
             guildId: inv.guild.id
         });
@@ -22,9 +22,10 @@ module.exports = class InviteCreateEvent extends BaseEvent {
             userId: inv.inviter.id,
             uses: inv.uses,
             temp: inv.temporary,
-            expires: inv.temporary ? inv.expiresTimestamp : -1
+            expires: inv.maxAge > 0 ? inv.expiresTimestamp : -1
         });
         guildInvite.set("invites", invMap);
         guildInvite.save();
+        
 	}
 }

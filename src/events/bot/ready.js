@@ -4,6 +4,10 @@ const { Client } = require('discord.js');
 const fs = require("fs")
 const ModuleConfig = require("../../utils/database/models/moduleconfig");
 const guildInvites = require('../../utils/database/models/guildInvites');
+const channels = require('../../utils/database/models/channels');
+const config = require('../../utils/database/models/config');
+const moduleconfig = require('../../utils/database/models/moduleconfig');
+const guilds = require('../../utils/database/models/guilds');
 
 module.exports = class ReadyEvent extends BaseEvent {
 	constructor() {
@@ -14,11 +18,20 @@ module.exports = class ReadyEvent extends BaseEvent {
 	 * 
 	 * @param {Client} client 
 	 */
-	async run (client) {
+	async run(client) {
 		console.log(client.user.tag + ' has logged in.');
 		client.user.setPresence({ activities: [{ name: 'Elefseria On Top', type: 'STREAMING', url: "https://twitch.tv/eternalrat" }] });
 		(await client.guilds.fetch()).forEach(clientGuild => {
-			clientGuild.fetch().then(guild => {
+			clientGuild.fetch().then(async guild => {
+				try {
+					const g = await guilds.create({
+						guildName: guild.name,
+						guildId: guild.id,
+						guildIcon: guild.iconURL(),
+						userCount: (await guild.members.fetch()).size
+					});
+					g.save();
+				} catch(err) {}
 				guild.invites.fetch().then(async invites => {
 					const invMap = new Map();
 					invites.forEach((inv) => {
@@ -26,7 +39,7 @@ module.exports = class ReadyEvent extends BaseEvent {
 							userId: inv.inviter.id,
 							uses: inv.uses,
 							temp: inv.temporary,
-							expires: inv.temporary ? inv.expiresTimestamp : -1
+							expires: inv.maxAge > 0 ? inv.expiresTimestamp : -1
 						});
 					});
 					const guildInvite = await guildInvites.findOneAndUpdate({

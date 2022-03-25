@@ -3,7 +3,8 @@ const stats = new mongoose.Schema({
 	guildId: {type: String},
 	userId: {type: String},
 	invitesCount: {type: Number},
-	invitedUser: {type: Array},
+	fakeCount: {type: Number},
+	invitedUser: {type: Map},
 	numberOfMsgs: {type: Number}
 });
 

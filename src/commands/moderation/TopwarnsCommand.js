@@ -17,7 +17,7 @@ module.exports = class TopwarnsCommand extends BaseCommand {
    * @param {Array} args 
    */
   async run(client, msg, args) {
-    let Top10 = await WarnModel.find({ guildId: msg.guild.id }).sort({ Count: -1 }).limit(10);
+    let Top10 = await WarnModel.find({ guildId: msg.guild.id, active: true }).sort({ Count: -1 }).limit(10);
     if (!Top10) {
       msg.channel.send(`There is any warn in your server`);
       return;
@@ -33,27 +33,24 @@ module.exports = class TopwarnsCommand extends BaseCommand {
  */
 async function topWarn(msg, top10)
 {
-    let info = '# - Warns - User\n';
-    let i = 0;
-    const linkBtn = new MessageActionRow().addComponents(
-      new MessageButton()
-          .setLabel("See the leaderboard")
-          .setURL(`https://localhost:3000/warns/${msg.guild.id}`)
-          .setStyle("LINK")
+  let info = '# - Warns - User\n';
+  let i = 0;
+  const linkBtn = new MessageActionRow().addComponents(
+    new MessageButton()
+      .setLabel("See the leaderboard")
+      .setURL(`https://localhost:3000/warns/${msg.guild.id}`)
+      .setStyle("LINK")
   );
-    const embed = new MessageEmbed()
-        .setTitle("Ranked list of warnings")
-        .setTimestamp();
-    top10.forEach(user => {
-        if (user.get("Count") !== 0) {
-          if (!msg.guild.members.cache.get(user.get("userId"))) {
-            OldWarnModel.remove(user);
-            WarnModel.remove(user);
-          } else {
-            info += `#${++i}:\t${user.get("Count")} - ${msg.guild.members.cache.get(user.get("userId")).user.tag}\n`
-          }
-        }
-    });
-    embed.setDescription(`\`\`\`${info}\`\`\``);
-    msg.channel.send({embeds: [embed], components: [linkBtn]})
+  const embed = new MessageEmbed()
+    .setTitle("Ranked list of warnings")
+    .setTimestamp();
+  top10.forEach(user => {
+    if (user.get("count") !== 0) {
+      if (msg.guild.members.cache.get(user.get("userId"))) {
+        info += `#${++i}:\t${user.get("count")} - ${msg.guild.members.cache.get(user.get("userId")).user.tag}\n`
+      }
+    }
+  });
+  embed.setDescription(`\`\`\`${info}\`\`\``);
+  msg.channel.send({embeds: [embed], components: [linkBtn]})
 }

@@ -1,5 +1,5 @@
 const BaseCommand = require('../../utils/structures/BaseCommand');
-const UsersChannel = require("../../utils/database/models/userscount");
+const channels = require("../../utils/database/models/channels");
 const { Client, Message, Guild, TextChannel } = require('discord.js');
 const PermissionGuard = require('../../utils/PermissionGuard');
 
@@ -17,9 +17,9 @@ module.exports = class UsersCommand extends BaseCommand {
   run(client, msg, args) {
     if (args.length != 1) return;
     if (args[0] === "create")
-      create_giveaway(args, msg.guild, msg.channel, msg)
+      create(args.slice(1), msg.guild, msg.channel, msg)
     else if (args[0] === "remove")
-      remove_giveaway(args, msg.guild, msg.channel)
+      remove(args.slice(1), msg.guild, msg.channel)
   }
 }
 
@@ -30,30 +30,24 @@ module.exports = class UsersCommand extends BaseCommand {
  * @param {TextChannel} channel 
  * @param {Message} msg 
  */
-async function create_giveaway(args, guild, channel, msg) {
-  const chann = await UsersChannel.findOne({ guildId: guild.id })
+async function create(args, guild, channel, msg) {
+  const chann = await channels.findOne({ guildId: guild.id });
   if (chann) {
-    channel.send("The users channel has already been set")
+    channel.send("The users channel has already been set");
   } else {
-    let nbr = guild.memberCount
+    let nbr = guild.memberCount;
     msg.guild.channels.create(`👨 Users count : ${nbr} 👨`, {type: "GUILD_VOICE"}).then(ch => {
-      let dbChannel = new UsersChannel({
-        guildId: guild.id,
-        channelId: ch.id
-      })
-      dbChannel.save().catch(err => console.log(err))
-      msg.channel.send("The giveaway channel has been set.")
-    })
+      chann.set("countChannel", ch.id);
+      msg.channel.send("The giveaway channel has been set.");
+    });
   }
 }
 
-async function remove_giveaway(args, guild, channel) {
-  const ch = await UsersChannel.findOne({ guildId: guild.id })
+async function remove(args, guild, channel) {
+  const ch = await channels.findOne({ guildId: guild.id });
   if (!ch) return;
-  const chann = ch.get("channelId")
-  guild.channels.cache.get(chann).delete()
-  UsersChannel.deleteOne(ch, function(err) {
-    if (err) console.log(err)
-  })
-  channel.send("The channel has been removed.")
+  const chann = ch.get("countChannel");
+  guild.channels.cache.get(chann).delete();
+  ch.set("countChannel", undefined);
+  channel.send("The channel has been removed.");
 }

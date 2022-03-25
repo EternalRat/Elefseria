@@ -4,7 +4,7 @@ const guildInvites = require('../../utils/database/models/guildInvites');
 
 module.exports = class InviteCreateEvent extends BaseEvent {
 	constructor() {
-		super('inviteCreate');
+		super('inviteDelete');
 	}
 
 	/**
@@ -13,7 +13,7 @@ module.exports = class InviteCreateEvent extends BaseEvent {
      * @param {Invite} inv
 	 */
 	async run (client, inv) {
-        const invMap = new Map();
+        let invMap = new Map();
         const guildInvite = await guildInvites.findOne({
             guildId: inv.guild.id
         });

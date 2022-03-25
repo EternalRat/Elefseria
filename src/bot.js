@@ -17,7 +17,8 @@ const client = new Client({
 		Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
 		Intents.FLAGS.GUILD_MEMBERS,
 		Intents.FLAGS.GUILD_VOICE_STATES,
-		Intents.FLAGS.GUILD_BANS
+		Intents.FLAGS.GUILD_BANS,
+		Intents.FLAGS.GUILD_INVITES
 	], partials: [
 		"GUILD_MEMBER",
 		"USER",

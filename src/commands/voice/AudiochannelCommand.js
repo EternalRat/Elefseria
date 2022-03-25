@@ -1,7 +1,7 @@
 const BaseCommand = require('../../utils/structures/BaseCommand');
 const PermissionGuard = require('../../utils/PermissionGuard');
 const { Client, Message } = require('discord.js');
-const audiochannel = require('../../utils/database/models/audiochannel');
+const channel = require('../../utils/database/models/channels');
 const logger = require("consola").withTag("RepCommand.js")
 logger.level = 5;
 
@@ -26,15 +26,8 @@ module.exports = class AudiochannelCommand extends BaseCommand {
       const response = await getResponses(message)
       if (message.guild.channels.cache.find(ch => ch.id === response.channelId)) {
         logger.success("Channel found")
-        var newAudio = await audiochannel.findOne({guildId: message.guild.id})
-        if (!newAudio) {
-          newAudio = new audiochannel({
-            normalChannelId: "empty",
-            premiumChannelId: "empty",
-            guildId: message.guild.id
-          })
-        }
-        newAudio.set(`${response.type}ChannelId`, response.channelId);
+        var newAudio = await channel.findOne({guildId: message.guild.id});
+        newAudio.set(`${response.type}Voice`, response.channelId);
         newAudio.save();
         message.channel.send("Le salon a bien été définit.")
       }
