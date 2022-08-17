@@ -82,8 +82,11 @@ async function increaseCount(message) {
 		userStat = await statistiques.create({
 			guildId: message.guild.id,
 			userId: message.author.id,
-			invitesCount: 0,
-			invitedUser: [],
+			joinedCount: 0,
+			leftCount: 0,
+			fakeCount: 0,
+			bonusCount: 0,
+			invitedUser: new Map(),
 			numberOfMsgs: 0
 		});
 	}

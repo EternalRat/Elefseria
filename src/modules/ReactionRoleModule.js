@@ -38,7 +38,7 @@ module.exports = class ReactionRoleModule extends BaseModule {
 	 */
 	async isThisModuleEnabled(guildId) {
 		const moduleSettings = await ModuleConfig.findOne({ guildId: guildId });
-		return moduleSettings.get('roleReactionState');
+		return moduleSettings.get('reactionRoleState');
 	}
 
 	/**

@@ -1,4 +1,4 @@
-const { Client, VoiceState } = require('discord.js');
+const { Client, VoiceState, MessageEmbed } = require('discord.js');
 const channel = require('../utils/database/models/channels');
 
 module.exports = class Voice {
@@ -20,7 +20,7 @@ module.exports = class Voice {
 		if (this.newState.channel) {
 			this._createVoiceChannel(channelAudio);
 		}
-		if (oldState.channel) {
+		if (this.oldState.channel) {
 			this._deleteChannel();
 		}
 		this.logs(channelAudio);
@@ -92,7 +92,8 @@ module.exports = class Voice {
 		}
 	}
 
-	logs(channelAudio) {
+	async logs() {
+		let channelAudio = await channel.findOne({guildId: this.newState.guild.id});
 		let logVoice = this.oldState.guild.channels.cache.find(ch => ch.id === channelAudio.get("voiceLog"))
 		if (!logVoice) return;
 		if (this.newState.channel) {

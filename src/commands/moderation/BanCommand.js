@@ -19,20 +19,28 @@ module.exports = class BanCommand extends BaseCommand {
 		var embedColor = '#ffffff'
 		var missingArgsEmbed = new MessageEmbed() // Creates the embed thats sent if the command isnt run right
 			.setColor(embedColor)
-			.setAuthor(msg.author.username, msg.author.avatarURL())
+			.setAuthor({
+				name: msg.author.username, 
+				iconURL: msg.author.avatarURL()
+			})
 			.setTitle("Missing arguments")
 			.setDescription(`Usage: \`${process.env.DISCORD_BOT_PREFIX}${this.name} ${this.usage}\``)
 			.setTimestamp();
 		let pattern = /[0-9]{18}/
 		if (msg.mentions.users.first() || msg.guild.members.cache.find(m => m.id === args[0])) {
-			let bUser = await msg.guild.members.fetch(msg.mentions.users.first() || args[0]);
+			try {
+				var bUser = await msg.guild.members.fetch(msg.mentions.users.first() || args[0]);
+			} catch (err) {return msg.channel.send("Something went wrong");}
 			if (msg.guild.members.cache.get(msg.author.id).roles.highest.position <= bUser.roles.highest.position) return msg.channel.send("That person can't be banned!");
 			let bReason = args.slice(1).join(" ");
 			if (!bReason) return msg.channel.send({embeds: [missingArgsEmbed]})
 
 			const ban = new MessageEmbed()
 				.setTitle("You've been banned !")
-				.setAuthor(msg.author.username, msg.author.avatarURL())
+				.setAuthor({
+					name: msg.author.username, 
+					iconURL: msg.author.avatarURL()
+				})
 				.setDescription(`Reason :\n\`\`\`${bReason}\`\`\``)
 			await bUser.send({embeds: [ban]})
 			const banEmbed = new MessageEmbed()

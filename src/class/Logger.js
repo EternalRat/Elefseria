@@ -1,12 +1,12 @@
-module.exports = class Logger {
+module.exports = {
 
-	LEVELS = {
+	LEVELS: {
 		NORMAL: 1,
 		DEBUG: 2,
 		ALL: 3	
-	};
+	},
 
-	level = 0;
+	level: 0,
 
 	/**
 	 * Print the variable type followed by his content
@@ -14,11 +14,11 @@ module.exports = class Logger {
 	 */
 	withType(variable) {
 		console.log(typeof(variable), variable);
-	}
+	},
 
 	error(msg) {
 
-	}
+	},
 
 	debug(msg) {
 

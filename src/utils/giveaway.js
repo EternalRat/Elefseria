@@ -49,13 +49,16 @@ async function scheduleGiveaways(client, giveaways) {
                             embed.setDescription(`**NO WINNERS**\nHosted by: ${message.guild.members.cache.get(HostId)}`)
                             embed.setFooter(`Ended at • ${moment.parseZone(moment.now()).format("dddd Do MMMM in YYYY, HH:mm:ss")}`)
                         } else {
-                            winner = winner.map(user => user.toString());
+                            winner.forEach(winners => {
+                                reaction.users.remove(winners.id);
+                            });
+                            winner = winner.map(user => user.username.toString());
                             embed.setDescription(`**WINNERS(S):\n${winner.join('\n')}**\nHosted by: ${message.guild.members.cache.get(HostId)}`)
                             embed.setFooter(`Ended at • ${moment.parseZone(moment.now()).format("dddd Do MMMM in YYYY, HH:mm:ss")}`)
                             channel.send(`**WINNER(S) ${winner.join(', ')}** ! You won the **${give.get("prize")}** !\nhttps://discordapp.com/channels/${give.get("guildId")}/${give.get("channelId")}/${give.get("messageId")}`)
                         }
                         await message.edit({content:'🎉 **GIVEAWAY ENDED** 🎉', embeds:[embed]});
-                        jobMap.delete(messageId)
+                        jobMap.delete(messageId);
                     }
                 }
             }
@@ -83,7 +86,10 @@ async function rerollGiveaways(messageId, msg) {
                 let give = await Giveaway.findOne({ messageId: messageId })
                 const embed = embeds[0];
                 let winner = determineWinners(entries, give.get("winners"));
-                winner = winner.map(user => user.toString());
+                winner.forEach(winners => {
+                    reaction.users.remove(winners.id);
+                });
+                winner = winner.map(user => user.username.toString());
                 if (winner.length !== 0)
                     channel.send(`**WINNER(S) ${winner.join(', ')}** ! You won the **${give.get("prize")}** !\nhttps://discordapp.com/channels/${give.get("guildId")}/${give.get("channelId")}/${give.get("messageId")}`)
             }
@@ -115,7 +121,9 @@ async function editGiveaways(messageId, response, msg, client) {
         Winners: ${winners}
         Hosted by: ${message.guild.members.cache.get(giveaway.get("HostId"))}`
     );
-    embeds[0].setFooter(`Ends at • ${moment.parseZone(ends).format("dddd Do MMMM in YYYY, HH:mm:ss")}`)
+    embeds[0].setFooter({
+        "text": `Ends at • ${moment.parseZone(ends).format("dddd Do MMMM in YYYY, HH:mm:ss")}`
+    })
     message.edit({content:"🎉 **GIVEAWAY ** 🎉", embeds: embeds});
     jobMap.get(messageId).reschedule(ends);
     return giveaway;
@@ -130,7 +138,7 @@ function determineWinners(users, max) {
         const random = Math.floor(Math.random() * users.size);
         const selected = users.at(random);
         if (!numbers.has(random)) {
-            winnersArray.push(selected.username);
+            winnersArray.push({username: selected.username, id: selected.id});
             i++;
         }
     }

@@ -1,6 +1,6 @@
 //TODO: Need to do website part for that
 const BaseCommand = require('../../utils/structures/BaseCommand');
-const { MessageEmbed, Client, Message, MessageActionRow, MessageButton, TextChannel } = require("discord.js");
+const { MessageEmbed, Client, Message, MessageActionRow, MessageButton } = require("discord.js");
 const PermissionGuard = require('../../utils/PermissionGuard');
 const XP = require("../../utils/database/models/exp");
 
@@ -16,6 +16,7 @@ module.exports = class Leaderboard extends BaseCommand {
      * @param {Array<String>} args 
      */
 	async run(client, msg, args) {
+        return msg.channel.send("This command isn't available right now.");
         const leaderboard = (await XP.find()).sort((a, b) => {
             return a < b;
         });

@@ -20,7 +20,9 @@ module.exports = class MessageupdateEvent extends BaseEvent {
         let channel = newMsg.guild.channels.cache.find(ch => ch.name === "msgs-logs");
         if (!channel) return;
         const embed = new MessageEmbed()
-            .setAuthor(newMsg.author.username, newMsg.author.displayAvatarURL())
+            .setAuthor({
+                name: newMsg.author.username, iconURL: newMsg.author.displayAvatarURL()
+            })
             .setDescription(`**A [message](${newMsg.url}) has been updated in ${oldMsg.guild.channels.cache.find(ch => ch === oldMsg.channel)}**`)
             .setThumbnail(newMsg.guild.iconURL())
             .addFields({
@@ -31,7 +33,10 @@ module.exports = class MessageupdateEvent extends BaseEvent {
                 value:newMsg.cleanContent
             })
             .setTimestamp()
-            .setFooter(client.user.username, client.user.displayAvatarURL())
+            .setFooter({
+                text: client.user.username, 
+                iconURL: client.user.displayAvatarURL()
+            })
         channel.send({embeds: [embed]});
     }
 }

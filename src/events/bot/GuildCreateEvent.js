@@ -46,7 +46,7 @@ module.exports = class GuildCreateEvent extends BaseEvent {
 				securityState: true,
 				settingsState: true,
 				ticketState: true,
-				voiceState: true,
+				voiceState: false,
 				levelingState: true
 			});
 			guildModuleConfig.save();
@@ -63,16 +63,20 @@ module.exports = class GuildCreateEvent extends BaseEvent {
 		try {
 			const g = await channels.create({
 				guildId: guild.id,
+				joinMsgDM: false,
 				channelJoin: undefined,
+				joinMsg: undefined,
 				channelLeft: undefined,
-				userCountChannel: undefined,
+				leftMsg: undefined,
 				memberCountChannel: undefined,
+				userCountChannel: undefined,
 				botCountChannel: undefined,
 				roleCountChannel: undefined,
 				channelCountChannel: undefined,
 				inviteLog: undefined,
+				inviteMsg: undefined,
 				msgLog: undefined,
-				channelLog: undefined,
+				voiceLog: undefined,
 				normalVoice: undefined,
 				premiumVoice: undefined,
 				betaVoice: undefined
