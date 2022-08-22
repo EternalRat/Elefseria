@@ -19,7 +19,10 @@ module.exports = class DelwarnCommand extends BaseCommand {
 		var embedColor = '#ffffff';
 		var missingArgsEmbed = new MessageEmbed()
 			.setColor(embedColor)
-			.setAuthor(msg.author.username, msg.author.avatarURL())
+			.setAuthor({
+				name: msg.author.username, 
+				iconURL: msg.author.avatarURL()
+			})
 			.setTitle("Missing arguments")
 			.setDescription(`Usage: \`${process.env.DISCORD_BOT_PREFIX}${this.name} ${this.usage}\``)
 			.setTimestamp();

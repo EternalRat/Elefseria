@@ -37,17 +37,20 @@ module.exports = class ConfigCommand extends BaseCommand {
             value:`${secConfig.get("people")}`,
             inline: true
         })
-        .setAuthor(message.author.username, message.author.avatarURL())
+        .setAuthor({
+          name: message.author.username, 
+          iconURL: message.author.avatarURL()
+        })
         .setThumbnail(message.guild.iconURL())
       return message.channel.send({embeds: [embed]})
     }
     if (args.length != 2) return message.channel.send("Specify raidmode/blacklist/time/people and another args.")
-    let param = args[0]
-    if (param != "raidmode" && param != "people" && param != "blacklist" && param != "time") return message.channel.send("Specify raidmode/blacklist/time/people and another args.")
+    let param = args[0].toLowerCase();
+    if (param != "raidmode" && param != "people" && param != "blacklist" && param != "time") return message.channel.send("Specify raidmode/blacklist/time/people and another arg.")
     let tochange = args[1]
     if (param === "time" || param === "people") tochange = parseInt(args[1])
-    if ((param === "raidmode" || param === "blacklist") && (tochange != "true" && tochange != "false")) return message.channel.send("Raidmode/Blacklist/antispam/antilink/bannedword must be composed only by true/false argument.")
-    if ((param === "time" || param === "people") && tochange === args[1]) return message.channel.send("Time/People must be composed only by integer argument.")
+    if ((param === "raidmode" || param === "blacklist") && (tochange != "true" && tochange != "false")) return message.channel.send("Raidmode/Blacklist must be composed only by true/false argument.")
+    if ((param === "time" || param === "people") && typeof(tochange) !== 'number') return message.channel.send("Time/People must be composed only by integer argument.")
     secConfig.set(param, tochange)
     secConfig.save().catch(console.error)
     message.channel.send(`The setting ${param} has been successfully changed.`)

@@ -19,7 +19,7 @@ module.exports = class AddreactionCommand extends BaseCommand {
 				if(fetchedMessage) {
 					let exp = await msg.channel.send("Please provide all of the emoji names with the role name, one by one, separated with a comma.\ne.g: snapchat,snapchat, where the emoji name comes first, role name comes second.\n\
 					Once you're done, just type '?done' and it'll be fine!");
-					let collector = new MessageCollector(msg.channel, {filter: msgCollectorFilter.bind(null, msg), time: 10000});
+					let collector = new MessageCollector(msg.channel, {filter: msgCollectorFilter.bind(null, msg)});
 					let emojiRoleMappings = {};
 					collector.on('collect', msg => {
 						let { cache } = msg.guild.emojis;
@@ -27,7 +27,7 @@ module.exports = class AddreactionCommand extends BaseCommand {
 							collector.stop('done command was issued.');
 							msg.channel.send("Done.").then(msg => msg.delete({timeout:3500}))
 							msg.delete();
-							exp.delete()
+							exp.delete();
 							return;
 						}
 						let [ emojiName, roleName ] = msg.content.split(/,\s+/);
@@ -59,6 +59,7 @@ module.exports = class AddreactionCommand extends BaseCommand {
 								msg.channel.send("A role reaction set up exists for this message already...");
 							} else {
 								let dbMsgModel = new MessageModel({
+									guildId: msg.guild.id,
 									messageId: fetchedMessage.id,
 									emojiRoleMappings: emojiRoleMappings
 								});

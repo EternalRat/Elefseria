@@ -27,9 +27,9 @@ module.exports = class BaseModule {
 		if (command.guildOnly && message.channel.type !== "GUILD_TEXT") return message.channel.send("This is a guildOnly command!")
 		if (command && command.permissions) {
 			if (command.cooldown && this.still_cooldown(client, message.author, command, message.channel)) return;
-			if (command.permissions.check(message.member.permissions.toArray()))
+			if (command.permissions.check(message.member.permissions.toArray())) {
 				command.run(client, message, args);
-			else
+			} else
 				message.channel.send(`You're missing of permissions for ${command.name} : ${command.permissions.getPerm()}`)
 		} else if (command && !command.permissions) {
 			if (command.cooldown && this.still_cooldown(client, message.author, command, message.channel)) return;

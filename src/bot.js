@@ -1,5 +1,6 @@
 require('dotenv').config();
 const { Client, Intents } = require('discord.js');
+const FinalFantasyModule = require('./modules/FinalFantasyModule');
 const FunModule = require('./modules/FunModule');
 const GiveawayModule = require('./modules/GiveawayModule');
 const LevelingModule = require('./modules/LevelingModule');
@@ -37,8 +38,9 @@ const client = new Client({
 });
 
 (async () => {
-	const paths = new Array("fun", "giveaway", "moderation", "reactionrole", "security", "settings", "ticket", "voice", "leveling");
+	const paths = new Array("finalfantasy", "fun", "giveaway", "moderation", "reactionrole", "security", "settings", "ticket", "voice", "leveling");
 	client.modules = new Set([
+		new FinalFantasyModule(),
 		new FunModule(),
 		new GiveawayModule(),
 		new ModerationModule(),

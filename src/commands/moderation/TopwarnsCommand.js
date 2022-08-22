@@ -2,7 +2,7 @@ require('dotenv').config();
 const PermissionGuard = require('../../utils/PermissionGuard');
 const BaseCommand = require('../../utils/structures/BaseCommand');
 const WarnModel = require("../../utils/database/models/warn")
-const { MessageEmbed, Message, Client } = require("discord.js");
+const { MessageEmbed, Message, Client, MessageActionRow, MessageButton } = require("discord.js");
 const { Document } = require('mongoose');
 
 module.exports = class TopwarnsCommand extends BaseCommand {
@@ -33,24 +33,24 @@ module.exports = class TopwarnsCommand extends BaseCommand {
  */
 async function topWarn(msg, top10)
 {
-  let info = '# - Warns - User\n';
+  let info = '#\tWarns\tUser\n';
   let i = 0;
-  const linkBtn = new MessageActionRow().addComponents(
+  /* const linkBtn = new MessageActionRow().addComponents(
     new MessageButton()
       .setLabel("See the leaderboard")
       .setURL(`https://localhost:3000/warns/${msg.guild.id}`)
       .setStyle("LINK")
-  );
+  ); */
   const embed = new MessageEmbed()
     .setTitle("Ranked list of warnings")
     .setTimestamp();
   top10.forEach(user => {
     if (user.get("count") !== 0) {
       if (msg.guild.members.cache.get(user.get("userId"))) {
-        info += `#${++i}:\t${user.get("count")} - ${msg.guild.members.cache.get(user.get("userId")).user.tag}\n`
+        info += `#${++i}\t${user.get("count")}\t${msg.guild.members.cache.get(user.get("userId")).user.tag}\n`
       }
     }
   });
   embed.setDescription(`\`\`\`${info}\`\`\``);
-  msg.channel.send({embeds: [embed], components: [linkBtn]})
+  msg.channel.send({embeds: [embed]/* , components: [linkBtn] */})
 }

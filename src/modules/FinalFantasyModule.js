@@ -5,12 +5,12 @@ const fs = require('fs').promises;
 const BaseCommand = require('../utils/structures/BaseCommand');
 const ModuleConfig = require("../utils/database/models/moduleconfig");
 
-module.exports = class ReactionRoleModule extends BaseModule {
+module.exports = class FinalFantasyModule extends BaseModule {
 	commands = new Map();
 	aliases = new Map();
-
+	
 	constructor() {
-		super("ReactionRole");
+		super("FinalFantasy");
 	}
 
 	async loadCommands(dir) {
@@ -38,7 +38,7 @@ module.exports = class ReactionRoleModule extends BaseModule {
 	 */
 	async isThisModuleEnabled(guildId) {
 		const moduleSettings = await ModuleConfig.findOne({ guildId: guildId });
-		return moduleSettings.get('reactionRoleState');
+		return moduleSettings.get('finalFantasyState');
 	}
 
 	/**
@@ -46,6 +46,6 @@ module.exports = class ReactionRoleModule extends BaseModule {
 	 * @param {String} guildId the id of the guild where the command has been executed 
 	 */
 	/* changeModuleState(guildId) {
-		ModuleConfig.set({ moduleName: "ReactionRole", guildId: guildId, state: !ModuleConfig.get({ moduleName: "ReactionRole", guildId: guildId })});
+		ModuleConfig.set({ moduleName: "Fun", guildId: guildId, state: !(await ModuleConfig.findOne({ moduleName: "Fun", guildId: guildId }).get())});
 	} */
 }

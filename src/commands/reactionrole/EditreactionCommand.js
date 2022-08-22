@@ -47,7 +47,7 @@ async function removeReaction(client, msg, fetchedMessage) {
     let msgCollectorFilter = (newMsg, originalMsg) => newMsg.author.id === originalMsg.author.id;
     let exp = await msg.channel.send("Please provide all of the emoji names with the role name, one by one, separated with a comma.\ne.g: snapchat,snapchat, where the emoji name comes first, role name comes second.\n\
     Once you're done, just type '?done' and it'll be fine!");
-    let collector = new MessageCollector(msg.channel, { filter: msgCollectorFilter.bind(null, msg), time: 10000 });
+    let collector = new MessageCollector(msg.channel, { filter: msgCollectorFilter.bind(null, msg)});
     let emojiMappings = new Array();
     collector.on('collect', msg => {
         if (msg.content.toLowerCase() === '?done') {
@@ -75,12 +75,13 @@ async function removeReaction(client, msg, fetchedMessage) {
             msg.channel.send("A role reaction doesn't exist for this message...");
         } else {
             let mapping = findMsgDocument.get('emojiRoleMappings');
-            emojiMappings.forEach(emojiId => {
+            emojiMappings.forEach(async emojiId => {
                 fetchedMessage.reactions.cache.get(emojiId).remove();
                 delete mapping[emojiId];
-            })
+            });
             await findMsgDocument.deleteOne();
             let dbMsgModel = new MessageModel({
+                guildId: msg.guild.id,
                 messageId: fetchedMessage.id,
                 emojiRoleMappings: mapping
             });
@@ -101,7 +102,7 @@ async function addReaction(client, msg, fetchedMessage) {
     let msgCollectorFilter = (newMsg, originalMsg) => newMsg.author.id === originalMsg.author.id;
     let exp = await msg.channel.send("Please provide all of the emoji names with the role name, one by one, separated with a comma.\ne.g: snapchat,snapchat, where the emoji name comes first, role name comes second.\n\
     Once you're done, just type '?done' and it'll be fine!");
-    let collector = new MessageCollector(msg.channel, { filter: msgCollectorFilter.bind(null, msg), time: 10000 });
+    let collector = new MessageCollector(msg.channel, { filter: msgCollectorFilter.bind(null, msg)});
     let emojiRoleMappings = new Object();
     collector.on('collect', msg => {
         let { cache } = msg.guild.emojis;

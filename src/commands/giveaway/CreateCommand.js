@@ -27,7 +27,7 @@ module.exports = class CreateCommand extends BaseCommand {
  */
 async function create_giveaway(client, args, message) {
 	if (args.length !== 1) return message.channel.send("Enter a channel please")
-	let channel = message.mentions.channels.first()
+	let channel = message.mentions.channels.first();
 	if (!channel) return message.channel.send("Tag a valid channel please")
 	try {
 		const response = await getResponses(message)
@@ -52,7 +52,9 @@ async function create_giveaway(client, args, message) {
 					Winners: ${response.winners}
 					Hosted by: ${message.guild.members.cache.get(response.HostId)}`
 				)
-				.setFooter(`Ends at • ${moment.parseZone(new Date(Date.now() + ms(response.duration))).format("dddd Do MMMM in YYYY, HH:mm:ss")}`)
+				.setFooter({
+					"text": `Ends at • ${moment.parseZone(new Date(Date.now() + ms(response.duration))).format("dddd Do MMMM in YYYY, HH:mm:ss")}`
+				})
 			const giveawayMsg = await message.guild.channels.cache.get(channel.id).send({content: "🎉 **GIVEAWAY** 🎉", embeds: [giveawayEmbed]})
 			await giveawayMsg.react('🎉');
 			response.messageId = giveawayMsg.id;

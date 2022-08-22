@@ -22,6 +22,7 @@ module.exports = class VerifyCommand extends BaseCommand {
 		guild.members.fetch().then(members => {
 			var findPeople = new Promise((resolve, reject) => {
 				members.filter(member => !member.user.bot).forEach(async (member, key, map) => {
+					console.log(member.user.username);
 					let findBan = await blacklist.findOne({userId: member.id})
 					if (findBan) people.push(member.user.username)
 					if (getLastKeyInMap(map) === key) resolve();

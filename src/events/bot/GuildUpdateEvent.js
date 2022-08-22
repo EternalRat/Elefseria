@@ -19,7 +19,7 @@ module.exports = class GuildCreateEvent extends BaseEvent {
 			const g = await guilds.findOneAndUpdate({
 				guildId: oldGuild.id,
 			}, {
-			guildName: newGuild.name,
+				guildName: newGuild.name,
 				guildIcon: newGuild.iconURL(),
 				userCount: (await newGuild.members.fetch()).size
 			});

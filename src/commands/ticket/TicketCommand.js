@@ -19,7 +19,8 @@ module.exports = class TicketCommand extends BaseCommand {
     let [cmd, ...arg] = args.join(' ').trim().split(/\s+/)
     let ticket = new Ticket(message);
     if (cmd === "transcript") {
-      ticket.transcriptTicket();
+      if (arg.length !== 1) return message.channel.send("Please provide your discord username");
+      ticket.transcriptTicket(arg[1]);
     } else if (cmd === "close") {
       ticket.closeTicket();
     } else if (cmd === "add") {

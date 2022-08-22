@@ -18,12 +18,18 @@ module.exports = class MessageDeleteEvent extends BaseEvent {
         if (msg.cleanContent.length > 1024) return
         if (!channel) return
         const embed = new MessageEmbed()
-            .setAuthor(msg.author.username, msg.author.displayAvatarURL())
+            .setAuthor({
+                name: msg.author.username, 
+                iconURL: msg.author.displayAvatarURL()
+            })
             .setDescription(`**A message has been deleted in ${msg.guild.channels.cache.find(ch => ch === msg.channel)}**`)
             .setThumbnail(msg.guild.iconURL())
             .addField("Old message:", msg.cleanContent)
             .setTimestamp()
-            .setFooter(client.user.username, client.user.displayAvatarURL())
+            .setFooter({
+                text: client.user.username, 
+                iconURL: client.user.displayAvatarURL()
+            })
         channel.send({embeds: [embed]})
     }
 }

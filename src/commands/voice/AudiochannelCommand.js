@@ -6,35 +6,35 @@ const logger = require("consola").withTag("RepCommand.js")
 logger.level = 5;
 
 const questions = [
-  "Quel est le type du salon que vous voulez ajouter ? (Normal/Premium)",
-  "Quel est l'ID du salon qui servira pour la création des vocaux ? (Salon vocal obligatoirement !)"
+	"Quel est le type du salon que vous voulez ajouter ? (Normal/Premium)",
+	"Quel est l'ID du salon qui servira pour la création des vocaux ? (Salon vocal obligatoirement !)"
 ]
 
 module.exports = class AudiochannelCommand extends BaseCommand {
-  constructor() {
-    super('audiochannel', 'vocal', ["setchannel"], 3, false, "Définir le salon qui servira à créer les autres salons.", null, new PermissionGuard(["ADMINISTRATOR"]));
-  }
+	constructor() {
+		super('audiochannel', 'vocal', ["setchannel"], 3, false, "Définir le salon qui servira à créer les autres salons.", null, new PermissionGuard(["ADMINISTRATOR"]));
+	}
 
-  /**
-   * 
-   * @param {Client} client 
-   * @param {Message} message 
-   * @param {Array} args 
-   */
-  async run(client, message, args) {
-    try {
-      const response = await getResponses(message)
-      if (message.guild.channels.cache.find(ch => ch.id === response.channelId)) {
-        logger.success("Channel found")
-        var newAudio = await channel.findOne({guildId: message.guild.id});
-        newAudio.set(`${response.type}Voice`, response.channelId);
-        newAudio.save();
-        message.channel.send("Le salon a bien été définit.")
-      }
-    } catch(err) {
-      console.log(err)
-    }
-  }
+	/**
+	 * 
+	 * @param {Client} client 
+	 * @param {Message} message 
+	 * @param {Array} args 
+	 */
+	async run(client, message, args) {
+		try {
+			const response = await getResponses(message)
+			if (message.guild.channels.cache.find(ch => ch.id === response.channelId)) {
+				logger.success("Channel found")
+				var newAudio = await channel.findOne({guildId: message.guild.id});
+				newAudio.set(`${response.type}Voice`, response.channelId);
+				newAudio.save();
+				message.channel.send("Le salon a bien été définit.")
+			}
+		} catch(err) {
+			console.log(err)
+		}
+	}
 }
 
 /**
@@ -42,29 +42,29 @@ module.exports = class AudiochannelCommand extends BaseCommand {
  * @param {Message} message 
  */
 async function getResponses(message) {
-  const responses = { };
-  const validType = ["normal", "beta", "duo", "premium"]
-  const validId = /[0-9]{18}/;
+	const responses = { };
+	const validType = ["normal", "beta", "duo", "premium"]
+	const validId = /[0-9]{18}/;
 
-  for (let i = 0; i < questions.length; i++) {
-      await message.channel.send(questions[i]);
-      const filter = (m) => m.author.id === message.author.id;
-      const response = await message.channel.awaitMessages({ filter, max: 1, time: 30_000, errors: ['time'] });
-      const { content } = response.first();
-      if (i === 0)
-        if (validType.includes(content.toLowerCase()))
-          responses.type = content.toLowerCase();
-        else {
-          message.channel.send("Entrée invalide pour le type de salon")
-          return null;
-        }
-      if (i === 1)
-        if (validId.test(content))
-          responses.channelId = content;
-        else {
-          message.channel.send("Entrée invalide pour l'ID du salon")
-          return null;
-        }
-  }
-  return responses;
+	for (let i = 0; i < questions.length; i++) {
+			await message.channel.send(questions[i]);
+			const filter = (m) => m.author.id === message.author.id;
+			const response = await message.channel.awaitMessages({ filter, max: 1, time: 30_000, errors: ['time'] });
+			const { content } = response.first();
+			if (i === 0)
+				if (validType.includes(content.toLowerCase()))
+					responses.type = content.toLowerCase();
+				else {
+					message.channel.send("Entrée invalide pour le type de salon")
+					return null;
+				}
+			if (i === 1)
+				if (validId.test(content))
+					responses.channelId = content;
+				else {
+					message.channel.send("Entrée invalide pour l'ID du salon")
+					return null;
+				}
+	}
+	return responses;
 }

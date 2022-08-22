@@ -18,6 +18,5 @@ module.exports = class voiceChannelManager extends BaseEvent {
 		if (newState.member.user.bot) return;
     const voice = new Voice(client, oldState, newState);
     await voice.voiceManager();
-    voice.logs();
   }
 }
