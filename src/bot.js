@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Client, GatewayIntentBits } = require('discord.js');
+const { Client, Intents } = require('discord.js');
 const FinalFantasyModule = require('./modules/FinalFantasyModule');
 const FunModule = require('./modules/FunModule');
 const GiveawayModule = require('./modules/GiveawayModule');
@@ -13,13 +13,13 @@ const VoiceModule = require('./modules/VoiceModule');
 const { registerEvents } = require('./utils/registry');
 const client = new Client({
 	intents: [
-		GatewayIntentBits.FLAGS.GUILDS,
-		GatewayIntentBits.FLAGS.GUILD_MESSAGES,
-		GatewayIntentBits.FLAGS.GUILD_MESSAGE_REACTIONS,
-		GatewayIntentBits.FLAGS.GUILD_MEMBERS,
-		GatewayIntentBits.FLAGS.GUILD_VOICE_STATES,
-		GatewayIntentBits.FLAGS.GUILD_BANS,
-		GatewayIntentBits.FLAGS.GUILD_INVITES
+		Intents.FLAGS.GUILDS,
+		Intents.FLAGS.GUILD_MESSAGES,
+		Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+		Intents.FLAGS.GUILD_MEMBERS,
+		Intents.FLAGS.GUILD_VOICE_STATES,
+		Intents.FLAGS.GUILD_BANS,
+		Intents.FLAGS.GUILD_INVITES
 	], partials: [
 		"GUILD_MEMBER",
 		"USER",
