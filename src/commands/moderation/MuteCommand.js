@@ -17,9 +17,6 @@ module.exports = class MuteCommand extends BaseCommand {
 	 * @param {Array} args 
 	 */
 	async run(client, msg, args) {
-		try {
-			var target = await msg.guild.members.fetch(msg.mentions.users.first() || args[0]);
-		} catch (err) {}
 		var embedColor = '#ffffff'
 		var missingArgsEmbed = new MessageEmbed()
 			.setColor(embedColor)
@@ -30,9 +27,16 @@ module.exports = class MuteCommand extends BaseCommand {
 			.setTitle("Missing arguments")
 			.setDescription(`Usage: \`${process.env.DISCORD_BOT_PREFIX}${this.name} ${this.usage}\``)
 			.setTimestamp();
+		if (!args[0]) {
+			return msg.channel.send({embeds: [missingArgsEmbed]})
+		}
+		try {
+			var target = await msg.guild.members.fetch(msg.mentions.users.first() || args[0]);
+		} catch (err) {}
+		
 		if (!target) return msg.channel.send({embeds: [missingArgsEmbed]})
 		msg.delete().catch()
-		if (msg.guild.members.cache.get(msg.author.id).roles.highest.position <= target.roles.highest.position) return msg.channel.send("That person can't be kicked!");
+		if (msg.guild.members.cache.get(msg.author.id).roles.highest.position <= target.roles.highest.position) return msg.channel.send("That person can't be muted!");
 		let role = msg.guild.roles.cache.find(r => r.name === "Muted");
 		if (!role) {
 			try {

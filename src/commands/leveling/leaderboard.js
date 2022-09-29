@@ -18,7 +18,7 @@ module.exports = class Leaderboard extends BaseCommand {
     
 	async run(client, msg, args) {
         //return msg.channel.send("This command isn't available right now.");
-        const leaderboard = (await XP.find())
+        const leaderboard = (await XP.find({guildId: msg.guild.id}))
         const sortExps = (a, b) => b.exp - a.exp;
         leaderboard.sort(sortExps);
         const places = ["🥇", "🥈", "🥉"]
@@ -33,10 +33,16 @@ module.exports = class Leaderboard extends BaseCommand {
                 .setStyle("LINK")
         );*/
         var desc = '';
-        for (var i = 0; i < 3; i++) {
+        var max = leaderboard.length > 3 ? 3 : leaderboard.length;
+        for (var i = 0; i < max; i++) {
             if (leaderboard[i] === undefined)
                 break;
-            desc += `${places[i]} ${await msg.guild.members.fetch(leaderboard[i].userId)}\n➥ Niveau ${leaderboard[i].level} (${leaderboard[i].exp} xp)\n\n`;
+            var user = await msg.guild.members.fetch(leaderboard[i].userId).catch(error => {
+                console.error('Failed to fetch user:', error);
+            });
+            if (!user)
+                break
+            desc += `${places[i]} ${user}\n➥ Niveau ${leaderboard[i].level} (${leaderboard[i].exp} xp)\n\n`;
         }
         leader.setDescription(desc);
         msg.channel.send({embeds: [leader]});

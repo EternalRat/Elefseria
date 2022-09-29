@@ -55,9 +55,6 @@ module.exports = class searchMountCommand extends BaseCommand {
 				.setImage(element.image)
 				.setFooter({ text: `${index + 1}`, iconURL: `${element.icon}` }))
 			});
-			//msg.channel.send('```\n' + mountOne.name + '\n' + mountOne.sources[0].text + '```' + mountOne.image)
-			//msg.channel.send((await this.getMountInfo(args[0], args[1])).slice(1, 1000))
-			//msg.channel.send({embeds: [embed]})
 			
 			this.sendList(msg.channel, list)
 		}

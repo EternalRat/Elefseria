@@ -16,6 +16,7 @@ module.exports = class Remove extends BaseCommand {
 	 * @returns 
 	 */
 	async run(client, msg, args) {
+		return
 		const missingArgs = new MessageEmbed()
 			.setTitle("Arguments missing")
 			.setAuthor({

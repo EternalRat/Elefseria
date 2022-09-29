@@ -67,7 +67,7 @@ async function levelingSystem(message, client) {
 	const curLevel = Math.floor(0.1 * Math.sqrt(userExp.get("exp")));
 	if (userExp.get("level") < curLevel) {
 		userExp.set("level", userExp.get("level") + 1);
-		message.reply(`You've leveled up. You're now level **${curLevel}**!`);
+		//message.channel.send(`${message.author.username} has leveled up. You're now level **${curLevel}**!`);
 	}
 	userExp.save();
 }
