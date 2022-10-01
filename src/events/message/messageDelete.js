@@ -13,6 +13,7 @@ module.exports = class MessageDeleteEvent extends BaseEvent {
      * @param {Message} msg 
      */
     async run (client, msg) {
+        if (msg.author.bot) return;
         let channel = msg.guild.channels.cache.find(ch => ch.name === "msgs-logs")
         if (msg.cleanContent === undefined || msg.cleanContent === null) return
         if (msg.cleanContent === "") return

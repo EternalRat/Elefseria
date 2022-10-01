@@ -16,6 +16,7 @@ module.exports = class MessageupdateEvent extends BaseEvent {
     async run (client, oldMsg, newMsg) {
         if (!newMsg) return;
         if (!newMsg.author) return;
+        if (newMsg.author.bot) return;
         if (newMsg.channel.type !== "GUILD_TEXT" || newMsg.cleanContent === oldMsg.cleanContent) return;
         if (newMsg.cleanContent.length > 1024 || (oldMsg.cleanContent && oldMsg.cleanContent.length > 1024)) return;
         let channel = newMsg.guild.channels.cache.find(ch => ch.name === "msgs-logs");

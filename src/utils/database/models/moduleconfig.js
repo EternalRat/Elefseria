@@ -1,6 +1,7 @@
 const mongoose = require("mongoose")
 const moduleConfig = new mongoose.Schema({
 	guildId: {type: String, unique: true},
+	animeState: {type: Boolean},
 	finalFantasyState: {type: Boolean},
 	funState: {type: Boolean},
 	giveawayState: {type: Boolean},

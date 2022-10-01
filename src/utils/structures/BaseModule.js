@@ -1,3 +1,5 @@
+const ModuleConfig = require("../../utils/database/models/moduleconfig");
+
 module.exports = class BaseModule {
 	commands = new Map();
 	aliases = new Map();
@@ -12,6 +14,20 @@ module.exports = class BaseModule {
 	 */
 	isAModuleCommand(name) {
 		return this.commands.has(name) || this.aliases.has(name);
+	}
+
+	/**
+	 * 
+	 * @param {String} guildId the id of the guild where the command has been executed 
+	 */
+	async changeModuleState(guildId) {
+		let moduleConfig= await ModuleConfig.findOne({ moduleName: this.name, guildId: guildId });
+		if (!moduleConfig) {
+			moduleConfig.set(this.name.toLowerCase() + 'State', true)
+		} else {
+			moduleConfig.set(this.name.toLowerCase() + 'State', !moduleConfig.get(this.name.toLowerCase() + 'State'))
+		}
+		moduleConfig.save()
 	}
 
 	/**

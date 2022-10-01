@@ -5,12 +5,12 @@ const fs = require('fs').promises;
 const BaseCommand = require('../utils/structures/BaseCommand');
 const ModuleConfig = require("../utils/database/models/moduleconfig");
 
-module.exports = class VoiceModule extends BaseModule {
+module.exports = class AnimeModule extends BaseModule {
 	commands = new Map();
 	aliases = new Map();
-
+	
 	constructor() {
-		super("Voice");
+		super("Anime");
 	}
 
 	async loadCommands(dir) {
@@ -21,7 +21,7 @@ module.exports = class VoiceModule extends BaseModule {
 			if (stat.isDirectory()) this.loadCommands(path.join(dir, file));
 			if (file.endsWith('.js')) {
 				const Command = require(path.join(filePath, file));
-                if (Command.prototype instanceof BaseCommand) {
+				if (Command.prototype instanceof BaseCommand) {
 					const cmd = new Command();
 					this.commands.set(cmd.name, cmd);
 					cmd.aliases.forEach((alias) => {
@@ -38,7 +38,7 @@ module.exports = class VoiceModule extends BaseModule {
 	 */
 	async isThisModuleEnabled(guildId) {
 		const moduleSettings = await ModuleConfig.findOne({ guildId: guildId });
-		return moduleSettings.get('voiceState');
+		return moduleSettings.get('animeState');
 	}
 
 	/**
@@ -46,6 +46,6 @@ module.exports = class VoiceModule extends BaseModule {
 	 * @param {String} guildId the id of the guild where the command has been executed 
 	 */
 	/* changeModuleState(guildId) {
-		ModuleConfig.set({ moduleName: "Ticket", guildId: guildId, state: !ModuleConfig.get({ moduleName: "Ticket", guildId: guildId })});
+		ModuleConfig.set({ moduleName: "Fun", guildId: guildId, state: !(await ModuleConfig.findOne({ moduleName: "Fun", guildId: guildId }).get())});
 	} */
 }
