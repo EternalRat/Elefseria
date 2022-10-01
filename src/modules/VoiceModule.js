@@ -10,7 +10,7 @@ module.exports = class VoiceModule extends BaseModule {
 	aliases = new Map();
 
 	constructor() {
-		super("Ticket");
+		super("Voice");
 	}
 
 	async loadCommands(dir) {

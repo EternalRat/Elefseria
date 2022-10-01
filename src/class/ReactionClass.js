@@ -1,7 +1,9 @@
-const { Client, MessageReaction, User, MessageEmbed } = require('discord.js');
+const { Client, MessageReaction, GuildMember, MessageEmbed } = require('discord.js');
 const MessageModel = require('../utils/database/models/reactionrole');
 const ticketChannel = require("../utils/database/models/ticket");
 const TranscriptTicket = require('../utils/transcriptTicket');
+const GUserBlacklist = require("../utils/database/models/giveawayblacklist");
+const Giveaway = require("../utils/database/models/giveaway");
 
 module.exports = class Reaction {
 
@@ -9,7 +11,7 @@ module.exports = class Reaction {
 	 * 
 	 * @param {Client} client 
 	 * @param {MessageReaction} reaction 
-	 * @param {User} user 
+	 * @param {GuildMember} user 
 	 */
 	constructor(client, reaction, user) {
 		this.client = client;
@@ -25,7 +27,7 @@ module.exports = class Reaction {
                 let msgDocument = await MessageModel.findOne({ messageId: id });
                 if (msgDocument) {
                     this.client.cachedMessageReactions.set(id, msgDocument.emojiRoleMappings);
-                    addMemberRole(this.client.cachedMessageReactions.get(this.reaction.message.id));
+                    this._addMemberRole(this.client.cachedMessageReactions.get(this.reaction.message.id));
 					return 1;
 				}
             } catch(err) {
@@ -33,7 +35,7 @@ module.exports = class Reaction {
             }
         } else {
             if (this.client.cachedMessageReactions.get(this.reaction.message.id)) {
-                addMemberRole(this.client.cachedMessageReactions.get(this.reaction.message.id));
+                this._addMemberRole(this.client.cachedMessageReactions.get(this.reaction.message.id));
 				return 1;
 			}
         }
@@ -49,6 +51,29 @@ module.exports = class Reaction {
 				member.roles.add(role);
 			}
 		}
+	}
+
+	async checkBlacklist() {
+		const giveaway = await Giveaway.findOne({guildId: this.reaction.message.guild.id, messageId: this.reaction.message.id});
+		if (!giveaway) return;
+		const blacklist = await GUserBlacklist.findOne({guildId: this.reaction.message.guild.id});
+		if (!blacklist) {
+			this.user.send(`Your participation for ${giveaway.get('prize')} has been confirmed.`);
+			return 0;
+		}
+		const blacklistedUser = blacklist.get("users");
+		if (blacklistedUser.length === 0) {
+			this.user.send(`Your participation for ${giveaway.get('prize')} has been confirmed.`);
+			return 0;
+		}
+		const userFound = blacklistedUser.find(user => user.id === this.user.id);
+		if (!userFound) {
+			this.user.send(`Your participation for ${giveaway.get('prize')} has been confirmed.`);
+			return 0;
+		}
+		this.reaction.users.remove(this.user.id);
+		this.user.send(`You cannot participate in the giveaway ${giveaway.get('prize')} because of : ${userFound.reason}`);
+		return 1;
 	}
 
 	async createTicket() {
@@ -71,7 +96,10 @@ module.exports = class Reaction {
 					const ticketEmbed = new MessageEmbed()
 						.setTitle(`Ticket`)
 						.setDescription("Afin de fermer le ticket, il vous suffira d'appuyer sur la réaction 🔐.")
-						.setAuthor(this.user.username, this.user.displayAvatarURL())
+						.setAuthor({
+							name: this.user.username, 
+							iconURL: this.user.displayAvatarURL()
+						})
 						.setThumbnail(this.reaction.message.guild.iconURL())
 						.setTimestamp();
 					ch.send({content: `@everyone`, embeds: [ticketEmbed]}).then(msg => {
@@ -97,14 +125,9 @@ module.exports = class Reaction {
 										ch.permissionOverwrites.edit(user.id, {
 											VIEW_CHANNEL: false
 										});
-										if (ch.guild.id === "872779126094827570") {
-											ch.delete();
-											return;
-										}
 										let newTranscript = new TranscriptTicket(ch.guild, ch.name, "EternalRat", user.username, ticketCh.get("ticketType"));
 										newTranscript.doTranscript(ch.messages);
 										newTranscript.createFile();
-										ch.delete();
 									}
 									break;
 							}

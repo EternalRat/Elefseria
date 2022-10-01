@@ -1,3 +1,5 @@
+const ModuleConfig = require("../../utils/database/models/moduleconfig");
+
 module.exports = class BaseModule {
 	commands = new Map();
 	aliases = new Map();
@@ -16,6 +18,20 @@ module.exports = class BaseModule {
 
 	/**
 	 * 
+	 * @param {String} guildId the id of the guild where the command has been executed 
+	 */
+	async changeModuleState(guildId) {
+		let moduleConfig= await ModuleConfig.findOne({ moduleName: this.name, guildId: guildId });
+		if (!moduleConfig) {
+			moduleConfig.set(this.name.toLowerCase() + 'State', true)
+		} else {
+			moduleConfig.set(this.name.toLowerCase() + 'State', !moduleConfig.get(this.name.toLowerCase() + 'State'))
+		}
+		moduleConfig.save()
+	}
+
+	/**
+	 * 
 	 * @param {String} name Name of the command that will be executed
 	 * @param {Client} client Discord Client
 	 * @param {Message} message Discord Message
@@ -27,9 +43,9 @@ module.exports = class BaseModule {
 		if (command.guildOnly && message.channel.type !== "GUILD_TEXT") return message.channel.send("This is a guildOnly command!")
 		if (command && command.permissions) {
 			if (command.cooldown && this.still_cooldown(client, message.author, command, message.channel)) return;
-			if (command.permissions.check(message.member.permissions.toArray()))
+			if (command.permissions.check(message.member.permissions.toArray())) {
 				command.run(client, message, args);
-			else
+			} else
 				message.channel.send(`You're missing of permissions for ${command.name} : ${command.permissions.getPerm()}`)
 		} else if (command && !command.permissions) {
 			if (command.cooldown && this.still_cooldown(client, message.author, command, message.channel)) return;

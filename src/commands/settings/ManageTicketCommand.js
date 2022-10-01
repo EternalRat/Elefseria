@@ -40,7 +40,10 @@ module.exports = class ManageTicketCommand extends BaseCommand {
       let ticketEmbed = new MessageEmbed()
         .setTitle(`Ticket`)
         .setDescription("Afin de créer un ticket, il vous suffit d'appuyer sur la réaction 📩.")
-        .setAuthor(message.author.username, message.author.displayAvatarURL())
+        .setAuthor({
+          name: message.author.username, 
+          iconURL: message.author.avatarURL()
+        })
         .setThumbnail(message.guild.iconURL())
         .setTimestamp();
       message.guild.channels.cache.get(response.channelId).send({embeds: [ticketEmbed]}).then(msg => {

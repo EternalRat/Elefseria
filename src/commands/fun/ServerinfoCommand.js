@@ -17,7 +17,10 @@ module.exports = class ServerinfoCommand extends BaseCommand {
         const owner = await msg.guild.fetchOwner();
         const serverInfo = new MessageEmbed()
             .setTitle(`Informations about ${msg.guild.name}`)
-            .setAuthor(msg.author.username, msg.author.avatarURL())
+            .setAuthor({
+                "name": msg.author.username,
+                "iconURL": msg.author.avatarURL()
+            })
             .addFields({
                 name: "Date of creation:",
                 value: `${parseZone(msg.guild.createdAt).format("dddd Do MMMM in YYYY, HH:mm:ss")}`,
@@ -53,7 +56,10 @@ module.exports = class ServerinfoCommand extends BaseCommand {
             })
             .setTimestamp()
             .setThumbnail(msg.guild.iconURL())
-            .setFooter(`Copyright - ${client.user.username}`, client.user.displayAvatarURL())
+            .setFooter({
+                "text": `Copyright - ${client.user.username}`,
+                "iconURL": client.user.displayAvatarURL()
+            })
             .setColor("RED")
         msg.channel.send({embeds: [serverInfo] });
     }

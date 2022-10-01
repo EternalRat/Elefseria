@@ -1,5 +1,5 @@
-const { Client, VoiceState } = require('discord.js');
-const audiochannel = require('../utils/database/models/audiochannel');
+const { Client, VoiceState, MessageEmbed } = require('discord.js');
+const channel = require('../utils/database/models/channels');
 
 module.exports = class Voice {
 	/**
@@ -15,18 +15,19 @@ module.exports = class Voice {
 	}
 
 	async voiceManager() {
-		let channelAudio = await audiochannel.findOne({guildId: this.newState.guild.id});
+		let channelAudio = await channel.findOne({guildId: this.newState.guild.id});
 		if (!channelAudio) return;
 		if (this.newState.channel) {
-			this._createVoiceChannel();
+			this._createVoiceChannel(channelAudio);
 		}
-		if (oldState.channel) {
+		if (this.oldState.channel) {
 			this._deleteChannel();
 		}
+		this.logs(channelAudio);
 	}
 
-	async _createVoiceChannel() {
-		if (this.newState.channel.id === channelAudio.get("normalChannelId")) {
+	async _createVoiceChannel(channelAudio) {
+		if (this.newState.channel.id === channelAudio.get("normalVoice")) {
 			let memberName = this.newState.member.user.username;
 			this.newState.guild.channels.create(`${memberName}`, {
 				type: "GUILD_VOICE",
@@ -35,7 +36,7 @@ module.exports = class Voice {
 				this.client.voiceChannel.set(channel.id, this.newState.member.user.id)
 				this.newState.setChannel(channel);
 			})
-		} else if (this.newState.channel.id === channelAudio.get("premiumChannelId")) {
+		} else if (this.newState.channel.id === channelAudio.get("premiumVoice")) {
 			if (!this.newState.member.roles.cache.find(r => r.id === "780779857276567563" || r.permissions.has("MANAGE_CHANNELS"))) return this.newState.setChannel(null);
 			let memberName = this.newState.member.user.username;
 			this.newState.guild.channels.create(`${memberName}`, {
@@ -91,9 +92,10 @@ module.exports = class Voice {
 		}
 	}
 
-	logs() {
-		let channelAudio = this.oldState.guild.channels.cache.find(ch => ch.name === "voice-logs")
-		if (!channelAudio) return;
+	async logs() {
+		let channelAudio = await channel.findOne({guildId: this.newState.guild.id});
+		let logVoice = this.oldState.guild.channels.cache.find(ch => ch.id === channelAudio.get("voiceLog"))
+		if (!logVoice) return;
 		if (this.newState.channel) {
 			if (this.newState.channel === this.oldState.channel) return;
 			const voiceEmbed = new MessageEmbed()
@@ -103,7 +105,7 @@ module.exports = class Voice {
 				Son ID : ${this.newState.member.user.id}`)
 				.setColor("BLUE")
 				.setTimestamp()
-			channelAudio.send({embeds: [voiceEmbed]});
+				logVoice.send({embeds: [voiceEmbed]});
 			return;
 		}
 		if (this.oldState.channel) {
@@ -114,7 +116,7 @@ module.exports = class Voice {
 				Son ID : ${this.oldState.member.user.id}`)
 				.setColor("RED")
 				.setTimestamp()
-			channelAudio.send({embeds: [voiceEmbed]})
+				logVoice.send({embeds: [voiceEmbed]})
 		}
 	}
 }

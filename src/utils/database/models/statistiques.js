@@ -2,8 +2,11 @@ const mongoose = require('mongoose');
 const stats = new mongoose.Schema({
 	guildId: {type: String},
 	userId: {type: String},
-	invitesCount: {type: Number},
-	invitedUser: {type: Array},
+	joinedCount: {type: Number},
+	leftCount: {type: Number},
+	fakeCount: {type: Number},
+	bonusCount: {type: Number},
+	invitedUser: {type: Map},
 	numberOfMsgs: {type: Number}
 });
 

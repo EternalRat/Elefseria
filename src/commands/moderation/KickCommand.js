@@ -19,11 +19,16 @@ module.exports = class KickCommand extends BaseCommand {
 		var embedColor = '#ffffff'
 		var missingArgsEmbed = new MessageEmbed() // Creates the embed thats sent if the command isnt run right
 				.setColor(embedColor)
-				.setAuthor(msg.author.username, msg.author.avatarURL())
+				.setAuthor({
+					name: msg.author.username, 
+					iconURL: msg.author.avatarURL()
+				})
 				.setTitle("Missing arguments")
 				.setDescription(`Usage: \`${process.env.DISCORD_BOT_PREFIX}${this.name} ${this.usage}\``)
 				.setTimestamp();
-		let kUser = await msg.guild.members.fetch(msg.mentions.users.first() || args[0]);
+		try {
+			var kUser = await msg.guild.members.fetch(msg.mentions.users.first() || args[0]);
+		} catch (err) {}
 		if (!kUser) return msg.channel.send({embeds: [missingArgsEmbed]});
 		if (msg.guild.members.cache.get(msg.author.id).roles.highest.position <= kUser.roles.highest.position) return msg.channel.send("You can't kick this member");
 		msg.delete().catch();
@@ -32,7 +37,10 @@ module.exports = class KickCommand extends BaseCommand {
 
 		const kick2 = new MessageEmbed()
 			.setTitle("You've been kicked !")
-			.setAuthor(msg.author.username, msg.author.avatarURL())
+			.setAuthor({
+				name: msg.author.username, 
+				iconURL: msg.author.avatarURL()
+			})
 			.setDescription(`Reason :\n\`\`\`${args.slice(1).join(' ')}\`\`\``)
 		kUser.send({embeds: [kick2]}).then(() => {
 			const kickEmbed = new MessageEmbed()

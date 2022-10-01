@@ -4,7 +4,7 @@ const Configs = new mongoose.Schema({
     blacklist: {type: Boolean, required:true},
     time: {type: Number, required: true},
     people: {type: Number, required: true},
-    guildId: {type: String, required:true}
+    guildId: {type: String, required: true, unique: true}
 });
 
 const configmodel = module.exports = mongoose.model('securityconfigs', Configs);

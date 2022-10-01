@@ -16,8 +16,11 @@ module.exports = class MessageEvent extends BaseEvent {
 	 */
 	async run(client, message) {
 		if (message.author.bot) return;
-		await levelingSystem(message);
+		await levelingSystem(message, client);
 		await increaseCount(message);
+		/*if (message.author.id == '139116958317543425') {
+			message.channel.send('Attention a toi Emi SATELLITE')
+		}*/
 		if (message.content.startsWith(client.prefix)) {
 			const [cmdName, ...cmdArgs] = message.content.slice(client.prefix.length).trim().split(/\s+/);
 			for (var mod of client.modules) {
@@ -39,7 +42,7 @@ module.exports = class MessageEvent extends BaseEvent {
  * 
  * @param {Message} message 
  */
-async function levelingSystem(message) {
+async function levelingSystem(message, client) {
 	let userExp = await Exp.findOne({
 		userId: message.author.id,
 		guildId: message.guild.id
@@ -53,7 +56,7 @@ async function levelingSystem(message) {
 			lastDateMessage: new Date()
 		})
 	} else {
-		if (new Date() - userExp.get("lastDateMessage") < ms("1m")) {
+		if (new Date() - userExp.get("lastDateMessage") < ms("1m") && message.content.startsWith(client.prefix)) {
 			return;
 		}
 	}
@@ -64,7 +67,7 @@ async function levelingSystem(message) {
 	const curLevel = Math.floor(0.1 * Math.sqrt(userExp.get("exp")));
 	if (userExp.get("level") < curLevel) {
 		userExp.set("level", userExp.get("level") + 1);
-		message.reply(`You've leveled up. You're now level **${curLevel}**!`);
+		//message.channel.send(`${message.author.username} has leveled up. You're now level **${curLevel}**!`);
 	}
 	userExp.save();
 }
@@ -82,8 +85,11 @@ async function increaseCount(message) {
 		userStat = await statistiques.create({
 			guildId: message.guild.id,
 			userId: message.author.id,
-			invitesCount: 0,
-			invitedUser: [],
+			joinedCount: 0,
+			leftCount: 0,
+			fakeCount: 0,
+			bonusCount: 0,
+			invitedUser: new Map(),
 			numberOfMsgs: 0
 		});
 	}

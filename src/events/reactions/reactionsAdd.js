@@ -16,7 +16,7 @@ module.exports = class MessageReactionAddEvent extends BaseEvent {
     async run (client, reaction, user) {
         if (user.id === client.user.id) return
         const react = new Reaction(client, reaction, user);
-        if (!(await react.addRole()))
+        if (!(await react.addRole()) && !(await react.checkBlacklist()))
             await react.createTicket();
     }
 }

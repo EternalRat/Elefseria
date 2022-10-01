@@ -1,5 +1,7 @@
 require('dotenv').config();
 const { Client, Intents } = require('discord.js');
+const AnimeModule = require('./modules/AnimeModule');
+const FinalFantasyModule = require('./modules/FinalFantasyModule');
 const FunModule = require('./modules/FunModule');
 const GiveawayModule = require('./modules/GiveawayModule');
 const LevelingModule = require('./modules/LevelingModule');
@@ -17,7 +19,8 @@ const client = new Client({
 		Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
 		Intents.FLAGS.GUILD_MEMBERS,
 		Intents.FLAGS.GUILD_VOICE_STATES,
-		Intents.FLAGS.GUILD_BANS
+		Intents.FLAGS.GUILD_BANS,
+		Intents.FLAGS.GUILD_INVITES
 	], partials: [
 		"GUILD_MEMBER",
 		"USER",
@@ -36,8 +39,10 @@ const client = new Client({
 });
 
 (async () => {
-	const paths = new Array("fun", "giveaway", "moderation", "reactionrole", "security", "settings", "ticket", "voice", "leveling");
+	const paths = new Array("anime", "finalfantasy", "fun", "giveaway", "moderation", "reactionrole", "security", "settings", "ticket", "voice", "leveling");
 	client.modules = new Set([
+		new AnimeModule(),
+		new FinalFantasyModule(),
 		new FunModule(),
 		new GiveawayModule(),
 		new ModerationModule(),

@@ -1,42 +1,37 @@
-const { MessageEmbed, Message, User } = require("discord.js");
+const { MessageEmbed, Message, User, GuildMember } = require("discord.js");
 
 /**
  * 
  * @param {Document} user 
- * @param {Document} oldUser 
  * @param {Message} msg 
- * @param {User} target 
- * @param {String} choice1 
- * @param {String} choice2 
+ * @param {GuildMember} target 
  */
-async function Seewarn(user, oldUser, msg, target, choice1, choice2)
+async function Seewarn(user, msg, target)
 {
-    let count = user.get("Count");
-    let oldCount = oldUser.get("Count");
+    let count = user.get("count");
     const embed = new MessageEmbed()
-        .setTitle(`Warnings of ${target.tag}`)
+        .setTitle(`Warnings of ${target.user.username}`)
         .addFields({
-            name:`${choice1} warnings:`,
+            name:`Warnings:`,
             value: `${count}`,
-            inline: true
-        },{
-            name:`${choice2} warnings:`,
-            value: `${oldCount}`,
             inline: true
         })
         .setThumbnail(msg.guild.iconURL())
-        .setAuthor(msg.author.username, msg.author.avatarURL())
+        .setAuthor({
+            name: msg.author.username, 
+            iconURL: msg.author.avatarURL()
+        })
         .setTimestamp()
-    let Reason = new Map();
+    let reasons = new Map();
     let userTag = new Array();
     user.userTag.forEach(value => {
         userTag.push(value)
-    })
-    user.Reason.forEach((key, value) => {
-        Reason.set(key, value)
+    });
+    user.reason.forEach((key, value) => {
+        reasons.set(key, value)
     });
     let i = 0;
-    Reason.forEach((key, reason) => {
+    reasons.forEach((key, reason) => {
         embed.addField(`Warn #${key} by **${userTag[i++]}**`, `**Reason:** ${reason}`)
     })
     msg.channel.send({embeds: [embed]});
