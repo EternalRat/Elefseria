@@ -63,7 +63,7 @@ const client = new Client({
 	client.prefix = process.env.DISCORD_BOT_PREFIX;
 	var i = 0;
 	for (var module of client.modules) {
-		await module.loadCommands("../commands/" + paths[i]);
+		await module.loadCommands("../../src/commands/" + paths[i]);
 		i++;
 	};
 	await registerEvents(client, '../events');

@@ -5,8 +5,8 @@ const fs = require('fs').promises;
 const BaseCommand = require('../utils/structures/BaseCommand');
 const ModuleConfig = require("../utils/database/models/moduleconfig");
 
-module.exports = class GiveawayModule extends BaseModule {
+module.exports = class NewsModule extends BaseModule {
 	constructor() {
-		super("Giveaway");
+		super("News");
 	}
 }
