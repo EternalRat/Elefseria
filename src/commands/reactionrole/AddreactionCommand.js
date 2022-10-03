@@ -1,6 +1,6 @@
 const BaseCommand = require('../../utils/structures/BaseCommand');
 const PermissionGuard = require("../../utils/PermissionGuard");
-const { MessageCollector } = require('discord.js');
+const { MessageCollector, Message } = require('discord.js');
 const MessageModel = require("../../utils/database/models/reactionrole")
 
 module.exports = class AddreactionCommand extends BaseCommand {
@@ -8,6 +8,12 @@ module.exports = class AddreactionCommand extends BaseCommand {
 		super('addreaction', 'reactionrole', ["reacta", "ra"], 3, true, "Add a reaction to a message with a role", "<messageId>", new PermissionGuard(["MANAGE_MESSAGES"]));
 	}
 
+	/**
+	 * 
+	 * @param {*} client 
+	 * @param {Message} msg 
+	 * @param {*} args 
+	 */
 	async run(client, msg, args) {
 		let msgCollectorFilter = (newMsg, originalMsg) => newMsg.author.id === originalMsg.author.id;
 		if(args.length !== 1) {

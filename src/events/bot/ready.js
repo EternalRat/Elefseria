@@ -30,9 +30,6 @@ module.exports = class ReadyEvent extends BaseEvent {
 		}, 60000);
 		(await client.guilds.fetch()).forEach(clientGuild => {
 			clientGuild.fetch().then(async guild => {
-				for (var mod of client.modules) {
-					guild.commands.set(mod.commands)
-				}
 				try {
 					if (!(await config.findOne({guildId: guild.id}))) {
 						let guildConfig = await config.create({
