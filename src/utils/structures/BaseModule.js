@@ -1,3 +1,8 @@
+const ModuleConfig = require("../database/models/moduleconfig");
+const BaseCommand = require('../structures/BaseCommand');
+const path = require('path');
+const fs = require('fs').promises;
+
 module.exports = class BaseModule {
 	commands = new Map();
 	aliases = new Map();
@@ -7,11 +12,61 @@ module.exports = class BaseModule {
 	}
 
 	/**
+	 * @param {String} guildId the id of the guild where the command has been executed
+	 * @returns {Boolean}
+	 */
+	 async isThisModuleEnabled(guildId) {
+		const moduleSettings = await ModuleConfig.findOne({ guildId: guildId });
+		return moduleSettings.get('reactionRoleState');
+	}
+
+
+	/**
 	 * @param {String} name Name of the command that should be executed
 	 * @returns {Boolean} weither it's a command from this module or not 
 	 */
 	isAModuleCommand(name) {
 		return this.commands.has(name) || this.aliases.has(name);
+	}
+
+	/**
+	 *
+	 * @param {String} dir Dir of the commands to load
+	 */
+	async loadCommands(dir) {
+
+
+		let filePath = path.join(__dirname, dir);
+		if (filePath.includes('src/src/')) filePath = filePath.replace('src/src/', 'src/')
+		const files = await fs.readdir(filePath);
+		for (const file of files) {
+			const stat = await fs.lstat(path.join(filePath, file));
+			if (stat.isDirectory()) this.loadCommands(path.join(dir, file));
+			if (file.endsWith('.js')) {
+				const Command = require(path.join(filePath, file));
+				if (Command.prototype instanceof BaseCommand) {
+					const cmd = new Command();
+					this.commands.set(cmd.name, cmd);
+					cmd.aliases.forEach((alias) => {
+						this.aliases.set(alias, cmd);
+					});
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * @param {String} guildId the id of the guild where the command has been executed 
+	 */
+	async changeModuleState(guildId) {
+		let moduleConfig= await ModuleConfig.findOne({ moduleName: this.name, guildId: guildId });
+		if (!moduleConfig) {
+			moduleConfig.set(this.name.toLowerCase() + 'State', true)
+		} else {
+			moduleConfig.set(this.name.toLowerCase() + 'State', !moduleConfig.get(this.name.toLowerCase() + 'State'))
+		}
+		moduleConfig.save()
 	}
 
 	/**

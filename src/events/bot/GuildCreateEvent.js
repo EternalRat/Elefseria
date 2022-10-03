@@ -39,6 +39,7 @@ module.exports = class GuildCreateEvent extends BaseEvent {
 		try {
 			let guildModuleConfig = await moduleconfig.create({
 				guildId: guild.id,
+				finalFantasyState: true,
 				funState: true,
 				giveawayState: true,
 				moderationState: true,

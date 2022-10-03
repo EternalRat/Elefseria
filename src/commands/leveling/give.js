@@ -33,6 +33,9 @@ module.exports = class Give extends BaseCommand {
 				}
 			]);
 		if (!args.length) return msg.channel.send({embeds: [missingArgs]});
+		if (parseInt(args[0]) == "NaN") {
+			return
+		}
 		var amount = parseInt(args[0]);
 		let target = await msg.guild.members.fetch(msg.mentions.users.first() || args[1]);
 		if (!target) return;

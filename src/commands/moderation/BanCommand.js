@@ -27,6 +27,8 @@ module.exports = class BanCommand extends BaseCommand {
 			.setDescription(`Usage: \`${process.env.DISCORD_BOT_PREFIX}${this.name} ${this.usage}\``)
 			.setTimestamp();
 		let pattern = /[0-9]{18}/
+		if (!args[0])
+			return msg.channel.send({embeds: [missingArgsEmbed]})
 		if (msg.mentions.users.first() || msg.guild.members.cache.find(m => m.id === args[0])) {
 			try {
 				var bUser = await msg.guild.members.fetch(msg.mentions.users.first() || args[0]);

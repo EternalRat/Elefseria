@@ -1,7 +1,7 @@
 const BaseModule = require('../utils/structures/BaseModule');
 
-module.exports = class VoiceModule extends BaseModule {
+module.exports = class AnimeModule extends BaseModule {
 	constructor() {
-		super("Voice");
+		super("Anime");
 	}
 }

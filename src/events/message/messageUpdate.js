@@ -1,5 +1,6 @@
 const BaseEvent = require("../../utils/structures/BaseEvent");
 const {MessageEmbed, Client, Message} = require("discord.js")
+const fs = require('fs')
 
 module.exports = class MessageupdateEvent extends BaseEvent {
     constructor () {
@@ -15,6 +16,7 @@ module.exports = class MessageupdateEvent extends BaseEvent {
     async run (client, oldMsg, newMsg) {
         if (!newMsg) return;
         if (!newMsg.author) return;
+        if (newMsg.author.bot) return;
         if (newMsg.channel.type !== "GUILD_TEXT" || newMsg.cleanContent === oldMsg.cleanContent) return;
         if (newMsg.cleanContent.length > 1024 || (oldMsg.cleanContent && oldMsg.cleanContent.length > 1024)) return;
         let channel = newMsg.guild.channels.cache.find(ch => ch.name === "msgs-logs");
@@ -38,5 +40,13 @@ module.exports = class MessageupdateEvent extends BaseEvent {
                 iconURL: client.user.displayAvatarURL()
             })
         channel.send({embeds: [embed]});
+        var dir = './logs/' + oldMsg.guild.name + '/';
+
+        if (!fs.existsSync(dir)){
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        fs.appendFile(dir + new Date().toISOString().split('T')[0],`Update - ${new Date().toISOString().split('T')[1]} - ${oldMsg.cleanContent} - ${newMsg.cleanContent} - ${newMsg.channel.name} - ${newMsg.author.username}\n`, function (err) {
+            if (err) throw err;
+        });
     }
 }
