@@ -20,6 +20,7 @@
     "myanimelist-api-wrapper": "^1.1.3",
     "node-myanimelist": "^4.0.0",
     "node-schedule": "^2.0.0",
+    "rss-parser": "^3.12.0",
     "winrarjs": "^0.0.17",
     "xhr2": "^0.2.1"
   }
