@@ -18,9 +18,6 @@ module.exports = class MessageEvent extends BaseEvent {
 		if (message.author.bot) return;
 		await levelingSystem(message, client);
 		await increaseCount(message);
-		/*if (message.author.id == '139116958317543425') {
-			message.channel.send('Attention a toi Emi SATELLITE')
-		}*/
 		if (message.content.startsWith(client.prefix)) {
 			const [cmdName, ...cmdArgs] = message.content.slice(client.prefix.length).trim().split(/\s+/);
 			for (var mod of client.modules) {

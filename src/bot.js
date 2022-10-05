@@ -7,6 +7,7 @@ const GiveawayModule = require('./modules/GiveawayModule');
 const LevelingModule = require('./modules/LevelingModule');
 const ModerationModule = require('./modules/ModerationModule');
 const ReactionRoleModule = require('./modules/ReactionRoleModule');
+const NewsModule = require('./modules/NewsModule');
 const SecurityModule = require('./modules/SecurityModule');
 const SettingsModule = require('./modules/SettingsModule');
 const TicketModule = require('./modules/TicketModule');
@@ -39,19 +40,20 @@ const client = new Client({
 });
 
 (async () => {
-	const paths = new Array("anime", "finalfantasy", "fun", "giveaway", "moderation", "reactionrole", "security", "settings", "ticket", "voice", "leveling");
+	const paths = new Array("anime", "finalfantasy", "fun", "giveaway", "leveling", "moderation", "news", "reactionrole", "security", "settings", "ticket", "voice", );
 	client.modules = new Set([
 		new AnimeModule(),
 		new FinalFantasyModule(),
 		new FunModule(),
 		new GiveawayModule(),
+		new LevelingModule(),
 		new ModerationModule(),
+		new NewsModule(),
 		new ReactionRoleModule(),
 		new SecurityModule(),
 		new SettingsModule(),
 		new TicketModule(),
 		new VoiceModule(),
-		new LevelingModule()
 	]);
 	client.mutes = require("./utils/json/mute.json");
 	client.cachedMessageReactions = new Map();

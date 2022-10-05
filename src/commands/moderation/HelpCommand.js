@@ -41,8 +41,7 @@ module.exports = class HelpCommand extends BaseCommand {
 					break;
 				}
 			};
-			//console.log(moduleFound.commands)
-			//console.log(moduleFound.commands.keys())
+			
 			const fieldValues = new Array()
 			for (var moduleCommand of moduleFound.commands) {
 				const moduleName = moduleCommand[0]
@@ -54,12 +53,12 @@ module.exports = class HelpCommand extends BaseCommand {
 				})
 				fieldValues.push({
 					name: `Description`,
-					value: `${command.description}`,
+					value: `${command.description ? command.description : "No description"}`,
 					inline: true,
 				})
 				fieldValues.push({
 					name: `Aliases`,
-					value: `${command.aliases.join(', ')}`,
+					value: `${command.aliases.length != 0 ? command.aliases.join(', ') : "No aliases"}`,
 					inline: true,
 				})
 			}
