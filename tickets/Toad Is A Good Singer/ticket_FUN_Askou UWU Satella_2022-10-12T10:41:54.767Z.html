@@ -1,60 +1,8 @@
-const { MessageManager, GuildChannel, TextChannel, Guild } = require("discord.js");
-const fs = require("fs");
-const Winrar = require("winrarjs");
-const { parseZone } = require("moment");
-
-module.exports = class TranscriptTicket {
-	/**
-	 * 
-	 * @param {Guild} guild 
-	 * @param {String} channelName 
-	 * @param {String} seller 
-	 * @param {String} customer 
-	 * @param {String} subject 
-	 */
-	constructor(guild, channelName, seller, customer, subject) {
-		this.guild = guild;
-		this.channelName = channelName;
-		this.seller = seller;
-		this.customer = customer;
-		this.subject = subject;
-		this.title = `Ticket for ${this.customer} about ${this.subject}`;
-		this.content = "";
-		this.file = ""
-	}
-
-	/**
-	 * Realize the transcription of all the messages in an html format
-	 * 
-	 * @param {MessageManager} messages 
-	 */
-	async doTranscript(messages) {
-		console.log(messages)
-		await messages.fetch({}, {cache: true}).then(message => {
-			message = message.reverse()
-			message.forEach(msg => {
-				this.content += `<div class="chatlog__message-group">
-				<div class="chatlog__author-avatar-container">
-					<img class="chatlog__author-avatar" src=${msg.author.displayAvatarURL({dynamic: true, format: "png" || "gif"})}>
-				</div>`;
-				this.content += `<div class="chatlog__messages">
-					<p id="conv"><span id="username" title="${msg.author.tag}">${msg.author.username}</span> <span id="timestamp">${parseZone(msg.createdTimestamp).format("dddd Do MMMM in YYYY, HH:mm:ss")}</span></br>${msg.content}</p>
-				</div>
-			</div>`;
-			})
-		});
-		
-	}
-
-	/**
-	 * Create the html file
-	 */
-	async createFile() {
-		var html_content = `<!DOCTYPE html>
+<!DOCTYPE html>
 		<html>
 			<head>
 				<meta charset="UTF-8">
-				<title>${this.title}</title>
+				<title>Ticket for Askou UWU Satella about FUN</title>
 				<style>
 				body {
 					height: 100%;
@@ -77,7 +25,7 @@ module.exports = class TranscriptTicket {
 					display: flex;
 					justify-content: center;
 					align-items: center;
-					max-width: 70%;
+					max-width: 300px;
 				}
 
 				.info__guild-icon-container {
@@ -177,7 +125,7 @@ module.exports = class TranscriptTicket {
 
 				.chatlog__messages {
 					flex: 1;
-					min-width: 60%;
+					min-width: 50%;
 				}
 				</style>
 			</head>
@@ -186,32 +134,16 @@ module.exports = class TranscriptTicket {
 					<div class="info">
 						<div class="info__guild-icon-container">
 							<img class=info__guild-icon
-								src=${this.guild.iconURL() ? this.guild.iconURL() : ""}>
+								src=>
 						</div>
 						<div class="info__metadata">
-							<div class="info__guild-name">${this.guild.name}</div>
-							<div class="info__channel-name">${this.channelName}</div>
+							<div class="info__guild-name">Toad Is A Good Singer</div>
+							<div class="info__channel-name">fun-ticket-askou-uwu-satella</div>
 						</div>
 					</div>
 					<div id="chat">
-						${this.content}
+						
 					</div>
 				</div>
 			</body>
-		</html>`;
-
-		var dir = './tickets/' + this.guild.name + "/";
-
-        if (!fs.existsSync(dir)){
-            fs.mkdirSync(dir, { recursive: true });
-        }
-
-		let fileName = dir + `/ticket_${this.subject}_${this.customer}_${new Date().toISOString()}.html`
-
-		this.file = fileName;
-
-		fs.appendFile(fileName, html_content, function (err) {
-			if (err) throw err;
-		});
-	}
-}
+		</html>

@@ -1,60 +1,8 @@
-const { MessageManager, GuildChannel, TextChannel, Guild } = require("discord.js");
-const fs = require("fs");
-const Winrar = require("winrarjs");
-const { parseZone } = require("moment");
-
-module.exports = class TranscriptTicket {
-	/**
-	 * 
-	 * @param {Guild} guild 
-	 * @param {String} channelName 
-	 * @param {String} seller 
-	 * @param {String} customer 
-	 * @param {String} subject 
-	 */
-	constructor(guild, channelName, seller, customer, subject) {
-		this.guild = guild;
-		this.channelName = channelName;
-		this.seller = seller;
-		this.customer = customer;
-		this.subject = subject;
-		this.title = `Ticket for ${this.customer} about ${this.subject}`;
-		this.content = "";
-		this.file = ""
-	}
-
-	/**
-	 * Realize the transcription of all the messages in an html format
-	 * 
-	 * @param {MessageManager} messages 
-	 */
-	async doTranscript(messages) {
-		console.log(messages)
-		await messages.fetch({}, {cache: true}).then(message => {
-			message = message.reverse()
-			message.forEach(msg => {
-				this.content += `<div class="chatlog__message-group">
-				<div class="chatlog__author-avatar-container">
-					<img class="chatlog__author-avatar" src=${msg.author.displayAvatarURL({dynamic: true, format: "png" || "gif"})}>
-				</div>`;
-				this.content += `<div class="chatlog__messages">
-					<p id="conv"><span id="username" title="${msg.author.tag}">${msg.author.username}</span> <span id="timestamp">${parseZone(msg.createdTimestamp).format("dddd Do MMMM in YYYY, HH:mm:ss")}</span></br>${msg.content}</p>
-				</div>
-			</div>`;
-			})
-		});
-		
-	}
-
-	/**
-	 * Create the html file
-	 */
-	async createFile() {
-		var html_content = `<!DOCTYPE html>
+<!DOCTYPE html>
 		<html>
 			<head>
 				<meta charset="UTF-8">
-				<title>${this.title}</title>
+				<title>Ticket for Askou UWU Satella about Réclamation</title>
 				<style>
 				body {
 					height: 100%;
@@ -186,32 +134,28 @@ module.exports = class TranscriptTicket {
 					<div class="info">
 						<div class="info__guild-icon-container">
 							<img class=info__guild-icon
-								src=${this.guild.iconURL() ? this.guild.iconURL() : ""}>
+								src=https://cdn.discordapp.com/icons/882289078148681759/536cf2fec0d81ba427b4b2f5e1b809c5.webp>
 						</div>
 						<div class="info__metadata">
-							<div class="info__guild-name">${this.guild.name}</div>
-							<div class="info__channel-name">${this.channelName}</div>
+							<div class="info__guild-name">A Place To have fun ?</div>
+							<div class="info__channel-name">réclamation-ticket-askou-uwu-satella</div>
 						</div>
 					</div>
 					<div id="chat">
-						${this.content}
+						<div class="chatlog__message-group">
+				<div class="chatlog__author-avatar-container">
+					<img class="chatlog__author-avatar" src=https://cdn.discordapp.com/avatars/1009376737936822343/e81bd566b86dfcfd23550079cdc4ec14.png>
+				</div><div class="chatlog__messages">
+					<p id="conv"><span id="username" title="Elefseria#1531">Elefseria</span> <span id="timestamp">Wednesday 12th October in 2022, 12:08:12</span></br>Nouveau Ticket</p>
+				</div>
+			</div><div class="chatlog__message-group">
+				<div class="chatlog__author-avatar-container">
+					<img class="chatlog__author-avatar" src=https://cdn.discordapp.com/avatars/1009376737936822343/e81bd566b86dfcfd23550079cdc4ec14.png>
+				</div><div class="chatlog__messages">
+					<p id="conv"><span id="username" title="Elefseria#1531">Elefseria</span> <span id="timestamp">Wednesday 12th October in 2022, 12:08:16</span></br></p>
+				</div>
+			</div>
 					</div>
 				</div>
 			</body>
-		</html>`;
-
-		var dir = './tickets/' + this.guild.name + "/";
-
-        if (!fs.existsSync(dir)){
-            fs.mkdirSync(dir, { recursive: true });
-        }
-
-		let fileName = dir + `/ticket_${this.subject}_${this.customer}_${new Date().toISOString()}.html`
-
-		this.file = fileName;
-
-		fs.appendFile(fileName, html_content, function (err) {
-			if (err) throw err;
-		});
-	}
-}
+		</html>

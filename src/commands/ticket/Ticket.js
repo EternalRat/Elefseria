@@ -15,6 +15,7 @@ module.exports = class Ticket {
 		this.msg.channel.permissionOverwrites.edit(this.msg.guild.id, {
 			"VIEW_CHANNEL": false
 		});
+		console.log("Yes ?")
 	}
 
 	/**

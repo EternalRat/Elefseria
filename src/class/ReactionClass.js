@@ -1,4 +1,4 @@
-const { Client, MessageReaction, GuildMember, MessageEmbed } = require('discord.js');
+const { Client, MessageReaction, GuildMember, MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
 const MessageModel = require('../utils/database/models/reactionrole');
 const ticketChannel = require("../utils/database/models/ticket");
 const TranscriptTicket = require('../utils/transcriptTicket');
@@ -21,29 +21,29 @@ module.exports = class Reaction {
 
 	async addRole() {
 		if (this.reaction.message.partial) {
-            await this.reaction.message.fetch();
-            let { id } = this.reaction.message;
-            try {
-                let msgDocument = await MessageModel.findOne({ messageId: id });
-                if (msgDocument) {
-                    this.client.cachedMessageReactions.set(id, msgDocument.emojiRoleMappings);
-                    this._addMemberRole(this.client.cachedMessageReactions.get(this.reaction.message.id));
+			await this.reaction.message.fetch();
+			let { id } = this.reaction.message;
+			try {
+				let msgDocument = await MessageModel.findOne({ messageId: id });
+				if (msgDocument) {
+					this.client.cachedMessageReactions.set(id, msgDocument.emojiRoleMappings);
+					this._addMemberRole(this.client.cachedMessageReactions.get(this.reaction.message.id));
 					return 1;
 				}
-            } catch(err) {
-                console.log(err);
-            }
-        } else {
-            if (this.client.cachedMessageReactions.get(this.reaction.message.id)) {
-                this._addMemberRole(this.client.cachedMessageReactions.get(this.reaction.message.id));
+			} catch (err) {
+				console.log(err);
+			}
+		} else {
+			if (this.client.cachedMessageReactions.get(this.reaction.message.id)) {
+				this._addMemberRole(this.client.cachedMessageReactions.get(this.reaction.message.id));
 				return 1;
 			}
-        }
+		}
 		return 0;
 	}
 
 	async _addMemberRole(emojiRoleMappings) {
-		if(emojiRoleMappings[this.reaction.emoji.id]) {
+		if (emojiRoleMappings[this.reaction.emoji.id]) {
 			let roleId = emojiRoleMappings[this.reaction.emoji.id];
 			let role = await this.reaction.message.guild.roles.fetch(roleId);
 			let member = this.reaction.message.guild.members.cache.get(this.user.id);
@@ -54,9 +54,9 @@ module.exports = class Reaction {
 	}
 
 	async checkBlacklist() {
-		const giveaway = await Giveaway.findOne({guildId: this.reaction.message.guild.id, messageId: this.reaction.message.id});
+		const giveaway = await Giveaway.findOne({ guildId: this.reaction.message.guild.id, messageId: this.reaction.message.id });
 		if (!giveaway) return;
-		const blacklist = await GUserBlacklist.findOne({guildId: this.reaction.message.guild.id});
+		const blacklist = await GUserBlacklist.findOne({ guildId: this.reaction.message.guild.id });
 		if (!blacklist) {
 			this.user.send(`Your participation for ${giveaway.get('prize')} has been confirmed.`);
 			return 0;
@@ -77,7 +77,7 @@ module.exports = class Reaction {
 	}
 
 	async createTicket() {
-		const ticketCh = await ticketChannel.findOne({messageId: this.reaction.message.id});
+		const ticketCh = await ticketChannel.findOne({ messageId: this.reaction.message.id });
 		if (ticketCh && this.reaction.emoji.name === "📩") {
 			this.reaction.users.remove(this.user.id);
 			const channelParent = this.reaction.message.channel.parent;
@@ -85,7 +85,7 @@ module.exports = class Reaction {
 			this.reaction.message.guild.channels.create(`${ticketCh.get("ticketType")} ticket ${this.user.username}`, {
 				type: "GUILD_TEXT",
 				parent: channelParent
-			}).then(async(ch) => {
+			}).then(async (ch) => {
 				ch.permissionOverwrites.edit(this.user.id, {
 					VIEW_CHANNEL: true
 				})
@@ -97,27 +97,45 @@ module.exports = class Reaction {
 						.setTitle(`Ticket`)
 						.setDescription("Afin de fermer le ticket, il vous suffira d'appuyer sur la réaction 🔐.")
 						.setAuthor({
-							name: this.user.username, 
+							name: this.user.username,
 							iconURL: this.user.displayAvatarURL()
 						})
 						.setThumbnail(this.reaction.message.guild.iconURL())
 						.setTimestamp();
-					ch.send({content: `@everyone`, embeds: [ticketEmbed]}).then(msg => {
+					const row = new MessageActionRow()
+						.addComponents(
+							new MessageButton()
+								.setCustomId('closeTicket')
+								.setLabel('🔐')
+								.setStyle("PRIMARY"),
+							new MessageButton()
+								.setCustomId('deleteTicket')
+								.setLabel('❌')
+								.setStyle("PRIMARY"),
+							new MessageButton()
+								.setCustomId('transcriptTicket')
+								.setLabel('📝')
+								.setStyle("PRIMARY"),
+						)
+					ch.send({ content: `Nouveau Ticket`, embeds: [ticketEmbed], components: [row] }).then(msg => {
 						msg.react("🔐");
-						const filter = (reaction, userReact) => ["🔐"].includes(reaction.emoji.name) && userReact.id === this.user.id
-						msg.awaitReactions({filter, max: 1}).then(async (collected) => {
-							const reaction = collected.first();
-
+						msg.react("❌");
+						msg.react("📝");
+						const filter = (reaction, userReact) => ["🔐", "📝" ,"❌"].includes(reaction.emoji.name) && userReact.id === this.user.id
+						const collector = msg.createReactionCollector({ filter });
+						collector.on('collect', reaction => {
+							console.log(reaction);
 							switch (reaction.emoji.name) {
 								case "🔐":
+									console.log("🔐")
 									var user = this.user;
 									var timer = 6;
-									var timeToDel = setInterval(async() => {
+									var timeToDel = setInterval(async () => {
 										ticketEmbed.setDescription(`Le ticket se fermera dans ${--timer}secondes !`)
 										if (timer <= 0) {
 											clearing();
 										} else {
-											msg.edit({embeds: [ticketEmbed]});
+											msg.edit({ embeds: [ticketEmbed] });
 										}
 									}, 1000);
 									async function clearing() {
@@ -125,13 +143,51 @@ module.exports = class Reaction {
 										ch.permissionOverwrites.edit(user.id, {
 											VIEW_CHANNEL: false
 										});
+										/*let newTranscript = new TranscriptTicket(ch.guild, ch.name, "EternalRat", user.username, ticketCh.get("ticketType"));
+										await newTranscript.doTranscript(ch.messages);
+										newTranscript.createFile();*/
+										ticketEmbed.setDescription(`Le ticket est clos !`)
+										msg.edit({ embeds: [ticketEmbed] });
+									}
+									break;
+								case "❌":
+									console.log("❌")
+									var user = this.user;
+									var timer = 6;
+									var timeToDel = setInterval(async () => {
+										ticketEmbed.setDescription(`Le ticket se détruira dans ${--timer}secondes !`)
+										if (timer <= 0) {
+											deleteTicket();
+										} else {
+											msg.edit({ embeds: [ticketEmbed] });
+										}
+									}, 1000);
+									async function deleteTicket() {
+										clearInterval(timeToDel);
+										ch.delete()
+										/*let newTranscript = new TranscriptTicket(ch.guild, ch.name, "EternalRat", user.username, ticketCh.get("ticketType"));
+										await newTranscript.doTranscript(ch.messages);
+										newTranscript.createFile();*/
+									}
+									break;
+								case "📝":
+									console.log("📝")
+									var user = this.user;
+									sendTranscript()
+									async function sendTranscript() {
 										let newTranscript = new TranscriptTicket(ch.guild, ch.name, "EternalRat", user.username, ticketCh.get("ticketType"));
-										newTranscript.doTranscript(ch.messages);
+										await newTranscript.doTranscript(ch.messages);
 										newTranscript.createFile();
+										ch.send({files: [newTranscript.file]})
 									}
 									break;
 							}
 						})
+						/*msg.awaitReactions({filter}).then(async (collected) => {
+							const reaction = collected.first();
+
+							
+						})*/
 					})
 				}, 1000)
 			})
