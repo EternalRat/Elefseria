@@ -216,51 +216,111 @@ export abstract class BaseModule {
      */
     public async registerSlashCommands(
         client: DiscordClient,
-        alreadyAdded: Array<string>,
+        alreadyAdded: Array<any>,
         guildId?: string,
     ): Promise<void> {
         console.info(
             'Registering slash commands should be done using a script now. See the DiscordJS documentation for further details.',
         );
-        /*  const toRegister = new Array();
-        for (const [_, interaction] of this.slashCommands) { */
-        /* if (alreadyAdded.includes(interaction.name)) {
-                console.info(`Interaction ${interaction.name} already added`);
-                continue;
-            } */
-        /* const slashCommand = (
-                interaction as BaseSlashCommand
-            ).getSlashCommand();
-            if (!slashCommand) continue;
-            toRegister.push(slashCommand.toJSON());
+        const commands = Array.from(this.slashCommands.values());
+        const commandsToRegister = commands.filter((command) => {
+            const slashedCommand = command.getSlashCommandJSON();
+            console.log({ slashedCommand }, { alreadyAdded });
+            if (
+                alreadyAdded.find(
+                    (addedCommand) => slashedCommand.name === addedCommand.name,
+                )
+            ) {
+                return false;
+            }
+            return true;
+        });
+        const commandsToRefresh = commands.filter((command) => {
+            if (
+                !alreadyAdded.find((registeredCommand) => {
+                    const slashedCommand = command.getSlashCommandJSON();
+                    const differentName =
+                        slashedCommand.name === registeredCommand.name;
+                    const differentDescription =
+                        slashedCommand.description ===
+                        registeredCommand.description;
+                    const differentOptions =
+                        JSON.stringify(slashedCommand.options) ===
+                        JSON.stringify(registeredCommand.options);
+                    const differentNSFW =
+                        slashedCommand.nsfw === registeredCommand.nsfw;
+                    const differentPerm =
+                        slashedCommand.default_member_permissions ===
+                        registeredCommand.default_member_permissions;
+                    console.log({ slashedCommand }, { registeredCommand });
+                    return (
+                        differentName &&
+                        differentDescription &&
+                        differentOptions &&
+                        differentNSFW &&
+                        differentPerm
+                    );
+                })
+            )
+                return true;
+            return false;
+        });
+
+        console.info(
+            `Started added ${commandsToRegister.length} application (/) commands.`,
+        );
+        // The put method is used to fully refresh all commands in the guild with the current set
+        const addedData = (await client.rest.put(
+            guildId
+                ? Routes.applicationGuildCommands(client.getClientId(), guildId)
+                : Routes.applicationCommands(client.getClientId()),
+            {
+                body: commandsToRegister.map((commandToRegister) =>
+                    commandToRegister.getSlashCommandJSON(),
+                ),
+            },
+        )) as Array<any>;
+
+        console.info(
+            `Successfully added ${addedData.length} application (/) commands.`,
+        );
+
+        console.info(
+            `Started refreshing ${commandsToRefresh.length} application (/) commands.`,
+        );
+
+        const refreshData = [];
+        for (const command of commandsToRefresh) {
+            const registeredCommand = alreadyAdded.find(
+                (registeredCommand) => registeredCommand.name === command.name,
+            );
+            if (registeredCommand) {
+                const commandId = registeredCommand.id;
+                const updatedData = (await client.rest.patch(
+                    guildId
+                        ? Routes.applicationGuildCommand(
+                              client.getClientId(),
+                              guildId,
+                              commandId,
+                          )
+                        : Routes.applicationCommand(
+                              client.getClientId(),
+                              commandId,
+                          ),
+                    {
+                        body: {
+                            ...command.getSlashCommandJSON(),
+                            id: commandId,
+                        },
+                    },
+                )) as Array<any>;
+                refreshData.push(updatedData);
+            }
         }
 
-        if (toRegister.length === 0) {
-            console.info(
-                `No slash commands to register for module ${this.name}`,
-            );
-            return;
-        }
-
-        console.table('To Register', toRegister);
-
-        if (!guildId) {
-            await client.rest.put(
-                Routes.applicationCommands(client.getClientId()),
-                {
-                    body: toRegister,
-                },
-            );
-        } else {
-            await client.rest.put(
-                Routes.applicationGuildCommands(client.getClientId(), guildId),
-                { body: toRegister },
-            );
-            const registeredSlashCommands = await client.rest.get(
-                Routes.applicationGuildCommands(client.getClientId(), guildId),
-            );
-            console.log({ registeredSlashCommands });
-        } */
+        console.info(
+            `Successfully refreshed ${refreshData.length} application (/) commands.`,
+        );
     }
 
     /**

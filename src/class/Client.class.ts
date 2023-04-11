@@ -129,9 +129,9 @@ export class DiscordClient extends Client {
                 `/applications/${this.clientId}/commands`,
             )) as Array<{ name: string }>;
 
-            let addedSlashCommands: string[] = [];
+            let addedSlashCommands: any[] = [];
             for (let i = 0; i < restResponse.length; i++) {
-                addedSlashCommands.push(restResponse[i].name);
+                addedSlashCommands.push(restResponse[i]);
             }
             await module.loadCommands(`src/commands/${module.getName()}`);
             await module.loadInteractions(

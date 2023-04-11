@@ -13,9 +13,10 @@ export class DBConnection {
 
     private constructor() {
         const connection = mysql.createConnection({
-            host: '',
+            host: process.env.DB_HOST,
             user: process.env.DB_USER!,
             password: process.env.DB_PASS,
+            port: parseInt(process.env.DB_PORT!),
         });
         connection.query(`CREATE DATABASE IF NOT EXISTS elefseria`);
         connection.end();

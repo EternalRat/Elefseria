@@ -28,7 +28,11 @@ export class PongSlashCommand extends BaseSlashCommand {
                         { name: 'Movie', value: 'gif_movie' },
                     ),
             )
-            .setDefaultMemberPermissions(null);
+            .setDefaultMemberPermissions(null)
+            .setDMPermission(false)
+            .setDescriptionLocalization('fr', 'Ping! Pong!')
+            .setNameLocalization('fr', 'pong')
+            .setNSFW(false);
     }
 
     /**
