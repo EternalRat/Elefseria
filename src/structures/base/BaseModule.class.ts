@@ -219,13 +219,16 @@ export abstract class BaseModule {
         alreadyAdded: Array<string>,
         guildId?: string,
     ): Promise<void> {
-        const toRegister = new Array();
-        for (const [_, interaction] of this.slashCommands) {
-            /* if (alreadyAdded.includes(interaction.name)) {
+        console.info(
+            'Registering slash commands should be done using a script now. See the DiscordJS documentation for further details.',
+        );
+        /*  const toRegister = new Array();
+        for (const [_, interaction] of this.slashCommands) { */
+        /* if (alreadyAdded.includes(interaction.name)) {
                 console.info(`Interaction ${interaction.name} already added`);
                 continue;
             } */
-            const slashCommand = (
+        /* const slashCommand = (
                 interaction as BaseSlashCommand
             ).getSlashCommand();
             if (!slashCommand) continue;
@@ -257,7 +260,7 @@ export abstract class BaseModule {
                 Routes.applicationGuildCommands(client.getClientId(), guildId),
             );
             console.log({ registeredSlashCommands });
-        }
+        } */
     }
 
     /**
