@@ -1,0 +1,181 @@
+:root {
+    --font-primary: "gg sans","Noto Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    --font-display: "gg sans","Noto Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    --font-headline: "ABC Ginto Nord","Noto Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    --text-normal: hsl((210, calc(1 * 9.1%), 87.1%) / 1);
+    --background-primary: rgb(66,69,73);
+    --background-secondary: rgb(54,57,62);
+    --font-code: Consolas,"Andale Mono WT","Andale Mono","Lucida Console","Lucida Sans Typewriter","DejaVu Sans Mono","Bitstream Vera Sans Mono","Liberation Mono","Nimbus Mono L",Monaco,"Courier New",Courier,monospace;
+}
+
+@font-face {
+    font-family: "gg sans";
+    src: url('https://fonts.cdnfonts.com/css/gg-sans-2');
+}
+
+.chatBox {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+
+    overflow-y: scroll;
+    overflow-x: hidden;
+    overflow-anchor: none;
+
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    -webkit-box-flex: 1;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    background: var(--background-secondary);
+    list-style: none;
+}
+
+a {
+    color: #00A8FC;
+    text-decoration: none;
+}
+
+.chatTimeStamp {
+    font-size: 0.75rem;
+    line-height: 1.125;
+    color: #B9BBBE;
+    display: inline;
+    vertical-align: baseline;
+    position: relative;
+    overflow: hidden;
+
+    user-select: text;
+    padding-left: 6px;
+
+    font-style: 16px var(--font-primary);
+}
+
+.chatGif {
+    height: 100%;
+    max-height: 300px;
+    border-radius: 8px;
+}
+
+.chatImage {
+    width: 100%;
+    max-width: 450px;
+    border-radius: 8px;
+}
+
+.chatContent {
+    margin-left: 36px;
+    padding-left: 36px;
+}
+
+.chatUsername {
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.375rem;
+    color: #F2F3F5;
+    display: inline;
+    vertical-align: baseline;
+    position: relative;
+    overflow: hidden;
+
+    user-select: text;
+
+    font-style: 16px var(--font-primary);
+}
+
+.chatAvatar {
+    position: absolute;
+    left: 16px;
+    margin-top: calc(4px - 0.125rem);
+
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-box-flex: 0;
+    -ms-flex: 0 0 auto;
+    flex: 0 0 auto;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.chatInput {
+    user-select: text;
+
+    overflow: hidden;
+    position: relative;
+
+    font-size: 1rem;
+    line-height: 1.375rem;
+
+    font-style: 16px var(--font-primary);
+
+    text-indent: 0;
+    color: #DBDEE1
+}
+
+.code {
+    width: calc(100% - 72px);
+    user-select: text;
+    overflow: hidden;
+    position: relative;
+    font-size: 1rem;
+    text-indent: 0;
+    line-height: 1.375rem;
+    color : #DBDEE1;
+    background: rgb(66,69,73);
+    border-radius: 8px;
+    font-style: 16px var(--font-primary);
+    white-space: break-spaces;
+}
+
+
+.chatInputImage {
+    user-select: text;
+
+    overflow: hidden;
+    position: relative;
+
+    font-size: 1rem;
+    line-height: 1.375rem;
+
+    font-style: 16px var(--font-primary);
+
+    text-indent: 0;
+    color: #DBDEE1
+}
+
+.userId {
+    display: none;
+}
+
+.userContent:hover .userId {
+    display: inline
+}
+
+.username {
+    display: inline;
+}
+
+.userContent:hover .username {
+    display: none;
+}
+
+.chatListItem {
+    outline: none;
+    position: relative;
+
+    padding-top: 4px;
+}
