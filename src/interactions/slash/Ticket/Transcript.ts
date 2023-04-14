@@ -10,7 +10,7 @@ export class TicketOpenSlashCommand extends BaseSlashCommand {
     constructor() {
         super(
             'transcript',
-            "Create a transcript for the current ticket.",
+            'Create a transcript for the current ticket.',
             'Ticket',
             null,
             0,

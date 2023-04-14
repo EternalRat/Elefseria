@@ -10,7 +10,7 @@ export class TicketOpenSlashCommand extends BaseSlashCommand {
     constructor() {
         super(
             'claim',
-            "Claim the ticket for yourself",
+            'Claim the ticket for yourself',
             'Ticket',
             null,
             0,

@@ -10,7 +10,7 @@ export class TicketOpenSlashCommand extends BaseSlashCommand {
     constructor() {
         super(
             'adduser',
-            "Add an user to the ticket",
+            'Add an user to the ticket',
             'Ticket',
             null,
             0,
