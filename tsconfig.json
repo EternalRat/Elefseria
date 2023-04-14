@@ -1,0 +1,65 @@
+{
+	"compilerOptions": {
+		"target": "es2017",
+		"module": "commonjs",
+		"outDir": "./dist/",
+		"lib": [
+			"esnext"
+		],
+		"strict": true,
+		"moduleResolution": "node",
+		"importHelpers": true,
+		"experimentalDecorators": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"allowSyntheticDefaultImports": true,
+		"resolveJsonModule": true,
+		"forceConsistentCasingInFileNames": true,
+		"removeComments": true,
+		"typeRoots": [
+			"node_modules/@types"
+		],
+		"sourceMap": false,
+		"baseUrl": "./",
+		"paths": {
+			"@src/*": [
+				"./src/*"
+			],
+			"@events/*": [
+				"./src/events/*"
+			],
+			"@commands/*": [
+				"./src/commands/*"
+			],
+			"@modules/*": [
+				"./src/modules/*"
+			],
+			"@class/*": [
+				"./src/class/*"
+			],
+		}
+	},
+	"typedocOptions": {
+		"entryPoints": [
+			"./src"
+		],
+		"out": "docs",
+		"entryPointStrategy": "expand"
+	},
+	"ts-node": {
+		"require": [
+			"tsconfig-paths/register"
+		]
+	},
+	"files": [
+		"src/entrypoint.ts"
+	],
+	"include": [
+		"src",
+		"./**/*.ts"
+	],
+	"exclude": [
+		"node_modules",
+		"dist"
+	],
+}
