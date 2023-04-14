@@ -1,4 +1,5 @@
 import Sequelize from 'sequelize';
+
 import { DBConnection } from '../../../../class/database/dbConnection.db.class';
 const sequelize = DBConnection.getInstance().sequelize;
 

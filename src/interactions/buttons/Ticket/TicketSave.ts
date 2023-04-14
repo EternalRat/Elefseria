@@ -1,11 +1,6 @@
-import { DiscordClient, BaseInteraction } from '@src/structures';
-import {
-    Attachment,
-    ChatInputCommandInteraction,
-    AttachmentBuilder,
-    AttachmentData,
-} from 'discord.js';
 import { TicketManager } from '@src/class/ticket/ticketManager.class';
+import { BaseInteraction, DiscordClient } from '@src/structures';
+import { AttachmentBuilder, ChatInputCommandInteraction } from 'discord.js';
 
 /**
  * @description TicketSave button interaction

@@ -1,3 +1,7 @@
+import { GuildHandler } from '@src/class/database/handler/guild.handler.class';
+import { TicketHandler } from '@src/class/database/handler/ticket.handler.class';
+import { UserHandler } from '@src/class/database/handler/user.handler.class';
+import { TicketManager } from '@src/class/ticket/ticketManager.class';
 import { BaseEvent, DiscordClient } from '@src/structures';
 import {
     ActivitiesOptions,
@@ -6,10 +10,6 @@ import {
     Guild,
     TextChannel,
 } from 'discord.js';
-import { GuildHandler } from '@src/class/database/handler/guild.handler.class';
-import { UserHandler } from '@src/class/database/handler/user.handler.class';
-import { TicketHandler } from '@src/class/database/handler/ticket.handler.class';
-import { TicketManager } from '@src/class/ticket/ticketManager.class';
 
 /**TicketDB
  * @description Ready event

@@ -1,19 +1,18 @@
-import { ButtonBuilder, ActionRowBuilder } from '@discordjs/builders';
+import { ActionRowBuilder, ButtonBuilder } from '@discordjs/builders';
+import { DiscordClient } from '@src/structures';
 import {
     ButtonStyle,
-    MessageType,
     ChatInputCommandInteraction,
-    TextChannel,
     Message,
     MessageCreateOptions,
-    User,
     OverwriteResolvable,
+    TextChannel,
+    User,
 } from 'discord.js';
 import { EmbedBuilder } from 'discord.js';
-import fs from 'fs';
-import { DiscordClient } from '@src/structures';
-import { TicketHandler } from '../database/handler/ticket.handler.class';
+
 import buildTranscript from '../../util/transcript';
+import { TicketHandler } from '../database/handler/ticket.handler.class';
 
 export class Ticket {
     private id: string;
@@ -199,7 +198,7 @@ export class Ticket {
 
     public async deleteTicket(
         interaction: ChatInputCommandInteraction,
-        client: DiscordClient,
+        _client: DiscordClient,
     ) {
         await interaction.reply('Ticket will be deleted in 10 seconds');
         const channel = interaction.channel;

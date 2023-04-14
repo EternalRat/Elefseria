@@ -30,9 +30,9 @@ export class TicketCreateCommand extends BaseCommand {
      */
 
     async execute(
-        client: DiscordClient,
+        _client: DiscordClient,
         message: Message,
-        args: string[],
+        _args: string[],
     ): Promise<void> {
         TicketManager.getInstance().setNewTicketFromMessage(message);
         console.info(TicketManager.getInstance().getTicket(message.channel.id));

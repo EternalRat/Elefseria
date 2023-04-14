@@ -1,5 +1,5 @@
-import { Message, Events } from 'discord.js';
 import { BaseEvent, DiscordClient } from '@src/structures';
+import { Events, Message } from 'discord.js';
 
 /**
  * @description MessageEdited event

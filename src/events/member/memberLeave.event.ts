@@ -1,7 +1,7 @@
-import { DiscordClient, BaseEvent } from '@src/structures';
-import { GuildMember, Events } from 'discord.js';
-import { UserHandler } from '@src/class/database/handler/user.handler.class';
 import { GuildHandler } from '@src/class/database/handler/guild.handler.class';
+import { UserHandler } from '@src/class/database/handler/user.handler.class';
+import { BaseEvent, DiscordClient } from '@src/structures';
+import { Events, GuildMember } from 'discord.js';
 
 /**
  * @description Event for when a member leave a guild

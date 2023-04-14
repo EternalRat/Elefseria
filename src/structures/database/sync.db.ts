@@ -1,11 +1,11 @@
 import { DBConnection } from '../../class/database/dbConnection.db.class';
 import { GuildModel, GuildUserModel } from './models/guild/guild.model';
-import { UserModel } from './models/user/user.model';
 import {
+    GuildTicketModel,
     TicketModel,
     UserTicketModel,
-    GuildTicketModel,
 } from './models/ticket/ticket.model';
+import { UserModel } from './models/user/user.model';
 
 export default async function databaseSynchronisation(): Promise<void> {
     const sequelize = DBConnection.getInstance().sequelize;
