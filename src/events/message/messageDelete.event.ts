@@ -1,5 +1,5 @@
-import { Message, Events } from 'discord.js';
 import { BaseEvent, DiscordClient } from '@src/structures';
+import { Events, Message } from 'discord.js';
 
 /**
  * @description MessageDeleted event
@@ -19,9 +19,9 @@ export class MessageDeletedEvent extends BaseEvent {
      * @param {string[]} args
      */
     async execute(
-        client: DiscordClient,
+        _client: DiscordClient,
         message: Message,
-        ...args: string[]
+        ..._args: string[]
     ): Promise<void> {
         if (message.author && message.author.bot) return;
 

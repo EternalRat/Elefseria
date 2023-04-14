@@ -1,5 +1,5 @@
-import { Guild, Events } from 'discord.js';
 import { BaseEvent, DiscordClient } from '@src/structures';
+import { Events, Guild } from 'discord.js';
 
 /**
  * @description GuildUpdate event

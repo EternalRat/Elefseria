@@ -1,6 +1,6 @@
-import { Client, REST } from 'discord.js';
-import { BaseModule } from '@src/structures';
 import eventLoader from '@events/loader';
+import { BaseModule } from '@src/structures';
+import { Client, REST, Routes } from 'discord.js';
 
 /**
  * @description Base class for client
@@ -126,12 +126,15 @@ export class DiscordClient extends Client {
     async loadModules(): Promise<void> {
         this.modules.forEach(async (module: BaseModule) => {
             const restResponse = (await this.baseRest.get(
-                `/applications/${this.clientId}/commands`,
-            )) as Array<{ name: string }>;
+                Routes.applicationGuildCommands(
+                    this.clientId,
+                    '1093194368531312700',
+                ),
+            )) as Array<any>;
 
-            let addedSlashCommands: string[] = [];
-            for (let i = 0; i < restResponse.length; i++) {
-                addedSlashCommands.push(restResponse[i].name);
+            let addedSlashCommands: any[] = [];
+            for (const response of restResponse) {
+                addedSlashCommands.push(response);
             }
             await module.loadCommands(`src/commands/${module.getName()}`);
             await module.loadInteractions(

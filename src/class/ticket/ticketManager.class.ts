@@ -1,22 +1,18 @@
+import { TicketHandler } from '@src/class/database/handler/ticket.handler.class';
+import { DiscordClient } from '@src/structures';
 import {
-    Message,
-    EmbedBuilder,
-    TextChannel,
+    CategoryChannelResolvable,
     ChannelType,
     ColorResolvable,
     Colors,
-    CategoryChannelResolvable,
-    MessageCreateOptions,
-    GuildChannel,
-    Channel,
-    Interaction,
-    Collection,
+    EmbedBuilder,
+    Message,
     OverwriteResolvable,
+    TextChannel,
 } from 'discord.js';
-import { DiscordClient } from '@src/structures';
 import { ChatInputCommandInteraction } from 'discord.js';
+
 import { Ticket } from './ticket.class';
-import { TicketHandler } from '@src/class/database/handler/ticket.handler.class';
 
 interface EmbebError {
     title: string;
@@ -89,7 +85,6 @@ export class TicketManager {
      * @returns {Promise<void>}
      */
     async createTicket(message: Message, client: DiscordClient): Promise<void> {
-        const channel = message.channel as TextChannel;
         const guild = message.guild;
         const member = message.member;
 

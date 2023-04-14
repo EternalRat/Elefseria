@@ -1,10 +1,13 @@
 import {
     BaseCommand,
     BaseInteraction,
-    DiscordClient,
     BaseSlashCommand,
+    DiscordClient,
 } from '@src/structures';
-import { Routes } from 'discord.js';
+import {
+    RESTPostAPIChatInputApplicationCommandsJSONBody,
+    Routes,
+} from 'discord.js';
 import fs from 'fs';
 
 /**
@@ -203,6 +206,59 @@ export abstract class BaseModule {
         }
     }
 
+    private hasSameOptions = (addedOption: any, option: any) => {
+        if (!addedOption && !option) return true;
+        if (addedOption.length === 0 && !option) return true;
+        if (!addedOption || !option) return false;
+        if (addedOption.length !== option.length) return false;
+        for (let i = 0; i < addedOption.length; i++) {
+            const added = addedOption[i];
+            const newOption = option[i];
+            if (added.name !== newOption.name) return false;
+            if (added.description !== newOption.description) return false;
+            if (added.type !== newOption.type) return false;
+            if (added.required !== newOption.required) return false;
+            if (
+                (added.choices && !newOption.choices) ||
+                (!added.choices && newOption.choices)
+            )
+                return false;
+            for (let j = 0; j < added.choices.length; j++) {
+                const addedChoice = added.choices[j];
+                const newChoice = newOption.choices[j];
+                if (addedChoice.name !== newChoice.name) return false;
+                if (addedChoice.value !== newChoice.value) return false;
+            }
+        }
+        return true;
+    };
+
+    private isCommandRegistered = (
+        alreadyAdded: Array<RESTPostAPIChatInputApplicationCommandsJSONBody>,
+        command: RESTPostAPIChatInputApplicationCommandsJSONBody,
+    ) => {
+        return alreadyAdded.find((addedCommand) => {
+            const isSameName = command.name === addedCommand.name;
+            const isSameDescription =
+                command.description === addedCommand.description;
+            const isSameOptions = this.hasSameOptions(
+                command.options,
+                addedCommand.options,
+            );
+            const isSameNSFW = command.nsfw === addedCommand.nsfw;
+            const isSameDefaultPermission =
+                command.default_permission === addedCommand.default_permission;
+
+            return (
+                isSameName &&
+                isSameDescription &&
+                isSameOptions &&
+                isSameNSFW &&
+                isSameDefaultPermission
+            );
+        });
+    };
+
     /**
      * @description Registers slash commands
      * @param {DiscordClient} client Discord Client
@@ -216,51 +272,91 @@ export abstract class BaseModule {
      */
     public async registerSlashCommands(
         client: DiscordClient,
-        alreadyAdded: Array<string>,
+        alreadyAdded: Array<any>,
         guildId?: string,
     ): Promise<void> {
+        const commands = Array.from(this.slashCommands.values());
+        const commandsToRegister = commands.filter((command) => {
+            const slashedCommand = command.getSlashCommandJSON();
+            if (
+                alreadyAdded.find((addedCommand) => {
+                    return slashedCommand.name === addedCommand.name;
+                })
+            ) {
+                return false;
+            }
+            return true;
+        });
+        const commandsToRefresh = commands.filter((command) => {
+            if (
+                this.isCommandRegistered(
+                    alreadyAdded,
+                    command.getSlashCommandJSON(),
+                )
+            )
+                return false;
+            return true;
+        });
+        const allCommands = commandsToRegister.concat(commandsToRefresh);
+        const commandsToUnregister = alreadyAdded.filter((addedCommand) => {
+            if (
+                commands.find((command) => {
+                    return (
+                        command.getSlashCommandJSON().name === addedCommand.name
+                    );
+                })
+            )
+                return false;
+            return true;
+        });
+
         console.info(
-            'Registering slash commands should be done using a script now. See the DiscordJS documentation for further details.',
+            `Started unregistering ${commandsToUnregister.length} application (/) commands.`,
         );
-        /*  const toRegister = new Array();
-        for (const [_, interaction] of this.slashCommands) { */
-        /* if (alreadyAdded.includes(interaction.name)) {
-                console.info(`Interaction ${interaction.name} already added`);
-                continue;
-            } */
-        /* const slashCommand = (
-                interaction as BaseSlashCommand
-            ).getSlashCommand();
-            if (!slashCommand) continue;
-            toRegister.push(slashCommand.toJSON());
-        }
 
-        if (toRegister.length === 0) {
-            console.info(
-                `No slash commands to register for module ${this.name}`,
+        for (const command of commandsToUnregister) {
+            await client.rest.delete(
+                guildId
+                    ? Routes.applicationGuildCommand(
+                          client.getClientId(),
+                          guildId,
+                          command.id,
+                      )
+                    : Routes.applicationCommand(
+                          client.getClientId(),
+                          command.id,
+                      ),
             );
-            return;
         }
 
-        console.table('To Register', toRegister);
+        console.info(
+            `Successfully unregistered ${commandsToUnregister.length} application (/) commands.`,
+        );
 
-        if (!guildId) {
-            await client.rest.put(
-                Routes.applicationCommands(client.getClientId()),
+        console.info(
+            `Started adding/refreshing ${allCommands.length} application (/) commands.`,
+        );
+
+        let addedOrRefreshed = 0;
+
+        for (const command of allCommands) {
+            await client.rest.post(
+                guildId
+                    ? Routes.applicationGuildCommands(
+                          client.getClientId(),
+                          guildId,
+                      )
+                    : Routes.applicationCommands(client.getClientId()),
                 {
-                    body: toRegister,
+                    body: command.getSlashCommandJSON(),
                 },
             );
-        } else {
-            await client.rest.put(
-                Routes.applicationGuildCommands(client.getClientId(), guildId),
-                { body: toRegister },
-            );
-            const registeredSlashCommands = await client.rest.get(
-                Routes.applicationGuildCommands(client.getClientId(), guildId),
-            );
-            console.log({ registeredSlashCommands });
-        } */
+            addedOrRefreshed++;
+        }
+
+        console.info(
+            `Successfully added/refreshed ${addedOrRefreshed} application (/) commands.`,
+        );
     }
 
     /**

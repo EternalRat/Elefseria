@@ -1,5 +1,8 @@
-import { SlashCommandBuilder, SlashCommandUserOption } from 'discord.js';
 import { BaseInteraction } from '@src/structures';
+import {
+    RESTPostAPIChatInputApplicationCommandsJSONBody,
+    SlashCommandBuilder,
+} from 'discord.js';
 export { DiscordClient } from '@class/Client.class';
 
 /**
@@ -38,7 +41,12 @@ export abstract class BaseSlashCommand extends BaseInteraction {
      * @returns {SlashCommandBuilder}
      *
      */
-    public getSlashCommand(): SlashCommandBuilder | undefined {
-        return this.slashCommand;
+    public getSlashCommandJSON(): RESTPostAPIChatInputApplicationCommandsJSONBody {
+        if (!this.slashCommand) {
+            throw new Error(
+                `Slash command ${this.name} does not have a SlashCommandBuilder`,
+            );
+        }
+        return this.slashCommand.toJSON();
     }
 }

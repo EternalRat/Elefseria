@@ -1,7 +1,7 @@
-import { Guild, Events } from 'discord.js';
-import { BaseEvent, DiscordClient } from '@src/structures';
 import { GuildHandler } from '@src/class/database/handler/guild.handler.class';
 import { UserHandler } from '@src/class/database/handler/user.handler.class';
+import { BaseEvent, DiscordClient } from '@src/structures';
+import { Events, Guild } from 'discord.js';
 
 /**
  * @description GuildCreate event

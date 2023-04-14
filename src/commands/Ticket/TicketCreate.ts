@@ -32,7 +32,7 @@ export class TicketCreateCommand extends BaseCommand {
     async execute(
         client: DiscordClient,
         message: Message,
-        args: string[],
+        _args: string[],
     ): Promise<void> {
         await TicketManager.getInstance().createTicket(message, client);
 

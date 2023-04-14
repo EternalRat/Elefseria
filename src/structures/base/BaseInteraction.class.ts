@@ -1,5 +1,5 @@
-import { Interaction, SlashCommandBuilder } from 'discord.js';
 import { DiscordClient } from '@src/structures';
+import { Interaction } from 'discord.js';
 
 /**
  * @description Base class for slash commands
@@ -96,6 +96,10 @@ export abstract class BaseInteraction {
         return this._options;
     }
 
+    public get isEnable(): boolean {
+        return this._enabled;
+    }
+
     /**
      * @description Returns JSON data for the command
      * @returns {Object}
@@ -114,8 +118,8 @@ export abstract class BaseInteraction {
      * @param {Interaction} interaction
      */
     public execute(
-        client: DiscordClient,
-        interaction: Interaction,
+        _client: DiscordClient,
+        _interaction: Interaction,
     ): Promise<void> {
         throw new Error(
             `Command ${this._name} doesn't have an execute method!`,

@@ -11,17 +11,19 @@ services:
         ports:
             - 3306:3306
 
-    bot:
+    discord-bot:
         build: .
         restart: always
         environment:
-            DB_HOST: db
+            DB_HOST: ${DB_HOST}
             DB_NAME: ${DB_NAME}
             DB_USER: ${DB_USER}
             DB_PASS: ${DB_PASS}
+            DB_PORT: ${DB_PORT}
             DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN}
             DISCORD_BOT_PREFIX: ${DISCORD_BOT_PREFIX}
             DISCORD_BOT_APP_ID: ${DISCORD_BOT_APP_ID}
+            AUTHOR_ID: ${AUTHOR_ID}
         volumes:
             - ./src:/app/src
         depends_on:

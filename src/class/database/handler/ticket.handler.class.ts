@@ -1,7 +1,8 @@
 import { OverwriteResolvable } from 'discord.js';
+
 import {
-    TicketModel,
     GuildTicketModel,
+    TicketModel,
     UserTicketModel,
 } from '../../../structures/database/models/ticket/ticket.model';
 
@@ -79,10 +80,10 @@ export class TicketHandler {
     }
 
     public async delete(): Promise<boolean> {
-        const ticketDB2 = await UserTicketModel.destroy({
+        await UserTicketModel.destroy({
             where: { fkTicket: this._id },
         });
-        const ticketDB3 = await GuildTicketModel.destroy({
+        await GuildTicketModel.destroy({
             where: { fkTicket: this._id },
         });
         const ticketDB = await TicketModel.destroy({ where: { id: this._id } });
@@ -93,10 +94,10 @@ export class TicketHandler {
     }
 
     public static async deleteTicket(id: string): Promise<boolean> {
-        const ticketDB2 = await UserTicketModel.destroy({
+        await UserTicketModel.destroy({
             where: { fkTicket: id },
         });
-        const ticketDB3 = await GuildTicketModel.destroy({
+        await GuildTicketModel.destroy({
             where: { fkTicket: id },
         });
         const ticketDB = await TicketModel.destroy({ where: { id: id } });
