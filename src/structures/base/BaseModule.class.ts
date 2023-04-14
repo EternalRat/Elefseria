@@ -1,10 +1,13 @@
 import {
     BaseCommand,
     BaseInteraction,
-    DiscordClient,
     BaseSlashCommand,
+    DiscordClient,
 } from '@src/structures';
-import { Routes } from 'discord.js';
+import {
+    RESTPostAPIChatInputApplicationCommandsJSONBody,
+    Routes,
+} from 'discord.js';
 import fs from 'fs';
 
 /**
@@ -203,6 +206,59 @@ export abstract class BaseModule {
         }
     }
 
+    private hasSameOptions = (addedOption: any, option: any) => {
+        if (!addedOption && !option) return true;
+        if (addedOption.length === 0 && !option) return true;
+        if (!addedOption || !option) return false;
+        if (addedOption.length !== option.length) return false;
+        for (let i = 0; i < addedOption.length; i++) {
+            const added = addedOption[i];
+            const newOption = option[i];
+            if (added.name !== newOption.name) return false;
+            if (added.description !== newOption.description) return false;
+            if (added.type !== newOption.type) return false;
+            if (added.required !== newOption.required) return false;
+            if (
+                (added.choices && !newOption.choices) ||
+                (!added.choices && newOption.choices)
+            )
+                return false;
+            for (let j = 0; j < added.choices.length; j++) {
+                const addedChoice = added.choices[j];
+                const newChoice = newOption.choices[j];
+                if (addedChoice.name !== newChoice.name) return false;
+                if (addedChoice.value !== newChoice.value) return false;
+            }
+        }
+        return true;
+    };
+
+    private isCommandRegistered = (
+        alreadyAdded: Array<RESTPostAPIChatInputApplicationCommandsJSONBody>,
+        command: RESTPostAPIChatInputApplicationCommandsJSONBody,
+    ) => {
+        return alreadyAdded.find((addedCommand) => {
+            const isSameName = command.name === addedCommand.name;
+            const isSameDescription =
+                command.description === addedCommand.description;
+            const isSameOptions = this.hasSameOptions(
+                command.options,
+                addedCommand.options,
+            );
+            const isSameNSFW = command.nsfw === addedCommand.nsfw;
+            const isSameDefaultPermission =
+                command.default_permission === addedCommand.default_permission;
+
+            return (
+                isSameName &&
+                isSameDescription &&
+                isSameOptions &&
+                isSameNSFW &&
+                isSameDefaultPermission
+            );
+        });
+    };
+
     /**
      * @description Registers slash commands
      * @param {DiscordClient} client Discord Client
@@ -219,17 +275,13 @@ export abstract class BaseModule {
         alreadyAdded: Array<any>,
         guildId?: string,
     ): Promise<void> {
-        console.info(
-            'Registering slash commands should be done using a script now. See the DiscordJS documentation for further details.',
-        );
         const commands = Array.from(this.slashCommands.values());
         const commandsToRegister = commands.filter((command) => {
             const slashedCommand = command.getSlashCommandJSON();
-            console.log({ slashedCommand }, { alreadyAdded });
             if (
-                alreadyAdded.find(
-                    (addedCommand) => slashedCommand.name === addedCommand.name,
-                )
+                alreadyAdded.find((addedCommand) => {
+                    return slashedCommand.name === addedCommand.name;
+                })
             ) {
                 return false;
             }
@@ -237,89 +289,73 @@ export abstract class BaseModule {
         });
         const commandsToRefresh = commands.filter((command) => {
             if (
-                !alreadyAdded.find((registeredCommand) => {
-                    const slashedCommand = command.getSlashCommandJSON();
-                    const differentName =
-                        slashedCommand.name === registeredCommand.name;
-                    const differentDescription =
-                        slashedCommand.description ===
-                        registeredCommand.description;
-                    const differentOptions =
-                        JSON.stringify(slashedCommand.options) ===
-                        JSON.stringify(registeredCommand.options);
-                    const differentNSFW =
-                        slashedCommand.nsfw === registeredCommand.nsfw;
-                    const differentPerm =
-                        slashedCommand.default_member_permissions ===
-                        registeredCommand.default_member_permissions;
-                    console.log({ slashedCommand }, { registeredCommand });
+                this.isCommandRegistered(
+                    alreadyAdded,
+                    command.getSlashCommandJSON(),
+                )
+            )
+                return false;
+            return true;
+        });
+        const allCommands = commandsToRegister.concat(commandsToRefresh);
+        const commandsToUnregister = alreadyAdded.filter((addedCommand) => {
+            if (
+                commands.find((command) => {
                     return (
-                        differentName &&
-                        differentDescription &&
-                        differentOptions &&
-                        differentNSFW &&
-                        differentPerm
+                        command.getSlashCommandJSON().name === addedCommand.name
                     );
                 })
             )
-                return true;
-            return false;
+                return false;
+            return true;
         });
 
         console.info(
-            `Started added ${commandsToRegister.length} application (/) commands.`,
-        );
-        // The put method is used to fully refresh all commands in the guild with the current set
-        const addedData = (await client.rest.put(
-            guildId
-                ? Routes.applicationGuildCommands(client.getClientId(), guildId)
-                : Routes.applicationCommands(client.getClientId()),
-            {
-                body: commandsToRegister.map((commandToRegister) =>
-                    commandToRegister.getSlashCommandJSON(),
-                ),
-            },
-        )) as Array<any>;
-
-        console.info(
-            `Successfully added ${addedData.length} application (/) commands.`,
+            `Started unregistering ${commandsToUnregister.length} application (/) commands.`,
         );
 
-        console.info(
-            `Started refreshing ${commandsToRefresh.length} application (/) commands.`,
-        );
-
-        const refreshData = [];
-        for (const command of commandsToRefresh) {
-            const registeredCommand = alreadyAdded.find(
-                (registeredCommand) => registeredCommand.name === command.name,
+        for (const command of commandsToUnregister) {
+            await client.rest.delete(
+                guildId
+                    ? Routes.applicationGuildCommand(
+                          client.getClientId(),
+                          guildId,
+                          command.id,
+                      )
+                    : Routes.applicationCommand(
+                          client.getClientId(),
+                          command.id,
+                      ),
             );
-            if (registeredCommand) {
-                const commandId = registeredCommand.id;
-                const updatedData = (await client.rest.patch(
-                    guildId
-                        ? Routes.applicationGuildCommand(
-                              client.getClientId(),
-                              guildId,
-                              commandId,
-                          )
-                        : Routes.applicationCommand(
-                              client.getClientId(),
-                              commandId,
-                          ),
-                    {
-                        body: {
-                            ...command.getSlashCommandJSON(),
-                            id: commandId,
-                        },
-                    },
-                )) as Array<any>;
-                refreshData.push(updatedData);
-            }
         }
 
         console.info(
-            `Successfully refreshed ${refreshData.length} application (/) commands.`,
+            `Successfully unregistered ${commandsToUnregister.length} application (/) commands.`,
+        );
+
+        console.info(
+            `Started adding/refreshing ${allCommands.length} application (/) commands.`,
+        );
+
+        let addedOrRefreshed = 0;
+
+        for (const command of allCommands) {
+            await client.rest.post(
+                guildId
+                    ? Routes.applicationGuildCommands(
+                          client.getClientId(),
+                          guildId,
+                      )
+                    : Routes.applicationCommands(client.getClientId()),
+                {
+                    body: command.getSlashCommandJSON(),
+                },
+            );
+            addedOrRefreshed++;
+        }
+
+        console.info(
+            `Successfully added/refreshed ${addedOrRefreshed} application (/) commands.`,
         );
     }
 

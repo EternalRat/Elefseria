@@ -1,7 +1,7 @@
 import {
-    Sequelize,
     ConnectionError,
     ConnectionTimedOutError,
+    Sequelize,
     TimeoutError,
 } from 'sequelize';
 require('dotenv').config(); // LOAD CONFIG (.env)

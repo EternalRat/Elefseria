@@ -1,4 +1,5 @@
 import { ChatInputCommandInteraction, Message } from 'discord.js';
+
 import { DiscordClient } from '../../class/Client.class';
 
 /**
@@ -140,9 +141,9 @@ export abstract class BaseCommand {
      * command.execute(message, args);
      */
     async execute(
-        client: DiscordClient,
-        message: Message,
-        args: string[],
+        _client: DiscordClient,
+        _message: Message,
+        _args: string[],
     ): Promise<void> {
         throw new Error(
             `Command ${this._name} doesn't provide an execute method!`,
@@ -150,8 +151,8 @@ export abstract class BaseCommand {
     }
 
     async executeSlash(
-        client: DiscordClient,
-        interaction: ChatInputCommandInteraction,
+        _client: DiscordClient,
+        _interaction: ChatInputCommandInteraction,
     ): Promise<void> {
         throw new Error(
             `Command ${this._name} doesn't provide an executeSlash method!`,

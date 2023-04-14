@@ -1,5 +1,5 @@
-import { EmbedBuilder, Message, Events } from 'discord.js';
-import { BaseEvent, DiscordClient, BaseModule } from '@src/structures';
+import { BaseEvent, DiscordClient } from '@src/structures';
+import { EmbedBuilder, Events, Message } from 'discord.js';
 import { Colors } from 'discord.js';
 
 /**

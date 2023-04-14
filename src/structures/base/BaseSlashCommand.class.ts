@@ -1,5 +1,8 @@
-import { RESTPostAPIChatInputApplicationCommandsJSONBody, SlashCommandBuilder, SlashCommandUserOption } from 'discord.js';
 import { BaseInteraction } from '@src/structures';
+import {
+    RESTPostAPIChatInputApplicationCommandsJSONBody,
+    SlashCommandBuilder,
+} from 'discord.js';
 export { DiscordClient } from '@class/Client.class';
 
 /**

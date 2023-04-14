@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
+
 import { DBConnection } from '../../../../class/database/dbConnection.db.class';
 import { UserModel } from '../user/user.model';
-import { TicketModel } from '../ticket/ticket.model';
 const sequelize = DBConnection.getInstance().sequelize;
 
 export const GuildModel = sequelize.define('guilds', {

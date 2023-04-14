@@ -1,5 +1,5 @@
-import { BaseInteraction, BaseEvent, DiscordClient } from '@src/structures';
-import { Base, Events, Interaction } from 'discord.js';
+import { BaseEvent, BaseInteraction, DiscordClient } from '@src/structures';
+import { Events, Interaction } from 'discord.js';
 
 /**
  * @description InteractionCreated event

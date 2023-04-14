@@ -1,6 +1,6 @@
+import { DiscordClient } from '@src/structures/';
 import { Message, TextChannel } from 'discord.js';
 import fs from 'fs';
-import { DiscordClient, models } from '@src/structures/';
 
 async function loadStyles() {
     const css = fs.readFileSync('./src/structures/css/transcript.css', 'utf8');
@@ -86,7 +86,7 @@ export default async function buildTranscript(
     client: DiscordClient,
     channel: TextChannel,
 ) {
-    const guild = client.guilds.cache.get(guildId);
+    const _guild = client.guilds.cache.get(guildId);
     const messages = (await channel.messages.fetch({ cache: true })).reverse();
 
     let transcript = '<body>';

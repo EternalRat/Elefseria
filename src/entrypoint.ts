@@ -1,9 +1,10 @@
 require('dotenv').config(); // LOAD CONFIG (.env)
-import { GatewayIntentBits, Partials, REST } from 'discord.js';
 import { DiscordClient } from '@src/structures';
-import databaseSynchronisation from './structures/database/sync.db';
+import { GatewayIntentBits, Partials, REST } from 'discord.js';
+
 import { DBConnection } from './class/database/dbConnection.db.class';
 import { TicketModule } from './modules/Ticket.module';
+import databaseSynchronisation from './structures/database/sync.db';
 
 const config = {
     intents: [

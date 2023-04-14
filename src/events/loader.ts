@@ -23,7 +23,7 @@ export = async (client: DiscordClient): Promise<void> => {
             );
             for (const subFile of subEventFiles) {
                 const Event = await import(`../events/${file}/${subFile}`);
-                Object.entries(Event).forEach(([key, value]) => {
+                Object.entries(Event).forEach(([_, value]) => {
                     try {
                         const event = new (value as any)();
                         if (event.once) {
