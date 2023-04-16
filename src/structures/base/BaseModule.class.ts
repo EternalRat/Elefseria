@@ -217,17 +217,26 @@ export abstract class BaseModule {
             if (added.name !== newOption.name) return false;
             if (added.description !== newOption.description) return false;
             if (added.type !== newOption.type) return false;
-            if (added.required !== newOption.required) return false;
             if (
-                (added.choices && !newOption.choices) ||
-                (!added.choices && newOption.choices)
+                (added.required === false && // true
+                    newOption.required !== undefined) || // false
+                (added.required === true &&
+                    added.required !== newOption.required)
             )
                 return false;
-            for (let j = 0; j < added.choices.length; j++) {
-                const addedChoice = added.choices[j];
-                const newChoice = newOption.choices[j];
-                if (addedChoice.name !== newChoice.name) return false;
-                if (addedChoice.value !== newChoice.value) return false;
+            if (added.choices || newOption.choices) {
+                if (
+                    (added.choices && !newOption.choices) ||
+                    (!added.choices && newOption.choices) ||
+                    added.choices.length !== newOption.choices.length
+                )
+                    return false;
+                for (let j = 0; j < added.choices.length; j++) {
+                    const addedChoice = added.choices[j];
+                    const newChoice = newOption.choices[j];
+                    if (addedChoice.name !== newChoice.name) return false;
+                    if (addedChoice.value !== newChoice.value) return false;
+                }
             }
         }
         return true;
@@ -288,12 +297,8 @@ export abstract class BaseModule {
             return true;
         });
         const commandsToRefresh = commands.filter((command) => {
-            if (
-                this.isCommandRegistered(
-                    alreadyAdded,
-                    command.getSlashCommandJSON(),
-                )
-            )
+            const slashedCommand = command.getSlashCommandJSON();
+            if (this.isCommandRegistered(alreadyAdded, slashedCommand))
                 return false;
             return true;
         });
