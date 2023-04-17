@@ -19,7 +19,7 @@ export class TicketSaveButtonInteraction extends BaseButtonInteraction {
      * @returns {Promise<void>}
      */
     async execute(
-        client: DiscordClient,
+        _client: DiscordClient,
         interaction: ButtonInteraction,
     ): Promise<void> {
         if (!interaction.guildId) {

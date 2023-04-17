@@ -1,5 +1,6 @@
 import { BaseEvent, BaseInteraction, DiscordClient } from '@src/structures';
 import { BaseButtonInteraction } from '@src/structures/base/BaseButtonInteraction.class';
+import { BaseModalInteraction } from '@src/structures/base/BaseModalInteraction.class';
 import { Events, Interaction } from 'discord.js';
 
 /**
@@ -23,14 +24,14 @@ export class InteractionCreatedEvent extends BaseEvent {
         client: DiscordClient,
         interaction: Interaction,
     ): Promise<void> {
-        if (!interaction.isButton()) return;
+        if (!interaction.isModalSubmit()) return;
         for (const module of client.getModules().values()) {
-            if (module.getButtonInteractions().size == 0) continue;
-            if (!module.getButtonInteractions().has(interaction.customId))
+            if (module.getModalInteractions().size == 0) continue;
+            if (!module.getModalInteractions().has(interaction.customId))
                 continue;
-            const command: BaseButtonInteraction = module
-                .getButtonInteractions()
-                .get(interaction.customId)! as BaseButtonInteraction;
+            const command: BaseModalInteraction = module
+                .getModalInteractions()
+                .get(interaction.customId)! as BaseModalInteraction;
             if (!command) continue;
             try {
                 await command.execute(

@@ -54,15 +54,20 @@ export class MessageCreatedEvent extends BaseEvent {
 
             for (const [, value] of info.modules.entries()) {
                 embed.addFields([
-                    { name: 'Module', value: value.getName(), inline: true },
+                    { name: 'Module', value: value.name, inline: true },
                     {
                         name: 'Commands',
                         value: value.getCommands().size.toString(),
                         inline: true,
                     },
                     {
-                        name: 'Interactions',
-                        value: value.getInteractions().size.toString(),
+                        name: 'Button Interactions',
+                        value: value.getButtonInteractions().size.toString(),
+                        inline: true,
+                    },
+                    {
+                        name: 'Modal Interactions',
+                        value: value.getModalInteractions().size.toString(),
                         inline: true,
                     },
                 ]);
@@ -91,7 +96,7 @@ export class MessageCreatedEvent extends BaseEvent {
             for (const module of client.getModules().values()) {
                 if (!module.hasCommand(commandName)) continue;
                 if (
-                    !module.isEnabled() ||
+                    !module.isEnabled ||
                     !module.getCommand(commandName)!.isEnabled
                 )
                     continue;

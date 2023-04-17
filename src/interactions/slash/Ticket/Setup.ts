@@ -1,4 +1,11 @@
-import { ActionRowBuilder, ModalBuilder, TextInputBuilder } from 'discord.js';
+import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    EmbedBuilder,
+    ModalBuilder,
+    TextInputBuilder,
+} from 'discord.js';
 import { BaseSlashCommand, DiscordClient } from '@src/structures';
 import {
     ChatInputCommandInteraction,
@@ -26,37 +33,34 @@ export class SetupTicketSlashCommand extends BaseSlashCommand {
         _client: DiscordClient,
         interaction: ChatInputCommandInteraction,
     ): Promise<void> {
-        const modal = new ModalBuilder().setCustomId('setup').setTitle('Setup');
-
-        // Create the text input components
-        const favoriteColorInput = new TextInputBuilder()
-            .setCustomId('favoriteColorInput')
-            // The label is the prompt the user sees for this input
-            .setLabel("What's your favorite color?")
-            // Short means only a single line of text
-            .setStyle(TextInputStyle.Short);
-
-        const hobbiesInput = new TextInputBuilder()
-            .setCustomId('hobbiesInput')
-            .setLabel("What's some of your favorite hobbies?")
-            // Paragraph means multiple lines of text.
-            .setStyle(TextInputStyle.Paragraph);
-
-        // An action row only holds one text input,
-        // so you need one action row per text input.
-        const firstActionRow =
-            new ActionRowBuilder<TextInputBuilder>().addComponents(
-                favoriteColorInput,
-            );
-        const secondActionRow =
-            new ActionRowBuilder<TextInputBuilder>().addComponents(
-                hobbiesInput,
+        const embed = new EmbedBuilder()
+            .setTitle('Ticket Basic Config Editor')
+            .setDescription(
+                'This is the basic config editor for setup and changes.',
             );
 
-        // Add inputs to the modal
-        modal.addComponents(firstActionRow, secondActionRow);
+        const actionRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+            new ButtonBuilder()
+                .setCustomId('addpanel')
+                .setLabel('+ Add a panel')
+                .setStyle(ButtonStyle.Primary),
+            new ButtonBuilder()
+                .setCustomId('removepanel')
+                .setLabel('🗑️ Remove a panel')
+                .setStyle(ButtonStyle.Danger),
+            new ButtonBuilder()
+                .setCustomId('editpanel')
+                .setLabel('✏️ Edit a panel')
+                .setStyle(ButtonStyle.Secondary),
+            new ButtonBuilder()
+                .setCustomId('sendpanels')
+                .setLabel('✅ Send panels')
+                .setStyle(ButtonStyle.Success),
+        );
 
-        // Show the modal to the user
-        await interaction.showModal(modal);
+        await interaction.reply({
+            embeds: [embed],
+            components: [actionRow],
+        });
     }
 }

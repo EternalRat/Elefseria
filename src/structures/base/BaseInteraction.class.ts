@@ -16,14 +16,14 @@ export abstract class BaseInteraction {
         name: string,
         description: string,
         moduleName: string,
-        isEnabled?: boolean,
-        permissions?: bigint[],
+        isEnabled: boolean = true,
+        permissions: bigint[] = [],
     ) {
         this._name = name;
         this._description = description;
         this._module = moduleName;
-        this._enabled = isEnabled || true;
-        this._permissions = permissions || [];
+        this._enabled = isEnabled;
+        this._permissions = permissions;
     }
 
     /**

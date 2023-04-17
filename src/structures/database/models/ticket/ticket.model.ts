@@ -17,12 +17,18 @@ export const GuildTicketModel = sequelize.define('guildTickets', {
             key: 'id',
         },
     },
+    rolesId: {
+        type: Sequelize.ARRAY(Sequelize.STRING),
+    },
     categoryId: {
         type: Sequelize.STRING,
     },
     message: {
         type: Sequelize.STRING,
         defaultValue: '',
+    },
+    channelId: {
+        type: Sequelize.STRING,
     },
     status: {
         type: Sequelize.INTEGER,
