@@ -1,26 +1,26 @@
-import { TicketManager } from '@src/class/ticket/ticketManager.class';
-import { BaseInteraction, DiscordClient } from '@src/structures';
-import { AttachmentBuilder, ChatInputCommandInteraction } from 'discord.js';
+import { DiscordClient } from '@src/structures';
+import { BaseButtonInteraction } from '@src/structures/base/BaseButtonInteraction.class';
+import { ButtonInteraction, ChatInputCommandInteraction } from 'discord.js';
 
 /**
  * @description TicketSave button interaction
  * @class TicketSaveButtonInteraction
  * @extends BaseInteraction
  */
-export class TicketSaveButtonInteraction extends BaseInteraction {
+export class TicketSaveButtonInteraction extends BaseButtonInteraction {
     constructor() {
-        super('ticketsave', 'Save transcript of a ticket', 'Ticket');
+        super('ticketsave', 'Save transcript of a ticket', 'Ticket', 0);
     }
 
     /**
      * @description Executes the interaction
      * @param {DiscordClient} client
-     * @param {ChatInputCommandInteraction} interaction
+     * @param {ButtonInteraction} interaction
      * @returns {Promise<void>}
      */
     async execute(
         client: DiscordClient,
-        interaction: ChatInputCommandInteraction,
+        interaction: ButtonInteraction,
     ): Promise<void> {
         if (!interaction.guildId) {
             await interaction.reply(
@@ -36,7 +36,7 @@ export class TicketSaveButtonInteraction extends BaseInteraction {
         }
 
         // Create Attachment
-        const ticket = TicketManager.getInstance().getTicket(
+        /* const ticket = TicketManager.getInstance().getTicket(
             interaction.channelId,
         );
         if (!ticket) {
@@ -60,6 +60,6 @@ export class TicketSaveButtonInteraction extends BaseInteraction {
             name: 'transcript.html',
         });
 
-        await interaction.reply({ files: [attachment] });
+        await interaction.reply({ files: [attachment] }); */
     }
 }

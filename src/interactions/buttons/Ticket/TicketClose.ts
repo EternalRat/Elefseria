@@ -1,31 +1,25 @@
-import { TicketManager } from '@src/class/ticket/ticketManager.class';
-import { BaseInteraction, DiscordClient } from '@src/structures';
-import { ChatInputCommandInteraction } from 'discord.js';
+import { DiscordClient } from '@src/structures';
+import { BaseButtonInteraction } from '@src/structures/base/BaseButtonInteraction.class';
+import { ButtonInteraction, ChatInputCommandInteraction } from 'discord.js';
 
 /**
  * @description TicketClose button interaction
  * @class TicketCloseButtonInteraction
  * @extends BaseButtonInteraction
  */
-export class TicketCloseButtonInteraction extends BaseInteraction {
+export class TicketCloseButtonInteraction extends BaseButtonInteraction {
     constructor() {
-        super('ticketclose', 'Close a ticket', 'Ticket');
+        super('ticketclose', 'Close a ticket', 'Ticket', 0);
     }
 
     /**
      * @description Executes the interaction
      * @param {DiscordClient} client
-     * @param {ChatInputCommandInteraction} interaction
+     * @param {ButtonInteraction} interaction
      * @returns {Promise<void>}
      */
     async execute(
-        client: DiscordClient,
-        interaction: ChatInputCommandInteraction,
-    ): Promise<void> {
-        const ticket = TicketManager.getInstance().getTicket(
-            interaction.channelId,
-        );
-        if (ticket) await ticket.closeTicket(interaction, client);
-        else interaction.reply('Ticket not found');
-    }
+        _client: DiscordClient,
+        _interaction: ButtonInteraction,
+    ): Promise<void> {}
 }

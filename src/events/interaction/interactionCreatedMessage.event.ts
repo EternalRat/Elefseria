@@ -1,4 +1,9 @@
-import { BaseEvent, BaseInteraction, DiscordClient } from '@src/structures';
+import {
+    BaseEvent,
+    BaseInteraction,
+    BaseSlashCommand,
+    DiscordClient,
+} from '@src/structures';
 import { Events, Interaction } from 'discord.js';
 
 /**
@@ -27,9 +32,9 @@ export class InteractionCreatedEvent extends BaseEvent {
             if (module.getSlashCommands().size == 0) continue;
             if (!module.getSlashCommands().has(interaction.commandName))
                 continue;
-            const command: BaseInteraction = module
+            const command: BaseSlashCommand = module
                 .getSlashCommands()
-                .get(interaction.commandName)!;
+                .get(interaction.commandName)! as BaseSlashCommand;
             if (!command) continue;
             try {
                 await command.execute(client, interaction);

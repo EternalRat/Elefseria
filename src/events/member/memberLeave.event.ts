@@ -1,5 +1,3 @@
-import { GuildHandler } from '@src/class/database/handler/guild.handler.class';
-import { UserHandler } from '@src/class/database/handler/user.handler.class';
 import { BaseEvent, DiscordClient } from '@src/structures';
 import { Events, GuildMember } from 'discord.js';
 
@@ -21,21 +19,18 @@ export class MemberLeaveEvent extends BaseEvent {
         if (member.user.bot) {
             return;
         }
-        if (!member.id || !member.user.tag) {
-            return;
-        }
 
-        const user = await UserHandler.getUserById(member.id);
-        if (user) {
-            await UserHandler.deleteUser(member.id);
-        }
+        // const user = await UserHandler.getUserById(member.id);
+        // if (user) {
+        //     await UserHandler.deleteUser(member.id);
+        // }
 
-        if (!member.guild) {
-            return;
-        }
-        let guild = await GuildHandler.getGuildById(member.guild.id);
-        if (guild) {
-            await guild.removeUserFromGuild(member.id);
-        }
+        // if (!member.guild) {
+        //     return;
+        // }
+        // let guild = await GuildHandler.getGuildById(member.guild.id);
+        // if (guild) {
+        //     await guild.removeUserFromGuild(member.id);
+        // }
     }
 }

@@ -16,6 +16,7 @@ module.exports = {
     rules: {
         'no-console': ['error', { allow: ['warn', 'error', 'info', 'table'] }],
         'no-unused-vars': 'off',
+        'no-var': 'error',
         'unused-imports/no-unused-imports': 'error',
         'unused-imports/no-unused-vars': [
             'warn',

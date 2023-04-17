@@ -5,6 +5,30 @@ import { GuildModel } from '../guild/guild.model';
 import { UserModel } from '../user/user.model';
 const sequelize = DBConnection.getInstance().sequelize;
 
+export const GuildTicketModel = sequelize.define('guildTickets', {
+    id: {
+        type: Sequelize.STRING,
+        primaryKey: true,
+    },
+    guildId: {
+        type: Sequelize.STRING,
+        references: {
+            model: GuildModel,
+            key: 'id',
+        },
+    },
+    categoryId: {
+        type: Sequelize.STRING,
+    },
+    message: {
+        type: Sequelize.STRING,
+        defaultValue: '',
+    },
+    status: {
+        type: Sequelize.INTEGER,
+    },
+});
+
 export const TicketModel = sequelize.define('tickets', {
     id: {
         type: Sequelize.STRING,
@@ -17,65 +41,45 @@ export const TicketModel = sequelize.define('tickets', {
             key: 'id',
         },
     },
-    permissions: {
-        type: Sequelize.JSON,
-    },
-    embedMessage: {
+    creatorId: {
         type: Sequelize.STRING,
+    },
+    users: {
+        type: Sequelize.ARRAY(Sequelize.STRING),
+    },
+    guildId: {
+        type: Sequelize.STRING,
+        references: {
+            model: GuildModel,
+            key: 'id',
+        },
+    },
+    channelId: {
+        type: Sequelize.STRING,
+    },
+    status: {
+        type: Sequelize.INTEGER,
     },
 });
 
-export const GuildTicketModel = sequelize.define(
-    'guild_tickets',
-    {
-        fkTicket: {
-            type: Sequelize.STRING,
-            references: {
-                model: TicketModel,
-                key: 'id',
-            },
-            allowNull: false,
-            primaryKey: true,
-        },
-        fkGuild: {
-            type: Sequelize.STRING,
-            references: {
-                model: GuildModel,
-                key: 'id',
-            },
-            primaryKey: true,
+export const TicketMessageModel = sequelize.define('ticketMessages', {
+    id: {
+        type: Sequelize.STRING,
+        primaryKey: true,
+    },
+    ticketId: {
+        type: Sequelize.STRING,
+        references: {
+            model: TicketModel,
+            key: 'id',
         },
     },
-    {
-        timestamps: false,
-        createdAt: false,
-        updatedAt: false,
+    message: {
+        type: Sequelize.STRING,
+        defaultValue: '',
     },
-);
-
-export const UserTicketModel = sequelize.define(
-    'users_tickets',
-    {
-        fkTicket: {
-            type: Sequelize.STRING,
-            references: {
-                model: TicketModel,
-                key: 'id',
-            },
-            allowNull: false,
-        },
-        fkUser: {
-            type: Sequelize.STRING,
-            references: {
-                model: UserModel,
-                key: 'id',
-            },
-            allowNull: false,
-        },
+    messageId: {
+        type: Sequelize.STRING, // Only used to get the message if it's an image, embed, ...
+        defaultValue: '',
     },
-    {
-        timestamps: false,
-        createdAt: false,
-        updatedAt: false,
-    },
-);
+});

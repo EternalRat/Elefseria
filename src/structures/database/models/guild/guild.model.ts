@@ -17,6 +17,10 @@ export const GuildModel = sequelize.define('guilds', {
 export const GuildUserModel = sequelize.define(
     'guild_users',
     {
+        id: {
+            type: Sequelize.STRING,
+            primaryKey: true,
+        },
         fkUser: {
             type: Sequelize.STRING,
             references: {

@@ -1,27 +1,25 @@
-import { TicketManager } from '@src/class/ticket/ticketManager.class';
-import { BaseInteraction, DiscordClient } from '@src/structures';
-import { ChatInputCommandInteraction } from 'discord.js';
+import { DiscordClient } from '@src/structures';
+import { BaseButtonInteraction } from '@src/structures/base/BaseButtonInteraction.class';
+import { ButtonInteraction, ChatInputCommandInteraction } from 'discord.js';
 
 /**
  * @description TicketDelete button interaction
  * @class TicketDeleteButtonInteraction
  * @extends BaseInteraction
  */
-export class TicketDeleteButtonInteraction extends BaseInteraction {
+export class TicketDeleteButtonInteraction extends BaseButtonInteraction {
     constructor() {
-        super('ticketdelete', 'Delete a ticket', 'Ticket');
+        super('ticketdelete', 'Delete a ticket', 'Ticket', 0);
     }
 
     /**
      * @description Executes the interaction
      * @param {DiscordClient} client
-     * @param {ChatInputCommandInteraction} interaction
+     * @param {ButtonInteraction} interaction
      * @returns {Promise<void>}
      */
     async execute(
-        client: DiscordClient,
-        interaction: ChatInputCommandInteraction,
-    ): Promise<void> {
-        TicketManager.getInstance().deleteTicket(interaction, client);
-    }
+        _client: DiscordClient,
+        _interaction: ButtonInteraction,
+    ): Promise<void> {}
 }

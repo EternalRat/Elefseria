@@ -1,5 +1,3 @@
-import { GuildHandler } from '@src/class/database/handler/guild.handler.class';
-import { UserHandler } from '@src/class/database/handler/user.handler.class';
 import { BaseEvent, DiscordClient } from '@src/structures';
 import { Events, GuildMember } from 'discord.js';
 
@@ -21,28 +19,25 @@ export class MemberJoinEvent extends BaseEvent {
         if (member.user.bot) {
             return;
         }
-        if (!member.id || !member.user.tag) {
-            return;
-        }
 
-        const user = await UserHandler.getUserById(member.id);
-        if (!user) {
-            await UserHandler.createUser(member.id, member.user.tag);
-        }
+        // const user = await UserHandler.getUserById(member.id);
+        // if (!user) {
+        //     await UserHandler.createUser(member.id, member.user.tag);
+        // }
 
-        if (!member.guild) {
-            return;
-        }
-        let guild = await GuildHandler.getGuildById(member.guild.id);
-        if (!guild) {
-            guild = await GuildHandler.createGuild(
-                member.id,
-                member.guild.name,
-            );
-        }
-        if (!guild) {
-            return;
-        }
-        await guild.addUserToGuild(member.id);
+        // if (!member.guild) {
+        //     return;
+        // }
+        // let guild = await GuildHandler.getGuildById(member.guild.id);
+        // if (!guild) {
+        //     guild = await GuildHandler.createGuild(
+        //         member.id,
+        //         member.guild.name,
+        //     );
+        // }
+        // if (!guild) {
+        //     return;
+        // }
+        // await guild.addUserToGuild(member.id);
     }
 }

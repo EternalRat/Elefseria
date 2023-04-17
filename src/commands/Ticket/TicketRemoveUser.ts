@@ -1,4 +1,4 @@
-import { TicketManager } from '@src/class/ticket/ticketManager.class';
+import { TicketHandler } from '@src/class/ticket/TicketHandler.class';
 import { BaseCommand, DiscordClient } from '@src/structures';
 import { Message } from 'discord.js';
 
@@ -45,13 +45,8 @@ export class TicketRemoveUserCommand extends BaseCommand {
             message.reply('Please specify a valid user');
             return;
         }
-        const ticket = TicketManager.getInstance().getTicket(
-            message.channel.id,
-        );
-        if (!ticket) {
-            message.reply('This channel is not a ticket');
-            return;
-        }
-        ticket.removeUser(user);
+        TicketHandler.getInstance().removeUserFromTicket(message.channel, [
+            user,
+        ]);
     }
 }

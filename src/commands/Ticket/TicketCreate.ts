@@ -1,6 +1,6 @@
-import { TicketManager } from '@src/class/ticket/ticketManager.class';
+import { TicketHandler } from '@src/class/ticket/TicketHandler.class';
 import { BaseCommand, DiscordClient } from '@src/structures';
-import { Message } from 'discord.js';
+import { ChannelType, Message } from 'discord.js';
 
 /**
  * @description TicketCreate command
@@ -30,15 +30,26 @@ export class TicketCreateCommand extends BaseCommand {
      */
 
     async execute(
-        client: DiscordClient,
+        _client: DiscordClient,
         message: Message,
         _args: string[],
     ): Promise<void> {
-        await TicketManager.getInstance().createTicket(message, client);
-
-        if (message.guild)
-            console.info(
-                TicketManager.getInstance().getTicket(message.guild.id),
+        if (message.channel.type !== ChannelType.GuildText) {
+            message.reply('This command can only be used in a server');
+            return;
+        }
+        const { ticket, channel } =
+            await TicketHandler.getInstance().createTicket(
+                message.guild!,
+                message.author,
+                [],
             );
+        if (ticket) {
+            message.reply(
+                `The ticket ${ticket.get('id')} has been created in ${channel}`,
+            );
+        } else {
+            message.reply('An error occurred');
+        }
     }
 }

@@ -1,26 +1,26 @@
-import { TicketManager } from '@src/class/ticket/ticketManager.class';
-import { BaseInteraction, DiscordClient } from '@src/structures';
-import { ChatInputCommandInteraction } from 'discord.js';
+import { DiscordClient } from '@src/structures';
+import { BaseButtonInteraction } from '@src/structures/base/BaseButtonInteraction.class';
+import { ButtonInteraction, ChatInputCommandInteraction, Interaction } from 'discord.js';
 
 /**
  * @description TicketCancelDelete button interaction
  * @class TicketCancelDeleteButtonInteraction
  * @extends BaseButtonInteraction
  */
-export class TicketCancelDeleteButtonInteraction extends BaseInteraction {
+export class TicketCancelDeleteButtonInteraction extends BaseButtonInteraction {
     constructor() {
-        super('ticketcanceldelete', 'Delete a ticket', 'Ticket');
+        super('ticketcanceldelete', 'Delete a ticket', 'Ticket', 0);
     }
 
     /**
      * @description Executes the interaction
      * @param {DiscordClient} client
-     * @param {ChatInputCommandInteraction} interaction
+     * @param {ButtonInteraction} interaction
      * @returns {Promise<void>}
      */
     async execute(
         client: DiscordClient,
-        interaction: ChatInputCommandInteraction,
+        interaction: ButtonInteraction,
     ): Promise<void> {
         if (!interaction.guildId) {
             await interaction.reply(
@@ -34,8 +34,5 @@ export class TicketCancelDeleteButtonInteraction extends BaseInteraction {
             );
             return;
         }
-        TicketManager.getInstance().cancelDeleteTicket(interaction.channelId);
-        await interaction.reply('Ticket deletion cancelled');
-        await interaction.deleteReply();
     }
 }

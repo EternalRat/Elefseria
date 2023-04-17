@@ -286,33 +286,46 @@ export abstract class BaseModule {
     ): Promise<void> {
         const commands = Array.from(this.slashCommands.values());
         const commandsToRegister = commands.filter((command) => {
-            const slashedCommand = command.getSlashCommandJSON();
-            if (
-                alreadyAdded.find((addedCommand) => {
-                    return slashedCommand.name === addedCommand.name;
-                })
-            ) {
+            try {
+                const slashedCommand = command.getSlashCommandJSON();
+                if (
+                    alreadyAdded.find((addedCommand) => {
+                        return slashedCommand.name === addedCommand.name;
+                    })
+                ) {
+                    return false;
+                }
+                return true;
+            } catch {
                 return false;
             }
-            return true;
         });
         const commandsToRefresh = commands.filter((command) => {
-            const slashedCommand = command.getSlashCommandJSON();
-            if (this.isCommandRegistered(alreadyAdded, slashedCommand))
+            try {
+                const slashedCommand = command.getSlashCommandJSON();
+                if (this.isCommandRegistered(alreadyAdded, slashedCommand))
+                    return false;
+                return true;
+            } catch {
                 return false;
-            return true;
+            }
         });
         const allCommands = commandsToRegister.concat(commandsToRefresh);
         const commandsToUnregister = alreadyAdded.filter((addedCommand) => {
-            if (
-                commands.find((command) => {
-                    return (
-                        command.getSlashCommandJSON().name === addedCommand.name
-                    );
-                })
-            )
+            try {
+                if (
+                    commands.find((command) => {
+                        return (
+                            command.getSlashCommandJSON().name ===
+                            addedCommand.name
+                        );
+                    })
+                )
+                    return false;
+                return true;
+            } catch {
                 return false;
-            return true;
+            }
         });
 
         console.info(
