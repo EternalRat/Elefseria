@@ -57,10 +57,10 @@ export class SetupTicketSlashCommand extends BaseSlashCommand {
                 .setLabel('✅ Send panels')
                 .setStyle(ButtonStyle.Success),
         );
-
         await interaction.reply({
             embeds: [embed],
             components: [actionRow],
+            ephemeral: true,
         });
     }
 }

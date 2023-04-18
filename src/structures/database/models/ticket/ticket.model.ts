@@ -1,4 +1,4 @@
-import Sequelize from 'sequelize';
+import Sequelize, { DataTypes } from 'sequelize';
 
 import { DBConnection } from '../../../../class/database/dbConnection.db.class';
 import { GuildModel } from '../guild/guild.model';
@@ -18,7 +18,8 @@ export const GuildTicketModel = sequelize.define('guildTickets', {
         },
     },
     rolesId: {
-        type: Sequelize.ARRAY(Sequelize.STRING),
+        type: Sequelize.STRING,
+        defaultValue: '',
     },
     categoryId: {
         type: Sequelize.STRING,
@@ -51,7 +52,7 @@ export const TicketModel = sequelize.define('tickets', {
         type: Sequelize.STRING,
     },
     users: {
-        type: Sequelize.ARRAY(Sequelize.STRING),
+        type: Sequelize.STRING,
     },
     guildId: {
         type: Sequelize.STRING,

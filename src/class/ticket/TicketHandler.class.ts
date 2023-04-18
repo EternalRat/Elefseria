@@ -510,4 +510,10 @@ export class TicketHandler {
         }
         return null;
     }
+
+    public async getLastPanelCreated(
+        guildId: string,
+    ): Promise<Model<any, any> | null> {
+        return TicketHandler._guildTicket.getLastPanelCreated(guildId);
+    }
 }

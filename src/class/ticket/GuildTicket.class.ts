@@ -105,4 +105,12 @@ export class GuildTicket {
         await ticket.save();
         return ticket;
     }
+
+    public async getLastPanelCreated(guildId: string) {
+        const ticket = await GuildTicket._guildTicket.findOne({
+            where: { guildId },
+            order: [['createdAt', 'DESC']],
+        });
+        return ticket;
+    }
 }

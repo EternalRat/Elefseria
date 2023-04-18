@@ -11,6 +11,7 @@ import {
 import fs from 'fs';
 import { BaseButtonInteraction } from './BaseButtonInteraction.class';
 import { BaseModalInteraction } from './BaseModalInteraction.class';
+import { BaseSelectInteraction } from './BaseSelectInteraction.class';
 
 /**
  * @description Base class for modules
@@ -22,6 +23,8 @@ export abstract class BaseModule {
     private buttonButtonInteractions: Map<string, BaseButtonInteraction> =
         new Map();
     private modalInteractions: Map<string, BaseModalInteraction> = new Map();
+    private selectChannelInteractions: Map<string, BaseSelectInteraction> =
+        new Map();
     private aliases: Map<string, BaseCommand> = new Map();
     private enabled: boolean;
     private commands: Map<string, BaseCommand> = new Map();
@@ -45,6 +48,10 @@ export abstract class BaseModule {
      */
     public getButtonInteractions(): Map<string, BaseInteraction> {
         return this.buttonButtonInteractions;
+    }
+
+    public getSelectChannelInteractions(): Map<string, BaseInteraction> {
+        return this.selectChannelInteractions;
     }
 
     /**
@@ -240,6 +247,32 @@ export abstract class BaseModule {
                     const interaction = new (value as any)();
                     if (interaction.module !== this._name) continue;
                     this.modalInteractions.set(interaction.name, interaction);
+                } catch (error) {
+                    console.error(error);
+                    console.error(
+                        `Could not load modal interaction ${path}/${file}`,
+                    );
+                }
+            }
+        }
+    }
+
+    async loadSelectChannelMenuInteractions(path: string): Promise<void> {
+        if (!fs.existsSync(path)) return;
+        let selectInteractionFiles = await fs.promises.readdir(path);
+        for (const file of selectInteractionFiles) {
+            const lstat = await fs.promises.lstat(`${path}/${file}`);
+            if (lstat.isDirectory()) {
+                await this.loadSelectChannelMenuInteractions(`${path}/${file}`);
+                continue;
+            }
+            const Interaction = await import(`${path}/${file}`);
+            for (const kVal in Object.keys(Interaction)) {
+                const value = Object.values(Interaction)[kVal];
+                try {
+                    const interaction = new (value as any)();
+                    if (interaction.module !== this._name) continue;
+                    this.selectChannelInteractions.set(interaction.name, interaction);
                 } catch (error) {
                     console.error(error);
                     console.error(

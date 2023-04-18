@@ -1,41 +1,20 @@
+import { TicketHandler } from '@src/class/ticket/TicketHandler.class';
 import { DiscordClient } from '@src/structures';
 import { BaseButtonInteraction } from '@src/structures/base/BaseButtonInteraction.class';
+import { Page, buildButtons, buildButtonsModal } from '@src/util/ticket';
 import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonInteraction,
     ButtonStyle,
     ChannelSelectMenuBuilder,
-    ChannelType,
     RoleSelectMenuBuilder,
-    TextInputBuilder,
     TextInputStyle,
 } from 'discord.js';
 
-interface Page {
-    embed: {
-        title: string;
-        description: string;
-    };
-    components: {
-        type: 'button' | 'role' | 'channel';
-        components: {
-            style: ButtonStyle | TextInputStyle;
-            label: string;
-            customId: string;
-        }[];
-    }[];
-    modals?: {
-        components: {
-            style: TextInputStyle;
-            label: string;
-            customId: string;
-        }[];
-    };
-}
-
 const pagesBuilder: Page[] = [
     {
+        name: 'Name',
         embed: {
             title: 'Setup 1/6 - Panel Name',
             description: 'Register the name of the panel',
@@ -60,14 +39,20 @@ const pagesBuilder: Page[] = [
         modals: {
             components: [
                 {
-                    style: TextInputStyle.Short,
-                    label: 'Panel name',
-                    customId: 'panelname',
+                    style: ButtonStyle.Primary,
+                    label: 'Save and next',
+                    customId: 'addpanel',
+                },
+                {
+                    style: ButtonStyle.Danger,
+                    label: 'Cancel',
+                    customId: 'addpanelcancel',
                 },
             ],
         },
     },
     {
+        name: 'Roles',
         embed: {
             title: 'Setup 2/6 - Allowed Roles',
             description:
@@ -102,6 +87,7 @@ const pagesBuilder: Page[] = [
         ],
     },
     {
+        name: 'Category',
         embed: {
             title: 'Setup 3/6 - Category',
             description:
@@ -136,6 +122,7 @@ const pagesBuilder: Page[] = [
         ],
     },
     {
+        name: 'Transcript',
         embed: {
             title: 'Setup 4/6 - Transcript Channel',
             description:
@@ -170,6 +157,7 @@ const pagesBuilder: Page[] = [
         ],
     },
     {
+        name: 'Message',
         embed: {
             title: 'Setup 5/6 - Custom Message',
             description:
@@ -195,14 +183,20 @@ const pagesBuilder: Page[] = [
         modals: {
             components: [
                 {
-                    style: TextInputStyle.Short,
-                    label: 'Message',
-                    customId: 'message',
+                    style: ButtonStyle.Primary,
+                    label: 'Save and next',
+                    customId: 'addpanel',
+                },
+                {
+                    style: ButtonStyle.Danger,
+                    label: 'Cancel',
+                    customId: 'addpanelcancel',
                 },
             ],
         },
     },
     {
+        name: 'Channel',
         embed: {
             title: 'Setup 6/6 - Channel To Send',
             description: 'Register the channel where the panel will be sent',
@@ -246,6 +240,9 @@ export class AddPanelButtonInteraction extends BaseButtonInteraction {
         _client: DiscordClient,
         interaction: ButtonInteraction,
     ): Promise<void> {
+        const lastPanel = await TicketHandler.getInstance().getLastPanelCreated(
+            interaction.guild!.id,
+        );
         const title = interaction.message.embeds[0].title;
         const page =
             title && title.startsWith('Setup ')
@@ -255,73 +252,31 @@ export class AddPanelButtonInteraction extends BaseButtonInteraction {
                           title.indexOf('/'),
                       ),
                   )
-                : 1;
+                : 0;
         if (page === 6) {
-            await interaction.deferUpdate();
             await interaction.editReply({
                 content: 'This command is currently under development',
                 embeds: [],
                 components: [],
             });
             return;
-        } else {
-            const btns = pagesBuilder[page].components.reduce(
-                (btns, btn) => {
-                    if (btn.type === 'button') {
-                        btns.button.push(
-                            ...btn.components.map((btn) => {
-                                return new ButtonBuilder()
-                                    .setCustomId(btn.customId)
-                                    .setLabel(btn.label)
-                                    .setStyle(btn.style as ButtonStyle);
-                            }),
-                        );
-                    } else if (btn.type === 'role') {
-                        btns.role.push(
-                            ...btn.components.map((btn) => {
-                                return new RoleSelectMenuBuilder()
-                                    .setCustomId(btn.customId)
-                                    .setPlaceholder(btn.label);
-                            }),
-                        );
-                    } else if (btn.type === 'channel') {
-                        btns.channel.push(
-                            ...btn.components.map((btn) => {
-                                return new ChannelSelectMenuBuilder()
-                                    .setCustomId(btn.customId)
-                                    .setPlaceholder(btn.label)
-                                    .setChannelTypes([ChannelType.GuildText]);
-                            }),
-                        );
-                    } else if (btn.type === 'category') {
-                        btns.category.push(
-                            ...btn.components.map((btn) => {
-                                return new ChannelSelectMenuBuilder()
-                                    .setCustomId(btn.customId)
-                                    .setPlaceholder(btn.label)
-                                    .setChannelTypes([
-                                        ChannelType.GuildCategory,
-                                    ]);
-                            }),
-                        );
-                    }
-                    return btns;
-                },
-                {
-                    button: [],
-                    role: [],
-                    channel: [],
-                    category: [],
-                } as Record<
-                    'button' | 'role' | 'channel' | 'category',
-                    (
-                        | ButtonBuilder
-                        | RoleSelectMenuBuilder
-                        | TextInputBuilder
-                        | ChannelSelectMenuBuilder
-                    )[]
-                >,
+        } else if (pagesBuilder[page].modals) {
+            const btns = buildButtonsModal(
+                lastPanel,
+                pagesBuilder[page].name,
+                pagesBuilder[page].modals!.components,
             );
+            await interaction.deferReply({ ephemeral: true });
+            await interaction.editReply({
+                embeds: [pagesBuilder[page].embed],
+                components: [
+                    new ActionRowBuilder<ButtonBuilder>().addComponents(
+                        ...btns,
+                    ),
+                ],
+            });
+        } else {
+            const btns = buildButtons(pagesBuilder[page].components);
             const rowRole =
                 new ActionRowBuilder<RoleSelectMenuBuilder>().addComponents(
                     btns.role as RoleSelectMenuBuilder[],
@@ -337,10 +292,15 @@ export class AddPanelButtonInteraction extends BaseButtonInteraction {
             const rowBtn = new ActionRowBuilder<ButtonBuilder>().addComponents(
                 btns.button as ButtonBuilder[],
             );
-            await interaction.deferUpdate();
+            const components = [];
+            if (rowRole.components.length > 0) components.push(rowRole);
+            if (rowChannel.components.length > 0) components.push(rowChannel);
+            if (rowCategory.components.length > 0) components.push(rowCategory);
+            components.push(rowBtn);
+            await interaction.deferReply({ ephemeral: true });
             await interaction.editReply({
                 embeds: [pagesBuilder[page].embed],
-                components: [rowRole, rowChannel, rowCategory, rowBtn],
+                components: [...components],
             });
         }
     }

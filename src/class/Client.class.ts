@@ -143,6 +143,9 @@ export class DiscordClient extends Client {
             await module.loadModalInteractions(
                 `src/interactions/modals/${module.name}`,
             );
+            await module.loadSelectChannelMenuInteractions(
+                `src/interactions/selectMenus/channel/${module.name}`,
+            );
             await module.loadSlashCommands(
                 `src/interactions/slash/${module.name}`,
             );
