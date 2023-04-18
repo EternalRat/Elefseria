@@ -1,4 +1,4 @@
-import { BaseEvent, BaseInteraction, DiscordClient } from '@src/structures';
+import { BaseEvent, DiscordClient } from '@src/structures';
 import { BaseButtonInteraction } from '@src/structures/base/BaseButtonInteraction.class';
 import { Events, Interaction } from 'discord.js';
 
@@ -33,10 +33,7 @@ export class InteractionCreatedEvent extends BaseEvent {
                 .get(interaction.customId)! as BaseButtonInteraction;
             if (!command) continue;
             try {
-                await command.execute(
-                    client,
-                    interaction,
-                );
+                await command.execute(client, interaction);
             } catch (error) {
                 console.error(error);
                 await interaction.reply({

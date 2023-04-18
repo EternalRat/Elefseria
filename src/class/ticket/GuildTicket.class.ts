@@ -39,32 +39,21 @@ export class GuildTicket {
         });
     }
 
-    public async createGuildTicket(
-        guildId: string,
-        categoryId: string,
-        message: string,
-    ) {
+    public async createGuildTicket(guildId: string) {
         const ticket = await GuildTicket._guildTicket.create({
             guildId,
-            categoryId,
-            message,
         });
         return ticket;
     }
 
-    public async updateGuildTicket(
-        guildId: string,
-        categoryId: string,
-        message: string,
-    ) {
+    public async updateGuildTicket(id: string, data: Record<string, any>) {
         const ticket = await GuildTicket._guildTicket.findOne({
-            where: { guildId },
+            where: { id },
         });
         if (!ticket) {
             throw new Error('Ticket not found');
         }
-        ticket.set('categoryId', categoryId);
-        ticket.set('message', message);
+        ticket.set(data);
         await ticket.save();
         return ticket;
     }

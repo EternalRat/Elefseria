@@ -1,4 +1,4 @@
-import { ButtonInteraction, ChatInputCommandInteraction, Interaction } from 'discord.js';
+import { ButtonInteraction } from 'discord.js';
 
 import { BaseInteraction } from './BaseInteraction.class';
 import { DiscordClient } from './BaseSlashCommand.class';

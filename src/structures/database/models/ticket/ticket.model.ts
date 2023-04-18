@@ -1,4 +1,4 @@
-import Sequelize, { DataTypes } from 'sequelize';
+import Sequelize from 'sequelize';
 
 import { DBConnection } from '../../../../class/database/dbConnection.db.class';
 import { GuildModel } from '../guild/guild.model';
@@ -6,15 +6,10 @@ import { UserModel } from '../user/user.model';
 const sequelize = DBConnection.getInstance().sequelize;
 
 export const GuildTicketModel = sequelize.define('guildTickets', {
-    id: {
-        type: Sequelize.STRING,
-        primaryKey: true,
-    },
     guildId: {
         type: Sequelize.STRING,
         references: {
             model: GuildModel,
-            key: 'id',
         },
     },
     rolesId: {
@@ -28,19 +23,19 @@ export const GuildTicketModel = sequelize.define('guildTickets', {
         type: Sequelize.STRING,
         defaultValue: '',
     },
+    transcriptChannelId: {
+        type: Sequelize.STRING,
+    },
     channelId: {
         type: Sequelize.STRING,
     },
     status: {
         type: Sequelize.INTEGER,
+        defaultValue: 2
     },
 });
 
 export const TicketModel = sequelize.define('tickets', {
-    id: {
-        type: Sequelize.STRING,
-        primaryKey: true,
-    },
     owner: {
         type: Sequelize.STRING,
         references: {
@@ -58,7 +53,6 @@ export const TicketModel = sequelize.define('tickets', {
         type: Sequelize.STRING,
         references: {
             model: GuildModel,
-            key: 'id',
         },
     },
     channelId: {
@@ -70,15 +64,10 @@ export const TicketModel = sequelize.define('tickets', {
 });
 
 export const TicketMessageModel = sequelize.define('ticketMessages', {
-    id: {
-        type: Sequelize.STRING,
-        primaryKey: true,
-    },
     ticketId: {
         type: Sequelize.STRING,
         references: {
             model: TicketModel,
-            key: 'id',
         },
     },
     message: {

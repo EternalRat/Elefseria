@@ -1,17 +1,11 @@
+import { BaseSlashCommand, DiscordClient } from '@src/structures';
 import {
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
     EmbedBuilder,
-    ModalBuilder,
-    TextInputBuilder,
 } from 'discord.js';
-import { BaseSlashCommand, DiscordClient } from '@src/structures';
-import {
-    ChatInputCommandInteraction,
-    PermissionFlagsBits,
-    TextInputStyle,
-} from 'discord.js';
+import { ChatInputCommandInteraction, PermissionFlagsBits } from 'discord.js';
 
 export class SetupTicketSlashCommand extends BaseSlashCommand {
     constructor() {

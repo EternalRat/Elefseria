@@ -459,23 +459,14 @@ export class TicketHandler {
         categoryId: string,
         message: string,
     ): Promise<Model<any, any> | null> {
-        return TicketHandler._guildTicket.createGuildTicket(
-            guildId,
-            categoryId,
-            message,
-        );
+        return TicketHandler._guildTicket.createGuildTicket(guildId);
     }
 
     public async updateGuildTicket(
-        guildId: string,
-        categoryId: string,
-        message: string,
+        id: string,
+        data: Record<string, any>,
     ): Promise<Model<any, any> | null> {
-        return TicketHandler._guildTicket.updateGuildTicket(
-            guildId,
-            categoryId,
-            message,
-        );
+        return TicketHandler._guildTicket.updateGuildTicket(id, data);
     }
 
     public async deleteGuildTicket(guildId: string): Promise<Model<any, any>> {
@@ -515,5 +506,15 @@ export class TicketHandler {
         guildId: string,
     ): Promise<Model<any, any> | null> {
         return TicketHandler._guildTicket.getLastPanelCreated(guildId);
+    }
+
+    public async createIfLastPanelActive(
+        guildId: string,
+        model: Model<any, any> | null,
+    ): Promise<Model<any, any>> {
+        if (!model || model.get('status') !== 2) {
+            return await TicketHandler._guildTicket.createGuildTicket(guildId);
+        }
+        return model;
     }
 }

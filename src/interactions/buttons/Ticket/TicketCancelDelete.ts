@@ -1,6 +1,6 @@
 import { DiscordClient } from '@src/structures';
 import { BaseButtonInteraction } from '@src/structures/base/BaseButtonInteraction.class';
-import { ButtonInteraction, ChatInputCommandInteraction, Interaction } from 'discord.js';
+import { ButtonInteraction } from 'discord.js';
 
 /**
  * @description TicketCancelDelete button interaction

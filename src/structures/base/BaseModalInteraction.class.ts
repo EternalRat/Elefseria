@@ -1,6 +1,7 @@
-import { ModalSubmitInteraction } from "discord.js";
-import { BaseInteraction } from "./BaseInteraction.class";
-import { DiscordClient } from "./BaseSlashCommand.class";
+import { ModalSubmitInteraction } from 'discord.js';
+
+import { BaseInteraction } from './BaseInteraction.class';
+import { DiscordClient } from './BaseSlashCommand.class';
 
 export class BaseModalInteraction extends BaseInteraction {
     constructor(name: string, description: string, moduleName: string) {
@@ -17,6 +18,6 @@ export class BaseModalInteraction extends BaseInteraction {
         _client: DiscordClient,
         _interaction: ModalSubmitInteraction,
     ): Promise<void> {
-        throw new Error("Method not implemented.");
+        throw new Error('Method not implemented.');
     }
 }

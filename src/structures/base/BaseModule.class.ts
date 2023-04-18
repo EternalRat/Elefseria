@@ -9,6 +9,7 @@ import {
     Routes,
 } from 'discord.js';
 import fs from 'fs';
+
 import { BaseButtonInteraction } from './BaseButtonInteraction.class';
 import { BaseModalInteraction } from './BaseModalInteraction.class';
 import { BaseSelectInteraction } from './BaseSelectInteraction.class';
@@ -266,13 +267,17 @@ export abstract class BaseModule {
                 await this.loadSelectChannelMenuInteractions(`${path}/${file}`);
                 continue;
             }
+            console.log(file);
             const Interaction = await import(`${path}/${file}`);
             for (const kVal in Object.keys(Interaction)) {
                 const value = Object.values(Interaction)[kVal];
                 try {
                     const interaction = new (value as any)();
                     if (interaction.module !== this._name) continue;
-                    this.selectChannelInteractions.set(interaction.name, interaction);
+                    this.selectChannelInteractions.set(
+                        interaction.name,
+                        interaction,
+                    );
                 } catch (error) {
                     console.error(error);
                     console.error(

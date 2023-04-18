@@ -1,5 +1,6 @@
 import { BaseEvent, DiscordClient } from '@src/structures';
-import { BaseModalInteraction } from '@src/structures/base/BaseModalInteraction.class';
+import { BaseButtonInteraction } from '@src/structures/base/BaseButtonInteraction.class';
+import { BaseSelectInteraction } from '@src/structures/base/BaseSelectInteraction.class';
 import { Events, Interaction } from 'discord.js';
 
 /**
@@ -23,15 +24,20 @@ export class InteractionCreatedEvent extends BaseEvent {
         client: DiscordClient,
         interaction: Interaction,
     ): Promise<void> {
-        if (!interaction.isModalSubmit()) return;
+        if (!interaction.isChannelSelectMenu()) return;
         for (const module of client.getModules().values()) {
-            if (module.getModalInteractions().size == 0) continue;
-            if (!module.getModalInteractions().has(interaction.customId))
+            console.log(module.name);
+            if (module.getSelectChannelInteractions().size == 0) continue;
+            console.log(module.getSelectChannelInteractions().size);
+            if (
+                !module.getSelectChannelInteractions().has(interaction.customId)
+            )
                 continue;
-            const command: BaseModalInteraction = module
-                .getModalInteractions()
-                .get(interaction.customId)! as BaseModalInteraction;
+            const command: BaseSelectInteraction = module
+                .getSelectChannelInteractions()
+                .get(interaction.customId)! as BaseSelectInteraction;
             if (!command) continue;
+            console.log('interaction', command.name);
             try {
                 await command.execute(client, interaction);
             } catch (error) {

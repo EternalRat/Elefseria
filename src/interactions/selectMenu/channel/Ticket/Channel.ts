@@ -1,11 +1,20 @@
 import { TicketHandler } from '@src/class/ticket/TicketHandler.class';
+import { AddPanelButtonInteraction } from '@src/interactions/buttons/Ticket/AddPanel';
 import { DiscordClient } from '@src/structures';
 import { BaseSelectInteraction } from '@src/structures/base/BaseSelectInteraction.class';
-import { Page } from '@src/util/ticket';
-import { ButtonStyle, ChannelSelectMenuInteraction, TextInputStyle } from 'discord.js';
+import { Page, buildButtons, buildButtonsModal } from '@src/util/ticket';
+import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    ChannelSelectMenuBuilder,
+    ChannelSelectMenuInteraction,
+    RoleSelectMenuBuilder,
+    TextInputStyle,
+} from 'discord.js';
 
 interface ChannelPage extends Page {
-    index: number
+    index: number;
 }
 
 const pagesBuilder: ChannelPage[] = [
@@ -120,7 +129,11 @@ const pagesBuilder: ChannelPage[] = [
 
 export class ChannelSelect extends BaseSelectInteraction {
     constructor() {
-        super('channel', 'Select a channel to send the ticket to', 'Ticket');
+        super(
+            'channelname',
+            'Select a channel to send the ticket to',
+            'Ticket',
+        );
     }
 
     async execute(
@@ -128,16 +141,13 @@ export class ChannelSelect extends BaseSelectInteraction {
         interaction: ChannelSelectMenuInteraction,
     ) {
         const val = interaction.values[0];
-        console.log(interaction.values);
         const title = interaction.message.embeds[0].title;
-        const isCategoryTicket =
-            title?.includes('Category');
-        const isChannelTicket =
-            title?.includes('Channel');
+        const isCategoryTicket = title?.includes('Category');
+        const isChannelTicket = title?.includes('Channel');
         const lastPanel = await TicketHandler.getInstance().getLastPanelCreated(
             interaction.guild!.id,
         );
-        const page =
+        let page =
             title && title.startsWith('Setup ')
                 ? parseInt(
                       title.slice(
@@ -145,37 +155,61 @@ export class ChannelSelect extends BaseSelectInteraction {
                           title.indexOf('/'),
                       ),
                   )
-                : 1;
-
-        if (isCategoryTicket) {
+                : 0;
+        await interaction.deferUpdate({
+            fetchReply: true,
+        });
+        if (val.length === 0) page--;
+        if (isCategoryTicket && val.length > 0) {
             lastPanel!.set('categoryId', val);
-            await interaction.update({
-                content: `You have selected the category \`${
-                    interaction.guild!.channels.cache.get(val)!.name
-                }\``,
-                embeds: [],
-                components: [],
-            });
-            await interaction.deferUpdate();
-            return;
         }
-        if (isChannelTicket && page === 4) {
-            await interaction.update({
-                content: `You have selected the channel \`${interaction.guild!.channels.cache.get(val)!.name}\``,
-                embeds: [],
-                components: [],
-            });
-            await interaction.deferUpdate();
+        if (isChannelTicket && page === 4 && val.length > 0) {
+            lastPanel!.set('transcriptChannelId', val);
+        } else if (isChannelTicket && page === 6 && val.length > 0) {
             lastPanel!.set('channelId', val);
-            return;
-        } else if (isChannelTicket && page === 6) {
-            await interaction.update({
-                content: `You have selected the channel \`${interaction.guild!.channels.cache.get(val)!.name}\``,
-                embeds: [],
-                components: [],
+        }
+        if (AddPanelButtonInteraction.pagesBuilder[page].modals) {
+            const btns = buildButtonsModal(
+                lastPanel,
+                AddPanelButtonInteraction.pagesBuilder[page].name,
+                AddPanelButtonInteraction.pagesBuilder[page].modals!.components,
+            );
+            await interaction.editReply({
+                embeds: [AddPanelButtonInteraction.pagesBuilder[page].embed],
+                components: [
+                    new ActionRowBuilder<ButtonBuilder>().addComponents(
+                        ...btns,
+                    ),
+                ],
             });
-            await interaction.deferUpdate();
-            return;
+        } else {
+            const btns = buildButtons(
+                AddPanelButtonInteraction.pagesBuilder[page].components,
+            );
+            const rowRole =
+                new ActionRowBuilder<RoleSelectMenuBuilder>().addComponents(
+                    btns.role as RoleSelectMenuBuilder[],
+                );
+            const rowChannel =
+                new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(
+                    btns.channel as ChannelSelectMenuBuilder[],
+                );
+            const rowCategory =
+                new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(
+                    btns.category as ChannelSelectMenuBuilder[],
+                );
+            const rowBtn = new ActionRowBuilder<ButtonBuilder>().addComponents(
+                btns.button as ButtonBuilder[],
+            );
+            const components = [];
+            if (rowRole.components.length > 0) components.push(rowRole);
+            if (rowChannel.components.length > 0) components.push(rowChannel);
+            if (rowCategory.components.length > 0) components.push(rowCategory);
+            components.push(rowBtn);
+            await interaction.editReply({
+                embeds: [AddPanelButtonInteraction.pagesBuilder[page].embed],
+                components,
+            });
         }
     }
 }

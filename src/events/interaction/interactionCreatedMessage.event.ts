@@ -1,9 +1,4 @@
-import {
-    BaseEvent,
-    BaseInteraction,
-    BaseSlashCommand,
-    DiscordClient,
-} from '@src/structures';
+import { BaseEvent, BaseSlashCommand, DiscordClient } from '@src/structures';
 import { Events, Interaction } from 'discord.js';
 
 /**
