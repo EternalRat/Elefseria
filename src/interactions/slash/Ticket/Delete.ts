@@ -52,6 +52,6 @@ export class TicketDeleteSlashCommand extends BaseSlashCommand {
             });
             return;
         }
-        await ticketInstance.deleteTicket(interaction.channel!);
+        await ticketInstance.deleteTicketByChannel(interaction.channel!);
     }
 }

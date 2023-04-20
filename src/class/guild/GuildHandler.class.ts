@@ -46,10 +46,9 @@ export class GuildHandler {
 
     public async createGuildUser(
         id: string,
-        fkUser: string,
         guildId: string,
     ): Promise<void> {
-        await GuildHandler._guildUser.createGuildUser(id, fkUser, guildId);
+        await GuildHandler._guildUser.createGuildUser(id, guildId);
     }
 
     public async deleteGuildUser(id: string): Promise<void> {

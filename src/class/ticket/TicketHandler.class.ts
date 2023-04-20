@@ -81,8 +81,21 @@ export class TicketHandler {
         return { ticket, channel };
     }
 
-    public async deleteTicket(channel: Channel): Promise<void> {
-        const ticket = await TicketHandler._ticket.getTicketById(channel.id);
+    public async deleteTicket(id: string): Promise<void> {
+        const ticket = await TicketHandler._ticket.getTicketById(
+            id,
+        );
+        if (ticket) {
+            await TicketHandler._ticket.deleteTicket(
+                ticket.get('id') as string,
+            );
+        }
+    }
+
+    public async deleteTicketByChannel(channel: Channel): Promise<void> {
+        const ticket = await TicketHandler._ticket.getTicketByChannelId(
+            channel.id,
+        );
         if (ticket) {
             await TicketHandler._ticket.deleteTicket(
                 ticket.get('id') as string,
@@ -92,7 +105,9 @@ export class TicketHandler {
     }
 
     public async closeTicket(channel: Channel): Promise<void> {
-        const ticket = await TicketHandler._ticket.getTicketById(channel.id);
+        const ticket = await TicketHandler._ticket.getTicketByChannelId(
+            channel.id,
+        );
         if (ticket) {
             await TicketHandler._ticket.closeTicket(ticket.get('id') as string);
         }
@@ -107,8 +122,14 @@ export class TicketHandler {
         ]);
     }
 
+    public async getTicketById(id: string): Promise<Model<any, any> | null> {
+        return await TicketHandler._ticket.getTicketById(id);
+    }
+
     public async isTicketOpen(channel: Channel): Promise<boolean> {
-        const ticket = await TicketHandler._ticket.getTicketById(channel.id);
+        const ticket = await TicketHandler._ticket.getTicketByChannelId(
+            channel.id,
+        );
         if (ticket) {
             return ticket.get('status') as boolean;
         }
@@ -116,7 +137,9 @@ export class TicketHandler {
     }
 
     public async isTicketClosed(channel: Channel): Promise<boolean> {
-        const ticket = await TicketHandler._ticket.getTicketById(channel.id);
+        const ticket = await TicketHandler._ticket.getTicketByChannelId(
+            channel.id,
+        );
         if (ticket) {
             return !(ticket.get('status') as boolean);
         }
@@ -127,7 +150,9 @@ export class TicketHandler {
         channel: Channel,
         user: User,
     ): Promise<boolean> {
-        const ticket = await TicketHandler._ticket.getTicketById(channel.id);
+        const ticket = await TicketHandler._ticket.getTicketByChannelId(
+            channel.id,
+        );
         if (ticket) {
             if ((ticket.get('owner') as string).length === 0) return true;
             return ticket.get('owner') === user.id;
@@ -139,7 +164,9 @@ export class TicketHandler {
         channel: Channel,
         user: User,
     ): Promise<boolean> {
-        const ticket = await TicketHandler._ticket.getTicketById(channel.id);
+        const ticket = await TicketHandler._ticket.getTicketByChannelId(
+            channel.id,
+        );
         if (ticket) {
             return (
                 (ticket.get('owner') as string).length > 0 &&
@@ -150,7 +177,9 @@ export class TicketHandler {
     }
 
     public async reopenTicket(channel: Channel): Promise<void> {
-        const ticket = await TicketHandler._ticket.getTicketById(channel.id);
+        const ticket = await TicketHandler._ticket.getTicketByChannelId(
+            channel.id,
+        );
         if (ticket) {
             await TicketHandler._ticket.reopenTicket(
                 ticket.get('id') as string,
@@ -190,7 +219,7 @@ export class TicketHandler {
         users: User[],
     ): Promise<Model<any, any>> {
         try {
-            const ticket = await TicketHandler._ticket.getTicketById(
+            const ticket = await TicketHandler._ticket.getTicketByChannelId(
                 channel.id,
             );
             if (ticket) {
@@ -228,7 +257,7 @@ export class TicketHandler {
         users: User[],
     ): Promise<Model<any, any>> {
         try {
-            const ticket = await TicketHandler._ticket.getTicketById(
+            const ticket = await TicketHandler._ticket.getTicketByChannelId(
                 channel.id,
             );
             if (ticket) {

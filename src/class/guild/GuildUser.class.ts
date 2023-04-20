@@ -17,13 +17,11 @@ export class GuildUser {
 
     public async createGuildUser(
         id: string,
-        fkUser: string,
         guildId: string,
     ): Promise<Model<any, any>> {
         return await GuildUser._guildUser.create({
             id,
-            fkUser,
-            guildId,
+            fkGuild: guildId,
         });
     }
 
@@ -38,12 +36,12 @@ export class GuildUser {
     public async getGuildUsersByGuildId(
         guildId: string,
     ): Promise<Model<any, any>[]> {
-        return await GuildUser._guildUser.findAll({ where: { guildId } });
+        return await GuildUser._guildUser.findAll({ where: { fkGuild: guildId } });
     }
 
     public async getGuildsByUserId(userId: string): Promise<Model<any, any>[]> {
         return await GuildUser._guildUser.findAll({
-            where: { fkUser: userId },
+            where: { id: userId },
         });
     }
 }
