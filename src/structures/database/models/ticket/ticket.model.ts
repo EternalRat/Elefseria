@@ -10,7 +10,12 @@ export const GuildTicketModel = sequelize.define('guildTickets', {
         type: Sequelize.STRING,
         references: {
             model: GuildModel,
+            key: 'id',
         },
+    },
+    name: {
+        type: Sequelize.STRING,
+        defaultValue: '',
     },
     rolesId: {
         type: Sequelize.STRING,
@@ -18,6 +23,7 @@ export const GuildTicketModel = sequelize.define('guildTickets', {
     },
     categoryId: {
         type: Sequelize.STRING,
+        defaultValue: '',
     },
     message: {
         type: Sequelize.STRING,
@@ -25,13 +31,15 @@ export const GuildTicketModel = sequelize.define('guildTickets', {
     },
     transcriptChannelId: {
         type: Sequelize.STRING,
+        defaultValue: '',
     },
     channelId: {
         type: Sequelize.STRING,
+        defaultValue: '',
     },
     status: {
         type: Sequelize.INTEGER,
-        defaultValue: 2
+        defaultValue: 2,
     },
 });
 
@@ -53,6 +61,7 @@ export const TicketModel = sequelize.define('tickets', {
         type: Sequelize.STRING,
         references: {
             model: GuildModel,
+            key: 'id',
         },
     },
     channelId: {
@@ -65,9 +74,10 @@ export const TicketModel = sequelize.define('tickets', {
 
 export const TicketMessageModel = sequelize.define('ticketMessages', {
     ticketId: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         references: {
             model: TicketModel,
+            key: 'id',
         },
     },
     message: {

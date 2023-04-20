@@ -18,8 +18,8 @@ export class GuildTicket {
 
     public async getGuildTicketByGuildId(
         guildId: string,
-    ): Promise<Model<any, any> | null> {
-        return await GuildTicket._guildTicket.findOne({ where: { guildId } });
+    ): Promise<Model<any, any>[]> {
+        return await GuildTicket._guildTicket.findAll({ where: { guildId } });
     }
 
     public async getGuildTicketByCategoryId(
@@ -58,9 +58,9 @@ export class GuildTicket {
         return ticket;
     }
 
-    public async deleteGuildTicket(guildId: string) {
+    public async deleteGuildTicket(id: string) {
         const ticket = await GuildTicket._guildTicket.findOne({
-            where: { guildId },
+            where: { id },
         });
         if (!ticket) {
             throw new Error('Ticket not found');

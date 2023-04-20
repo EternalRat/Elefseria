@@ -23,15 +23,13 @@ export class InteractionCreatedEvent extends BaseEvent {
         client: DiscordClient,
         interaction: Interaction,
     ): Promise<void> {
-        if (!interaction.isChannelSelectMenu()) return;
+        if (!interaction.isRoleSelectMenu()) return;
         for (const module of client.getModules().values()) {
-            if (module.getSelectChannelInteractions().size == 0) continue;
-            if (
-                !module.getSelectChannelInteractions().has(interaction.customId)
-            )
+            if (module.getSelectRoleInteractions().size == 0) continue;
+            if (!module.getSelectRoleInteractions().has(interaction.customId))
                 continue;
             const command: BaseSelectInteraction = module
-                .getSelectChannelInteractions()
+                .getSelectRoleInteractions()
                 .get(interaction.customId)! as BaseSelectInteraction;
             if (!command) continue;
             try {

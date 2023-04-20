@@ -442,7 +442,7 @@ export class TicketHandler {
 
     public async getGuildTicketByGuildId(
         guildId: string,
-    ): Promise<Model<any, any> | null> {
+    ): Promise<Model<any, any>[]> {
         return TicketHandler._guildTicket.getGuildTicketByGuildId(guildId);
     }
 
@@ -456,8 +456,6 @@ export class TicketHandler {
 
     public async createGuildTicket(
         guildId: string,
-        categoryId: string,
-        message: string,
     ): Promise<Model<any, any> | null> {
         return TicketHandler._guildTicket.createGuildTicket(guildId);
     }
@@ -469,8 +467,8 @@ export class TicketHandler {
         return TicketHandler._guildTicket.updateGuildTicket(id, data);
     }
 
-    public async deleteGuildTicket(guildId: string): Promise<Model<any, any>> {
-        return TicketHandler._guildTicket.deleteGuildTicket(guildId);
+    public async deleteGuildTicket(id: string): Promise<Model<any, any>> {
+        return TicketHandler._guildTicket.deleteGuildTicket(id);
     }
 
     public async deleteGuildTicketByCategoryId(

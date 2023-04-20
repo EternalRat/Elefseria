@@ -146,6 +146,12 @@ export class DiscordClient extends Client {
             await module.loadSelectChannelMenuInteractions(
                 `src/interactions/selectMenu/channel/${module.name}`,
             );
+            await module.loadSelectRoleMenuInteractions(
+                `src/interactions/selectMenu/role/${module.name}`,
+            );
+            await module.loadSelectStringMenuInteractions(
+                `src/interactions/selectMenu/string/${module.name}`,
+            );
             await module.loadSlashCommands(
                 `src/interactions/slash/${module.name}`,
             );

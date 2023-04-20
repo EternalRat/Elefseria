@@ -26,38 +26,50 @@ export interface Page {
         title: string;
         description: string;
     };
-    components: Component[];
+    components?: Component[];
     modals?: {
         components: ComponentItem[];
     };
 }
 
 export const buildButtonsModal = (
-    lastPanel: Model<any, any> | null,
+    lastPanel: Model<any, any>,
     name: string,
     components: ComponentItem[],
 ) => {
-    const btnsModal = components.reduce((btns, btn) => {
-        let newBtn = new ButtonBuilder()
-            .setCustomId(btn.customId)
-            .setLabel(btn.label)
-            .setStyle(btn.style as ButtonStyle);
-        btns.push(newBtn);
-        return btns;
-    }, [] as ButtonBuilder[]);
+    const btnsModal = components.reduce(
+        (btns, btn) => {
+            let newBtn = new ButtonBuilder()
+                .setCustomId(btn.customId)
+                .setLabel(btn.label)
+                .setStyle(btn.style as ButtonStyle);
+            btns.always.push(newBtn);
+            return btns;
+        },
+        {
+            always: [] as ButtonBuilder[],
+            optional: [] as ButtonBuilder[],
+        },
+    );
     if (name === 'Name') {
-        btnsModal.push(
+        btnsModal.optional.push(
             new ButtonBuilder()
-                .setCustomId('panelname')
-                .setLabel(lastPanel ? 'Modify Panel Name' : 'Create Panel Name')
+                .setCustomId('namePanel')
+                .setLabel(
+                    (lastPanel?.get('name') as string).length > 0
+                        ? 'Modify Panel Name'
+                        : 'Create Panel Name',
+                )
                 .setStyle(ButtonStyle.Secondary),
         );
     } else if (name === 'Message') {
-        btnsModal.push(
+        btnsModal.optional.push(
             new ButtonBuilder()
-                .setCustomId('panelmessage')
+                .setCustomId('messagePanel')
                 .setLabel(
-                    lastPanel ? 'Modify Panel Message' : 'Create Panel Message',
+                    (lastPanel?.get('message') as string).length > 0
+                        ? 'Modify Panel Message'
+                        : 'Create Panel Message',
                 )
                 .setStyle(ButtonStyle.Secondary),
         );
@@ -82,7 +94,9 @@ export const buildButtons = (components: Component[]) => {
                     ...btn.components.map((btn) => {
                         return new RoleSelectMenuBuilder()
                             .setCustomId(btn.customId)
-                            .setPlaceholder(btn.label);
+                            .setPlaceholder(btn.label)
+                            .setMinValues(1)
+                            .setMaxValues(3);
                     }),
                 );
             } else if (btn.type === 'channel') {

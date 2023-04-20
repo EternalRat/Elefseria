@@ -16,10 +16,10 @@ export default async function databaseSynchronisation(): Promise<void> {
     await GuildUserModel.sync({
         logging: false,
     });
-    await GuildTicketModel.sync({
+    await TicketModel.sync({
         logging: false,
     });
-    await TicketModel.sync({
+    await GuildTicketModel.sync({
         logging: false,
     });
     await TicketMessageModel.sync({
