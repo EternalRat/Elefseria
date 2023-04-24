@@ -24,7 +24,7 @@ export class BackPanelInteraction extends BaseButtonInteraction {
         const activePanelNumber = allPanels.filter(
             (panel) => panel.get('status') === 1,
         ).length;
-        const page =
+        let page =
             title && title.startsWith('Setup ')
                 ? parseInt(
                       title.slice(
@@ -33,6 +33,9 @@ export class BackPanelInteraction extends BaseButtonInteraction {
                       ),
                   ) - 2
                 : 0;
+        if (title && title.startsWith('Remove')) {
+            page = -1;
+        }
         await interaction.deferUpdate({
             fetchReply: true,
         });

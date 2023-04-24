@@ -61,13 +61,13 @@ export class ReadyEvent extends BaseEvent {
                         return;
                     }
                 }
-                await this.loadingUsers(guild, guildDB);
+                await this.loadingUsers(guild);
                 await this.loadingTickets(guild, guildDB);
             });
         });
     }
 
-    async loadingUsers(guild: Guild, guildDB: Model<any, any>): Promise<void> {
+    async loadingUsers(guild: Guild): Promise<void> {
         const guildMembers = await guild.members.fetch();
         const idAlreadyAdded = await this._guildHandler.getGuildUsersByGuildId(
             guild.id,
@@ -122,7 +122,7 @@ export class ReadyEvent extends BaseEvent {
                             (ticket.get('id') as string).toString(),
                         );
                     } catch (e) {
-                        console.log(`Ticket ${ticket.get('id')} deleted`);
+                        console.info(`Ticket ${ticket.get('id')} deleted`);
                         await this._ticketHandler.deleteTicket(
                             ticket.get('id') as string,
                         );

@@ -23,7 +23,6 @@ export class InteractionCreatedEvent extends BaseEvent {
         interaction: Interaction,
     ): Promise<void> {
         if (!interaction.isCommand()) return;
-        console.log(interaction);
         for (const module of client.getModules().values()) {
             if (module.getSlashCommands().size == 0) continue;
             if (!module.getSlashCommands().has(interaction.commandName))

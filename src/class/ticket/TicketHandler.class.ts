@@ -82,9 +82,7 @@ export class TicketHandler {
     }
 
     public async deleteTicket(id: string): Promise<void> {
-        const ticket = await TicketHandler._ticket.getTicketById(
-            id,
-        );
+        const ticket = await TicketHandler._ticket.getTicketById(id);
         if (ticket) {
             await TicketHandler._ticket.deleteTicket(
                 ticket.get('id') as string,
