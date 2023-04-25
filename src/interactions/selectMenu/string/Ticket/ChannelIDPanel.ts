@@ -1,4 +1,5 @@
 import { TicketHandler } from '@src/class/ticket/TicketHandler.class';
+import { SetupTicketSlashCommand } from '@src/interactions/slash/Ticket/Setup';
 import { DiscordClient } from '@src/structures';
 import { BaseSelectInteraction } from '@src/structures/base/BaseSelectInteraction.class';
 import { EmbedBuilder, StringSelectMenuInteraction } from 'discord.js';
@@ -20,9 +21,15 @@ export class ChannelIdPanelInteraction extends BaseSelectInteraction {
         const panels = allPanels.filter((panel) =>
             val.includes((panel.get('id') as number).toString()),
         );
+        const filteredPanels = allPanels.filter(
+            (panel) => !panels.includes(panel),
+        );
         for (const panel of panels) {
             await ticketHandler.deleteGuildTicket(panel.get('id') as string);
         }
+        const activePanelNumber = filteredPanels.filter(
+            (panel) => panel.get('status') === 1,
+        ).length;
         const embed = new EmbedBuilder()
             .setTitle('Remove Panel')
             .setDescription(
@@ -32,12 +39,19 @@ export class ChannelIdPanelInteraction extends BaseSelectInteraction {
             )
             .setColor('Red');
 
+        const { embed: embeds, actionRow } =
+            SetupTicketSlashCommand.getSetupComponents(
+                activePanelNumber,
+                filteredPanels,
+            );
+
         await interaction.deferUpdate({
             fetchReply: true,
         });
         await interaction.editReply({
-            embeds: [embed],
-            components: [],
+            content: '',
+            embeds: [embed, embeds],
+            components: [actionRow],
         });
     }
 }

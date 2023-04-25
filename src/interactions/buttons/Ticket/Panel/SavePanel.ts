@@ -34,6 +34,7 @@ export class AddPanelButtonInteraction extends BaseButtonInteraction {
             allPanels,
         );
         await interaction.editReply({
+            content: '',
             embeds: [embed],
             components: [actionRow],
         });

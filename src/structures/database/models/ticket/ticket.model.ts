@@ -51,6 +51,13 @@ export const TicketModel = sequelize.define('tickets', {
             key: 'id',
         },
     },
+    panelId: {
+        type: Sequelize.INTEGER,
+        references: {
+            model: GuildTicketModel,
+            key: 'id',
+        },
+    },
     creatorId: {
         type: Sequelize.STRING,
     },

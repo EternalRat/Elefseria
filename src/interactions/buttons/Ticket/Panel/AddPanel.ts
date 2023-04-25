@@ -67,18 +67,18 @@ export class AddPanelButtonInteraction extends BaseButtonInteraction {
                 )
                 .setColor('Random');
             await interaction.editReply({
+                content: '',
                 embeds: [embed],
                 components: [row],
             });
         } else {
-            const replyComponents = await AddPanelButtonInteraction.buildReply(
-                lastPanel,
-                page,
-            );
+            const { embeds, components } =
+                await AddPanelButtonInteraction.buildReply(lastPanel, page);
 
             await interaction.editReply({
-                embeds: [...replyComponents.embeds],
-                components: [...replyComponents.components],
+                content: '',
+                embeds: [...embeds],
+                components: [...components],
             });
         }
     }
@@ -139,32 +139,6 @@ export class AddPanelButtonInteraction extends BaseButtonInteraction {
             }
             components.push(...newComponentRows.reverse());
         } else {
-            const btns = buildButtons(
-                AddPanelButtonInteraction.pagesBuilder[page].components!,
-            );
-            const rowRole =
-                new ActionRowBuilder<RoleSelectMenuBuilder>().addComponents(
-                    btns.role as RoleSelectMenuBuilder[],
-                );
-            const rowChannel =
-                new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(
-                    btns.channel as ChannelSelectMenuBuilder[],
-                );
-            const rowCategory =
-                new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(
-                    btns.category as ChannelSelectMenuBuilder[],
-                );
-            const rowBtn = new ActionRowBuilder<ButtonBuilder>().addComponents(
-                btns.button as ButtonBuilder[],
-            );
-            const newComponents = [];
-            if (rowRole.components.length > 0) newComponents.push(rowRole);
-            if (rowChannel.components.length > 0)
-                newComponents.push(rowChannel);
-            if (rowCategory.components.length > 0)
-                newComponents.push(rowCategory);
-            newComponents.push(rowBtn);
-            components.push(...newComponents);
             if (
                 (lastPanel.get('transcriptChannelId') as string).length > 0 &&
                 page === 3
@@ -205,6 +179,35 @@ export class AddPanelButtonInteraction extends BaseButtonInteraction {
                     );
                 embeds.push(embedBuilder.toJSON());
             }
+            const btns = buildButtons(
+                AddPanelButtonInteraction.pagesBuilder[page].components!,
+            );
+            const rowRole =
+                new ActionRowBuilder<RoleSelectMenuBuilder>().addComponents(
+                    btns.role as RoleSelectMenuBuilder[],
+                );
+            const rowChannel =
+                new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(
+                    btns.channel as ChannelSelectMenuBuilder[],
+                );
+            const rowCategory =
+                new ActionRowBuilder<ChannelSelectMenuBuilder>().addComponents(
+                    btns.category as ChannelSelectMenuBuilder[],
+                );
+            const rowBtn = new ActionRowBuilder<ButtonBuilder>().addComponents(
+                btns.button as ButtonBuilder[],
+            );
+            const newComponents = [];
+            if (rowRole.components.length > 0) newComponents.push(rowRole);
+            if (rowChannel.components.length > 0)
+                newComponents.push(rowChannel);
+            if (rowCategory.components.length > 0)
+                newComponents.push(rowCategory);
+            newComponents.push(rowBtn);
+            components.push(...newComponents);
+        }
+        if (page === 0 && embeds.length !== 2) {
+            components[1].components[0].setDisabled(true);
         }
         return {
             embeds,

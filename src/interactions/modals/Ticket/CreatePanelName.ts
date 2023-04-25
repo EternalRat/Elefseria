@@ -38,6 +38,7 @@ export class CreatePanelModalInteraction extends BaseModalInteraction {
             { name },
         );
         await interaction.editReply({
+            content: '',
             embeds: [...replyComponent.embeds],
             components: [...replyComponent.components],
         });

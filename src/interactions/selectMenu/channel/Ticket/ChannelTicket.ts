@@ -49,6 +49,7 @@ export class ChannelTicketSelect extends BaseSelectInteraction {
                 : undefined,
         );
         await interaction.editReply({
+            content: '',
             embeds: [...replyComponent.embeds],
             components: [...replyComponent.components],
         });

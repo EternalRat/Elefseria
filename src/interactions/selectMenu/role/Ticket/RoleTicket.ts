@@ -39,6 +39,7 @@ export class RoleTicketInteraction extends BaseSelectInteraction {
             { rolesId: val },
         );
         await interaction.editReply({
+            content: '',
             embeds: [...replyComponent.embeds],
             components: [...replyComponent.components],
         });

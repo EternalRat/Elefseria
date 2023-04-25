@@ -13,10 +13,6 @@ export class BackPanelInteraction extends BaseButtonInteraction {
 
     async execute(_client: DiscordClient, interaction: ButtonInteraction) {
         const ticketHandler = TicketHandler.getInstance();
-        const lastPanel = await ticketHandler.createIfLastPanelActive(
-            interaction.guildId!,
-            await ticketHandler.getLastPanelCreated(interaction.guild!.id),
-        );
         const title = interaction.message.embeds[0].title;
         const allPanels = await ticketHandler.getGuildTicketByGuildId(
             interaction.guildId!,
@@ -33,7 +29,7 @@ export class BackPanelInteraction extends BaseButtonInteraction {
                       ),
                   ) - 2
                 : 0;
-        if (title && title.startsWith('Remove')) {
+        if (title && (title.startsWith('Remove') || title.startsWith('Edit'))) {
             page = -1;
         }
         await interaction.deferUpdate({
@@ -47,16 +43,22 @@ export class BackPanelInteraction extends BaseButtonInteraction {
                     allPanels,
                 );
             await interaction.editReply({
+                content: '',
                 embeds: [embed],
                 components: [actionRow],
             });
             return;
         }
+        const lastPanel = await ticketHandler.createIfLastPanelActive(
+            interaction.guildId!,
+            await ticketHandler.getLastPanelCreated(interaction.guild!.id),
+        );
         const replyComponent = await AddPanelButtonInteraction.buildReply(
             lastPanel,
             page,
         );
         await interaction.editReply({
+            content: '',
             embeds: [...replyComponent.embeds],
             components: [...replyComponent.components],
         });

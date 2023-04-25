@@ -43,6 +43,7 @@ export class CategoryTicketSelect extends BaseSelectInteraction {
             { categoryId: val },
         );
         await interaction.editReply({
+            content: '',
             embeds: [...replyComponent.embeds],
             components: [...replyComponent.components],
         });

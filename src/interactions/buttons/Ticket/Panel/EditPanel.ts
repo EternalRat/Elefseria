@@ -2,18 +2,18 @@ import { TicketHandler } from '@src/class/ticket/TicketHandler.class';
 import { DiscordClient } from '@src/structures';
 import { BaseButtonInteraction } from '@src/structures/base/BaseButtonInteraction.class';
 import {
-    ActionRowBuilder,
-    ButtonBuilder,
     ButtonInteraction,
-    ButtonStyle,
-    EmbedBuilder,
     StringSelectMenuBuilder,
     StringSelectMenuOptionBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    ActionRowBuilder,
+    EmbedBuilder,
 } from 'discord.js';
 
-export class RemovePanelInteraction extends BaseButtonInteraction {
+export class EditPanelInteraction extends BaseButtonInteraction {
     constructor() {
-        super('removePanel', 'Remove a ticket panel', 'Ticket', 0);
+        super('editPanel', 'Edit the selected panel', 'Ticket', 0);
     }
 
     async execute(_client: DiscordClient, interaction: ButtonInteraction) {
@@ -21,10 +21,18 @@ export class RemovePanelInteraction extends BaseButtonInteraction {
         const allPanels = await ticketHandler.getGuildTicketByGuildId(
             interaction.guildId!,
         );
+        if (allPanels.find((panel) => panel.get('status') === 2)) {
+            await interaction.deferUpdate({
+                fetchReply: true,
+            });
+            await interaction.editReply({
+                content: 'There is a panel that is currently being edited/created, please finish it first.',
+            });
+            return;
+        }
         const stringOptionInput = new StringSelectMenuBuilder()
-            .setCustomId('removePanelIds')
-            .setMinValues(allPanels.length > 0 ? 1 : 0)
-            .setMaxValues(allPanels.length)
+            .setCustomId('editPanelId')
+            .setMinValues(1)
             .addOptions(
                 allPanels.map((panel) => {
                     return new StringSelectMenuOptionBuilder()
@@ -53,13 +61,13 @@ export class RemovePanelInteraction extends BaseButtonInteraction {
             );
         const btnRow = new ActionRowBuilder<ButtonBuilder>().addComponents(btn);
         const embed = new EmbedBuilder()
-            .setTitle('Remove Panel')
+            .setTitle('Edit Panel')
             .setDescription(
-                'Select the panels you want to remove. You can select multiple panels at once.',
+                'Select the panel you want to edit.',
             )
             .setColor('Red');
         const noPanels = new EmbedBuilder().setDescription(
-            "There's no panel to remove",
+            "There's no panel to edit",
         );
         await interaction.deferUpdate({
             fetchReply: true,
