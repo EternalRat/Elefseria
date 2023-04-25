@@ -23,6 +23,7 @@ export class SendPanelInteraction extends BaseButtonInteraction {
         const allPanels = await ticketHandler.getGuildTicketByGuildId(
             interaction.guildId!,
         );
+        const allInvalidPanel = [];
 
         for (const panel of allPanels) {
             try {
@@ -33,13 +34,8 @@ export class SendPanelInteraction extends BaseButtonInteraction {
                     },
                 )) as TextChannel | null;
                 if (!textChannel) {
-                    interaction.reply({
-                        content: `The panel ${
-                            panel.get('name') as string
-                        } couldn't be send, the channel with the id ${
-                            panel.get('id') as string
-                        } could not be found`,
-                        ephemeral: true,
+                    allInvalidPanel.push({
+                        name: panel.get('name') as string,
                     });
                     continue;
                 }
@@ -64,15 +60,20 @@ export class SendPanelInteraction extends BaseButtonInteraction {
                     components: [row],
                 });
             } catch {
-                interaction.reply({
-                    content: `The panel ${
-                        panel.get('name') as string
-                    } couldn't be send, the channel with the id ${
-                        panel.get('id') as string
-                    } could not be found`,
-                    ephemeral: true,
+                allInvalidPanel.push({
+                    name: panel.get('name') as string,
                 });
             }
+        }
+        if (allInvalidPanel.length > 0) {
+            await interaction.reply({
+                content: `The panels **${allInvalidPanel
+                    .map((invalidPanel) => invalidPanel.name)
+                    .join(
+                        ', ',
+                    )}** couldn't be send because their respective channels were invalid`,
+                ephemeral: true,
+            });
         }
     }
 }
