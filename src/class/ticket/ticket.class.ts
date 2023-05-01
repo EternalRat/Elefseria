@@ -22,28 +22,19 @@ export class Ticket {
     }
 
     public async createTicket(
+        panelId: string,
         creatorId: string,
-        users: User[],
         guildId: string,
         channelId: string,
     ) {
         const ticket = await Ticket._ticket.create({
+            panelId,
             creatorId: creatorId,
-            users: users.map((u) => u.id),
+            users: '',
             guildId,
             channelId,
             status: 1,
         });
-        return ticket;
-    }
-
-    public async reopenTicket(id: string): Promise<Model<any, any>> {
-        const ticket = await Ticket._ticket.findOne({ where: { id } });
-        if (!ticket) {
-            throw new Error('Ticket not found');
-        }
-        ticket.set('status', 1);
-        await ticket.save();
         return ticket;
     }
 
@@ -69,159 +60,90 @@ export class Ticket {
         return await Ticket._ticket.findAll({ where: { owner: userId } });
     }
 
-    public async deleteTicket(id: string): Promise<void> {
-        await Ticket._ticket.destroy({ where: { id } });
+    public async reopenTicket(
+        ticket: Model<any, any>,
+    ): Promise<Model<any, any>> {
+        ticket.set('status', 1);
+        await ticket.save();
+        return ticket;
     }
 
     public async addUsersToTicket(
-        channelId: string,
-        guildId: string,
+        ticket: Model<any, any>,
         users: User[],
     ): Promise<Model<any, any>> {
-        const ticket = await Ticket._ticket.findOne({
-            where: { channelId, guildId },
-        });
-        if (!ticket) {
-            throw new Error('Ticket not found');
-        }
         ticket.set(
             'users',
-            (ticket.get('users') as Array<string>).concat(
-                users.map((u) => u.id),
-            ),
+            (ticket.get('users') as string)
+                .split(',')
+                .concat(users.map((u) => u.id))
+                .join(','),
         );
         await ticket.save();
         return ticket;
     }
 
     public async removeUsersFromTicket(
-        channelId: string,
-        guildId: string,
+        ticket: Model<any, any>,
         users: User[],
     ): Promise<Model<any, any>> {
-        const ticket = await Ticket._ticket.findOne({
-            where: { channelId, guildId },
-        });
-        if (!ticket) {
-            throw new Error('Ticket not found');
-        }
         ticket.set(
             'users',
-            (ticket.get('users') as Array<string>).filter(
-                (u) => !users.map((u) => u.id).includes(u),
-            ),
+            (ticket.get('users') as string)
+                .split(',')
+                .filter((u) => !users.map((u) => u.id).includes(u))
+                .join(','),
         );
         await ticket.save();
         return ticket;
     }
 
-    public async removeUsersFromTicketById(ticketId: string, users: User[]) {
-        const ticket = await Ticket._ticket.findOne({
-            where: { id: ticketId },
-        });
-        if (!ticket) {
-            throw new Error('Ticket not found');
-        }
-        ticket.set(
-            'users',
-            (ticket.get('users') as Array<string>).filter(
-                (u) => !users.map((u) => u.id).includes(u),
-            ),
-        );
-        await ticket.save();
-        return ticket;
-    }
-
-    public async updateTicket(
-        channelId: string,
-        guildId: string,
-        ownerId: string,
+    public async setUsersToTicket(
+        ticket: Model<any, any>,
         users: User[],
-    ): Promise<Model<any, any> | null> {
-        const ticket = await Ticket._ticket.findOne({
-            where: { channelId, guildId },
-        });
-        if (!ticket) {
-            throw new Error('Ticket not found');
-        }
-        ticket.set('owner', ownerId);
-        ticket.set(
-            'users',
-            users.map((u) => u.id),
-        );
+    ): Promise<Model<any, any>> {
+        ticket.set('users', users.map((u) => u.id).join(','));
         await ticket.save();
         return ticket;
     }
 
     public async updateTicketOwner(
-        channelId: string,
-        guildId: string,
+        ticket: Model<any, any>,
         ownerId: string,
     ): Promise<Model<any, any> | null> {
-        const ticket = await Ticket._ticket.findOne({
-            where: { channelId, guildId },
-        });
-        if (!ticket) {
-            throw new Error('Ticket not found');
-        }
         ticket.set('owner', ownerId);
         await ticket.save();
         return ticket;
     }
 
-    public async updateTicketUsers(
-        channelId: string,
-        guildId: string,
-        users: User[],
+    public async closeTicket(
+        ticket: Model<any, any>,
     ): Promise<Model<any, any> | null> {
-        const ticket = await Ticket._ticket.findOne({
-            where: { channelId, guildId },
-        });
-        if (!ticket) {
-            throw new Error('Ticket not found');
-        }
-        ticket.set(
-            'users',
-            users.map((u) => u.id),
-        );
-        await ticket.save();
-        return ticket;
-    }
-
-    public async getTicketNbByGuildId(guildId: string): Promise<number> {
-        return await Ticket._ticket.count({ where: { guildId } });
-    }
-
-    public async closeTicket(id: string): Promise<Model<any, any> | null> {
-        const ticket = await Ticket._ticket.findOne({
-            where: { id },
-        });
-        if (!ticket) {
-            throw new Error('Ticket not found');
-        }
         ticket.set('status', 0);
         await ticket.save();
         return ticket;
     }
 
+    public async deleteTicket(ticket: Model<any, any>): Promise<void> {
+        await ticket.destroy();
+    }
+
+    // ============================== TICKET MESSAGE ============================== //
+
+    public async getTicketNbByGuildId(guildId: string): Promise<number> {
+        return await Ticket._ticket.count({ where: { guildId } });
+    }
+
     public async saveMessage(
-        channelId: string,
-        guildId: string,
+        ticketId: string,
         messageId: string,
         messageContent: string = '',
     ): Promise<Model<any, any> | null> {
-        const ticket = await Ticket._ticket.findOne({
-            where: { channelId, guildId },
-        });
-        if (!ticket) {
-            throw new Error('Ticket not found');
-        }
-        await Ticket._ticketMessage.create({
-            ticketId: ticket.get('id'),
+        return await Ticket._ticketMessage.create({
+            ticketId: ticketId,
             message: messageContent,
             messageId,
         });
-        return ticket;
     }
 
     public async getMessagesByTicketId(

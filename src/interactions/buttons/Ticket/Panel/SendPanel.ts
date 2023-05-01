@@ -20,7 +20,7 @@ export class SendPanelInteraction extends BaseButtonInteraction {
         interaction: ButtonInteraction,
     ): Promise<void> {
         const ticketHandler = TicketHandler.getInstance();
-        const allPanels = await ticketHandler.getGuildTicketByGuildId(
+        const allPanels = await ticketHandler.getPanelsByGuildId(
             interaction.guildId!,
         );
         const allInvalidPanel = [];

@@ -14,7 +14,7 @@ export class BackPanelInteraction extends BaseButtonInteraction {
     async execute(_client: DiscordClient, interaction: ButtonInteraction) {
         const ticketHandler = TicketHandler.getInstance();
         const title = interaction.message.embeds[0].title;
-        const allPanels = await ticketHandler.getGuildTicketByGuildId(
+        const allPanels = await ticketHandler.getPanelsByGuildId(
             interaction.guildId!,
         );
         const activePanelNumber = allPanels.filter(
@@ -51,7 +51,7 @@ export class BackPanelInteraction extends BaseButtonInteraction {
         }
         const lastPanel = await ticketHandler.createIfLastPanelActive(
             interaction.guildId!,
-            await ticketHandler.getLastPanelCreated(interaction.guild!.id),
+            await ticketHandler.getLatestPanel(interaction.guild!.id),
         );
         const replyComponent = await AddPanelButtonInteraction.buildReply(
             lastPanel,

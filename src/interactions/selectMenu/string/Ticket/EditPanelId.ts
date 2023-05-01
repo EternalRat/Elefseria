@@ -1,9 +1,8 @@
 import { TicketHandler } from '@src/class/ticket/TicketHandler.class';
 import { AddPanelButtonInteraction } from '@src/interactions/buttons/Ticket/Panel/AddPanel';
-import { SetupTicketSlashCommand } from '@src/interactions/slash/Ticket/Setup';
 import { DiscordClient } from '@src/structures';
 import { BaseSelectInteraction } from '@src/structures/base/BaseSelectInteraction.class';
-import { EmbedBuilder, StringSelectMenuInteraction } from 'discord.js';
+import { StringSelectMenuInteraction } from 'discord.js';
 
 export class ChannelIdPanelInteraction extends BaseSelectInteraction {
     constructor() {
@@ -16,7 +15,7 @@ export class ChannelIdPanelInteraction extends BaseSelectInteraction {
     ) {
         const ticketHandler = TicketHandler.getInstance();
         const val = interaction.values[0];
-        const allPanels = await ticketHandler.getGuildTicketByGuildId(
+        const allPanels = await ticketHandler.getPanelsByGuildId(
             interaction.guildId!,
         );
 

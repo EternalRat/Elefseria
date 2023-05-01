@@ -27,7 +27,7 @@ export class AddPanelButtonInteraction extends BaseButtonInteraction {
         const ticketHandler = TicketHandler.getInstance();
         const lastPanel = await ticketHandler.createIfLastPanelActive(
             interaction.guildId!,
-            await ticketHandler.getLastPanelCreated(interaction.guild!.id),
+            await ticketHandler.getLatestPanel(interaction.guild!.id),
         );
         const title = interaction.message.embeds[0].title;
         const page =

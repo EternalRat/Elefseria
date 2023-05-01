@@ -13,12 +13,12 @@ export class AddPanelButtonInteraction extends BaseButtonInteraction {
         const ticketHandler = TicketHandler.getInstance();
         const lastPanel = await ticketHandler.createIfLastPanelActive(
             interaction.guildId!,
-            await ticketHandler.getLastPanelCreated(interaction.guild!.id),
+            await ticketHandler.getLatestPanel(interaction.guild!.id),
         );
-        await ticketHandler.updateGuildTicket(lastPanel.get('id') as string, {
+        await ticketHandler.updatePanel(lastPanel.get('id') as string, {
             status: 1,
         });
-        const allPanels = await ticketHandler.getGuildTicketByGuildId(
+        const allPanels = await ticketHandler.getPanelsByGuildId(
             interaction.guildId!,
         );
         const activePanelNumber = allPanels.filter(

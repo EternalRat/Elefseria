@@ -13,10 +13,10 @@ export class CancelPanelInteraction extends BaseButtonInteraction {
         const ticketHandler = TicketHandler.getInstance();
         const lastPanel = await ticketHandler.createIfLastPanelActive(
             interaction.guildId!,
-            await ticketHandler.getLastPanelCreated(interaction.guild!.id),
+            await ticketHandler.getLatestPanel(interaction.guild!.id),
         );
-        await ticketHandler.deleteGuildTicket(lastPanel.get('id') as string);
-        const allPanels = await ticketHandler.getGuildTicketByGuildId(
+        await ticketHandler.deletePanel(lastPanel.get('id') as string);
+        const allPanels = await ticketHandler.getPanelsByGuildId(
             interaction.guildId!,
         );
         const activePanelNumber = allPanels.filter(

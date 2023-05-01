@@ -1,57 +1,52 @@
 import { TicketHandler } from '@src/class/ticket/TicketHandler.class';
-import { BaseSlashCommand, DiscordClient } from '@src/structures';
+import { DiscordClient } from '@src/structures';
+import { BaseButtonInteraction } from '@src/structures/base/BaseButtonInteraction.class';
 import {
     ActionRowBuilder,
     ButtonBuilder,
+    ButtonInteraction,
     ButtonStyle,
-    ChatInputCommandInteraction,
     EmbedBuilder,
 } from 'discord.js';
 
 /**
- * @description TicketOpen slash command
- * @class TicketOpen
- * @extends BaseSlashCommand
+ * @description TicketClose button interaction
+ * @class TicketCloseButtonInteraction
+ * @extends BaseButtonInteraction
  */
-export class TicketCloseSlashCommand extends BaseSlashCommand {
+export class TicketCloseButtonInteraction extends BaseButtonInteraction {
     constructor() {
-        super('close', "Close the current ticket you're in.", 'Ticket');
+        super('closeTicket', 'Close a ticket', 'Ticket', 0);
     }
 
     /**
-     * @description Executes the slash command
+     * @description Executes the interaction
      * @param {DiscordClient} client
-     * @param {ChatInputCommandInteraction} interaction
+     * @param {ButtonInteraction} interaction
      * @returns {Promise<void>}
      */
     async execute(
-        client: DiscordClient,
-        interaction: ChatInputCommandInteraction,
+        _client: DiscordClient,
+        interaction: ButtonInteraction,
     ): Promise<void> {
-        const ticketInstance = TicketHandler.getInstance();
-        if (!interaction.guildId) {
-            await interaction.reply({
-                content: 'This command can only be used in a server',
-                ephemeral: true,
-            });
+        const ticketHandler = TicketHandler.getInstance();
+        if (!interaction.channel) {
+            await interaction.reply(
+                'This command can only be used in a channel',
+            );
             return;
         }
-        if (!interaction.channelId) {
-            await interaction.reply({
-                content:
-                    'This command can only be used in a channel, if you are in a ticket, try again discord may have not updated the channel id yet',
-                ephemeral: true,
-            });
+        if (!(await ticketHandler.isTicket(interaction.channelId))) {
+            await interaction.reply(
+                'This command can only be used in a ticket',
+            );
             return;
         }
-        if (!(await ticketInstance.isTicket(interaction.channelId))) {
-            await interaction.reply({
-                content: 'This channel is not a ticket',
-                ephemeral: true,
-            });
+        if (await ticketHandler.isTicketClosed(interaction.channel)) {
+            await interaction.reply('Ticket is already closed');
             return;
         }
-        await ticketInstance.closeTicket(interaction.channel!);
+        await ticketHandler.closeTicket(interaction.channel);
         const embed = new EmbedBuilder()
             .setTitle('Ticket Interaction')
             .setDescription('Ticket closed by <@' + interaction.user.id + '>')

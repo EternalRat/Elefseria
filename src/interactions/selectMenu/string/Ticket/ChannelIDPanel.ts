@@ -15,7 +15,7 @@ export class ChannelIdPanelInteraction extends BaseSelectInteraction {
     ) {
         const ticketHandler = TicketHandler.getInstance();
         const val = interaction.values;
-        const allPanels = await ticketHandler.getGuildTicketByGuildId(
+        const allPanels = await ticketHandler.getPanelsByGuildId(
             interaction.guildId!,
         );
         const panels = allPanels.filter((panel) =>
@@ -25,7 +25,7 @@ export class ChannelIdPanelInteraction extends BaseSelectInteraction {
             (panel) => !panels.includes(panel),
         );
         for (const panel of panels) {
-            await ticketHandler.deleteGuildTicket(panel.get('id') as string);
+            await ticketHandler.deletePanel(panel.get('id') as string);
         }
         const activePanelNumber = filteredPanels.filter(
             (panel) => panel.get('status') === 1,

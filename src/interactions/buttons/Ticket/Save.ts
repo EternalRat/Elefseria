@@ -9,7 +9,7 @@ import { ButtonInteraction } from 'discord.js';
  */
 export class TicketSaveButtonInteraction extends BaseButtonInteraction {
     constructor() {
-        super('ticketsave', 'Save transcript of a ticket', 'Ticket', 0);
+        super('saveTicket', 'Save transcript of a ticket', 'Ticket', 0);
     }
 
     /**

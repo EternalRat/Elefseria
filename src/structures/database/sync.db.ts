@@ -1,6 +1,6 @@
 import { GuildModel, GuildUserModel } from './models/guild/guild.model';
 import {
-    GuildTicketModel,
+    PanelModel,
     TicketMessageModel,
     TicketModel,
 } from './models/ticket/ticket.model';
@@ -16,7 +16,7 @@ export default async function databaseSynchronisation(): Promise<void> {
     await GuildUserModel.sync({
         logging: false,
     });
-    await GuildTicketModel.sync({
+    await PanelModel.sync({
         logging: false,
     });
     await TicketModel.sync({

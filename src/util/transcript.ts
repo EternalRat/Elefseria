@@ -85,6 +85,7 @@ export default async function buildTranscript(
     messages: {
         id: string;
         content: string;
+        messageId: string;
     }[],
 ) {
     let transcript = '<body>';
@@ -96,7 +97,7 @@ export default async function buildTranscript(
     let lastTime = '-1:-1';
     let lastDate = '-1/-1/-1';
     messages.forEach(async (msgFromDB) => {
-        const message = await channel.messages.fetch(msgFromDB.id);
+        const message = await channel.messages.fetch(msgFromDB.messageId);
         const date = new Date(message.createdTimestamp);
         const dateFormatted = date.toLocaleDateString();
         const timeFormatted = date.getHours() + ':' + date.getMinutes();
