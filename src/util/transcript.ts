@@ -1,4 +1,4 @@
-import { Collection, Message, TextChannel } from 'discord.js';
+import { Collection, Message } from 'discord.js';
 import fs from 'fs';
 
 async function loadStyles() {
@@ -81,7 +81,6 @@ function messageHtmlCreator(message: Message) {
 }
 
 export default async function buildTranscript(
-    channel: TextChannel,
     messages: Collection<string, Message<true>>,
 ) {
     let transcript = '<body>';

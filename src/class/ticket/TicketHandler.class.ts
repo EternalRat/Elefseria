@@ -445,7 +445,7 @@ export class TicketHandler {
         return TicketHandler._panel.deletePanel(id);
     }
 
-    private async getChannelMessage(channel: TextChannel, after = '') {
+    private async getChannelMessage(channel: TextChannel, after?: string) {
         let messages = await channel.messages.fetch({
             cache: true,
             after,
@@ -476,7 +476,7 @@ export class TicketHandler {
                     return Promise.reject('Ticket not found');
                 }
                 const messages = await this.getChannelMessage(channel);
-                const transcript = await buildTranscript(channel, messages);
+                const transcript = await buildTranscript(messages);
                 const bufferResolvable = Buffer.from(transcript);
                 const attachment = new AttachmentBuilder(bufferResolvable, {
                     name: 'transcript.html',

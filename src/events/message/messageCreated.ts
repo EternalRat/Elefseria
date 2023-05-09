@@ -1,4 +1,3 @@
-import { TicketHandler } from '@src/class/ticket/TicketHandler.class';
 import { BaseEvent, DiscordClient } from '@src/structures';
 import { EmbedBuilder, Events, Message } from 'discord.js';
 import { Colors } from 'discord.js';
@@ -114,14 +113,6 @@ export class MessageCreatedEvent extends BaseEvent {
                     }
                 }
             }
-        } else {
-            const ticketHandler = TicketHandler.getInstance();
-            const ticket = await ticketHandler.getTicketByChannelId(
-                message.channel.id,
-            );
-            if (!ticket) return;
-            const ticketId = ticket.get('id') as string;
-            ticketHandler.saveMessage(ticketId, message);
         }
     }
 }
