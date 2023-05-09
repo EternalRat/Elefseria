@@ -1,7 +1,6 @@
 import buildTranscript from '@src/util/transcript';
 import {
     AttachmentBuilder,
-    CategoryChannel,
     Channel,
     ChannelType,
     Guild,
@@ -11,16 +10,27 @@ import {
 } from 'discord.js';
 import { Model } from 'sequelize';
 
-import { GuildTicket } from './GuildTicket.class';
+import { Panel } from './Panel.class';
 import { Ticket } from './ticket.class';
 
+/**
+ * This class handles everything related to tickets. It also manages panels.
+ * It should be used to link discord and the database through the class made for Tickets and Panels.
+ * @description TicketHandler class
+ * @class TicketHandler
+ */
 export class TicketHandler {
     private static instance: TicketHandler;
     private static _ticket: Ticket = Ticket.getInstance();
-    private static _guildTicket: GuildTicket = GuildTicket.getInstance();
+    private static _panel: Panel = Panel.getInstance();
 
     private constructor() {}
 
+    /**
+     * @description Returns the instance of the TicketHandler class
+     * @static
+     * @returns {TicketHandler} The instance of the TicketHandler class
+     */
     public static getInstance(): TicketHandler {
         if (TicketHandler.instance) {
             return TicketHandler.instance;
@@ -29,10 +39,14 @@ export class TicketHandler {
         return TicketHandler.instance;
     }
 
+    // ============================== TICKET ============================== //
+
     public async createTicket(
+        panelId: string,
         guild: Guild,
         creator: User,
-        users: User[],
+        roles: string[],
+        categoryId: string | undefined,
     ): Promise<{ ticket: Model<any, any>; channel: TextChannel }> {
         let channel: TextChannel | undefined;
         let nbrTickets: number | undefined;
@@ -44,6 +58,7 @@ export class TicketHandler {
             channel = await guild.channels.create({
                 name: `ticket-${nbrTickets + 1}`,
                 type: ChannelType.GuildText,
+                parent: categoryId,
                 permissionOverwrites: [
                     {
                         id: guild.roles.everyone,
@@ -56,18 +71,19 @@ export class TicketHandler {
                             PermissionFlagsBits.SendMessages,
                         ],
                     },
-                    ...users.map((u) => ({
-                        id: u.id,
-                        allow: [
-                            PermissionFlagsBits.ViewChannel,
-                            PermissionFlagsBits.SendMessages,
-                        ],
-                    })),
                 ],
             });
+            if (roles.length > 0 && roles[0] !== '') {
+                for (const role in roles) {
+                    await channel.permissionOverwrites.create(role, {
+                        ViewChannel: true,
+                        SendMessages: true,
+                    });
+                }
+            }
             ticket = await TicketHandler._ticket.createTicket(
+                panelId,
                 creator.id,
-                users,
                 guild.id,
                 channel.id,
             );
@@ -81,47 +97,26 @@ export class TicketHandler {
         return { ticket, channel };
     }
 
-    public async deleteTicket(id: string): Promise<void> {
-        const ticket = await TicketHandler._ticket.getTicketById(id);
-        if (ticket) {
-            await TicketHandler._ticket.deleteTicket(
-                ticket.get('id') as string,
-            );
-        }
+    public async getTicketByChannelId(
+        channelId: string,
+    ): Promise<Model<any, any> | null> {
+        return TicketHandler._ticket.getTicketByChannelId(channelId);
     }
 
-    public async deleteTicketByChannel(channel: Channel): Promise<void> {
-        const ticket = await TicketHandler._ticket.getTicketByChannelId(
-            channel.id,
-        );
-        if (ticket) {
-            await TicketHandler._ticket.deleteTicket(
-                ticket.get('id') as string,
-            );
-        }
-        await channel.delete();
+    public async getTicketByGuildId(
+        guildId: string,
+    ): Promise<Model<any, any>[]> {
+        return TicketHandler._ticket.getTicketsByGuildId(guildId);
     }
 
-    public async closeTicket(channel: Channel): Promise<void> {
-        const ticket = await TicketHandler._ticket.getTicketByChannelId(
-            channel.id,
-        );
-        if (ticket) {
-            await TicketHandler._ticket.closeTicket(ticket.get('id') as string);
-        }
-        await (channel as TextChannel).permissionOverwrites.set([
-            {
-                id: (channel as TextChannel).guild.roles.everyone,
-                deny: [
-                    PermissionFlagsBits.ViewChannel,
-                    PermissionFlagsBits.SendMessages,
-                ],
-            },
-        ]);
+    public async getTicketsByUserId(
+        userId: string,
+    ): Promise<Model<any, any>[]> {
+        return TicketHandler._ticket.getTicketsByUserId(userId);
     }
 
-    public async getTicketById(id: string): Promise<Model<any, any> | null> {
-        return await TicketHandler._ticket.getTicketById(id);
+    public async isTicket(channelId: string): Promise<Model<any, any> | null> {
+        return TicketHandler._ticket.getTicketByChannelId(channelId);
     }
 
     public async isTicketOpen(channel: Channel): Promise<boolean> {
@@ -166,6 +161,7 @@ export class TicketHandler {
             channel.id,
         );
         if (ticket) {
+            if (!ticket.get('owner')) return false;
             return (
                 (ticket.get('owner') as string).length > 0 &&
                 ticket.get('owner') !== user.id
@@ -174,14 +170,49 @@ export class TicketHandler {
         return false;
     }
 
+    public async closeTicket(channel: Channel): Promise<void> {
+        try {
+            const ticket = await TicketHandler._ticket.getTicketByChannelId(
+                channel.id,
+            );
+            if (!ticket) return;
+            const panel = await TicketHandler._panel.getPanel(
+                ticket.get('panelId') as string,
+            );
+            if (!panel) return;
+            await TicketHandler._ticket.closeTicket(ticket);
+            await (channel as TextChannel).permissionOverwrites.set([
+                {
+                    id: (channel as TextChannel).guild.roles.everyone,
+                    deny: [
+                        PermissionFlagsBits.ViewChannel,
+                        PermissionFlagsBits.SendMessages,
+                    ],
+                },
+            ]);
+            const roles = (panel.get('rolesId') as string).split(',');
+            if (roles.length > 0 && roles[0] !== '') {
+                for (const role in roles) {
+                    await (channel as TextChannel).permissionOverwrites.create(
+                        role,
+                        {
+                            ViewChannel: true,
+                            SendMessages: false,
+                        },
+                    );
+                }
+            }
+        } catch {
+            throw new Error('Error while closing ticket');
+        }
+    }
+
     public async reopenTicket(channel: Channel): Promise<void> {
         const ticket = await TicketHandler._ticket.getTicketByChannelId(
             channel.id,
         );
         if (ticket) {
-            await TicketHandler._ticket.reopenTicket(
-                ticket.get('id') as string,
-            );
+            await TicketHandler._ticket.reopenTicket(ticket);
         }
         await (channel as TextChannel).permissionOverwrites.set([
             {
@@ -221,30 +252,25 @@ export class TicketHandler {
                 channel.id,
             );
             if (ticket) {
-                const guild = await channel.client.guilds.fetch(
-                    ticket.get('guildId') as string,
-                );
-                const guildChannel = await guild.channels.fetch(channel.id);
-                if (
-                    guildChannel &&
-                    guildChannel.type === ChannelType.GuildText
-                ) {
-                    for (const user of users) {
-                        await guildChannel.permissionOverwrites.create(user, {
+                for (const user of users) {
+                    await (channel as TextChannel).permissionOverwrites.create(
+                        user.id,
+                        {
                             ViewChannel: true,
                             SendMessages: true,
-                        });
-                    }
-                    await TicketHandler._ticket.addUsersToTicket(
-                        guildChannel.id,
-                        ticket.get('id') as string,
-                        users,
+                        },
                     );
                 }
+                await TicketHandler._ticket.addUsersToTicket(ticket, users);
                 return ticket;
             }
         } catch (error) {
             console.error(error);
+            for (const user of users) {
+                await (channel as TextChannel).permissionOverwrites.delete(
+                    user.id,
+                );
+            }
             return Promise.reject(error);
         }
         return Promise.reject('Ticket not found');
@@ -259,22 +285,15 @@ export class TicketHandler {
                 channel.id,
             );
             if (ticket) {
-                const guild = await channel.client.guilds.fetch(
-                    ticket.get('guildId') as string,
-                );
-                const guildChannel = await guild.channels.fetch(channel.id);
-                if (
-                    guildChannel &&
-                    guildChannel.type === ChannelType.GuildText
-                ) {
-                    for (const user of users) {
-                        await guildChannel.permissionOverwrites.delete(user);
-                    }
-                    await TicketHandler._ticket.removeUsersFromTicketById(
-                        ticket.get('id') as string,
-                        users,
+                for (const user of users) {
+                    await (channel as TextChannel).permissionOverwrites.delete(
+                        user.id,
                     );
                 }
+                await TicketHandler._ticket.removeUsersFromTicket(
+                    ticket,
+                    users,
+                );
                 return ticket;
             }
         } catch (error) {
@@ -282,26 +301,6 @@ export class TicketHandler {
             return Promise.reject(error);
         }
         return Promise.reject('Ticket not found');
-    }
-
-    public async getTicketByChannelId(
-        channelId: string,
-    ): Promise<Model<any, any> | null> {
-        return TicketHandler._ticket.getTicketByChannelId(channelId);
-    }
-
-    public async isTicket(channelId: string): Promise<Model<any, any> | null> {
-        return TicketHandler._ticket.getTicketByChannelId(channelId);
-    }
-
-    public async getTicketByGuildId(
-        guildId: string,
-    ): Promise<Model<any, any>[]> {
-        return TicketHandler._ticket.getTicketsByGuildId(guildId);
-    }
-
-    public async getTicketByUserId(userId: string): Promise<Model<any, any>[]> {
-        return TicketHandler._ticket.getTicketsByUserId(userId);
     }
 
     public async updateTicketOwner(
@@ -340,62 +339,13 @@ export class TicketHandler {
                     },
                 ]);
                 ticket = await TicketHandler._ticket.updateTicketOwner(
-                    channel.id,
-                    guild.id,
+                    ticket,
                     newOwnerId,
                 );
                 guildChannel.setName(
                     `claim-${
                         (await guild.members.fetch(newOwnerId)).displayName
                     }`,
-                );
-            }
-        } catch (error) {
-            console.error(error);
-            return Promise.reject(error);
-        }
-        return ticket;
-    }
-
-    public async updateTicketUsers(
-        channel: Channel,
-        guild: Guild,
-        users: User[],
-    ): Promise<Model<any, any> | null> {
-        let ticket: Model<any, any> | null = null;
-        try {
-            const guildChannel = await guild.channels.fetch(channel.id);
-            if (guildChannel && guildChannel.type === ChannelType.GuildText) {
-                ticket = await TicketHandler._ticket.getTicketByChannelId(
-                    channel.id,
-                );
-                if (!ticket) {
-                    return Promise.reject('Ticket not found');
-                }
-                await guildChannel.permissionOverwrites.set([
-                    {
-                        id: guild.roles.everyone,
-                        deny: [PermissionFlagsBits.ViewChannel],
-                    },
-                    {
-                        id: ticket.get('creatorId') as string,
-                        allow: [
-                            PermissionFlagsBits.ViewChannel,
-                            PermissionFlagsBits.SendMessages,
-                        ],
-                    },
-                    ...users.map((u) => ({
-                        id: u.id,
-                        allow: [
-                            PermissionFlagsBits.ViewChannel,
-                            PermissionFlagsBits.SendMessages,
-                        ],
-                    })),
-                ]);
-                ticket = await TicketHandler._ticket.updateTicketUsers(
-                    channel.id,
-                    guild.id,
-                    users,
                 );
             }
         } catch (error) {
@@ -429,6 +379,72 @@ export class TicketHandler {
         return ticket;
     }
 
+    public async deleteTicket(id: string): Promise<void> {
+        const ticket = await TicketHandler._ticket.getTicketById(id);
+        if (ticket) {
+            await TicketHandler._ticket.deleteTicket(ticket);
+        }
+    }
+
+    public async deleteTicketByChannel(channel: Channel): Promise<void> {
+        const ticket = await TicketHandler._ticket.getTicketByChannelId(
+            channel.id,
+        );
+        if (ticket) {
+            await TicketHandler._ticket.deleteTicket(ticket);
+        }
+        await channel.delete();
+    }
+
+    // ============================== PANEL ============================== //
+
+    public async createPanel(guildId: string): Promise<Model<any, any> | null> {
+        return TicketHandler._panel.createPanel(guildId);
+    }
+
+    public async createIfLastPanelActive(
+        guildId: string,
+        model: Model<any, any> | null,
+    ): Promise<Model<any, any>> {
+        if (!model || model.get('status') !== 2) {
+            return await TicketHandler._panel.createPanel(guildId);
+        }
+        return model;
+    }
+
+    public async getPanelsByGuildId(
+        guildId: string,
+    ): Promise<Model<any, any>[]> {
+        return TicketHandler._panel.getPanelsByGuildId(guildId);
+    }
+
+    public async getPanelByGuildAndChannelId(
+        guildId: string,
+        channelId: string,
+    ): Promise<Model<any, any> | null> {
+        return TicketHandler._panel.getPanelByGuildAndChannelId(
+            guildId,
+            channelId,
+        );
+    }
+
+    public async getLatestPanel(
+        guildId: string,
+    ): Promise<Model<any, any> | null> {
+        return TicketHandler._panel.getLatestPanel(guildId);
+    }
+
+    public async updatePanel(
+        id: string,
+        data: Record<string, any>,
+    ): Promise<Model<any, any> | null> {
+        return TicketHandler._panel.updatePanel(id, data);
+    }
+
+    public async deletePanel(id: string): Promise<Model<any, any>> {
+        return TicketHandler._panel.deletePanel(id);
+    }
+
     private async getChannelMessage(channel: TextChannel, after = '') {
         let messages = await channel.messages.fetch({
             cache: true,
@@ -460,99 +476,36 @@ export class TicketHandler {
                     return Promise.reject('Ticket not found');
                 }
                 const messages = await this.getChannelMessage(channel);
-                const transcript = await buildTranscript(
-                    channel,
-                    messages.toJSON(),
-                );
+                const transcript = await buildTranscript(channel, messages);
                 const bufferResolvable = Buffer.from(transcript);
                 const attachment = new AttachmentBuilder(bufferResolvable, {
                     name: 'transcript.html',
                 });
-
                 user.send({
                     files: [attachment],
                 });
+                const panel = await TicketHandler._panel.getPanel(
+                    ticket.get('panelId') as string,
+                );
+                const channelId = panel!.get('transcriptChannelId') as string;
+                if (channelId) {
+                    const transcriptChannel = await guild.channels.fetch(
+                        channelId,
+                    );
+                    if (
+                        transcriptChannel &&
+                        transcriptChannel.type === ChannelType.GuildText
+                    ) {
+                        transcriptChannel.send({
+                            files: [attachment],
+                        });
+                    }
+                }
             }
         } catch (error) {
             console.error(error);
             return Promise.reject(error);
         }
         return ticket;
-    }
-
-    public async getGuildTicketByGuildId(
-        guildId: string,
-    ): Promise<Model<any, any>[]> {
-        return TicketHandler._guildTicket.getGuildTicketByGuildId(guildId);
-    }
-
-    public async getGuildTicketByCategoryId(
-        categoryId: string,
-    ): Promise<Model<any, any> | null> {
-        return TicketHandler._guildTicket.getGuildTicketByCategoryId(
-            categoryId,
-        );
-    }
-
-    public async createGuildTicket(
-        guildId: string,
-    ): Promise<Model<any, any> | null> {
-        return TicketHandler._guildTicket.createGuildTicket(guildId);
-    }
-
-    public async updateGuildTicket(
-        id: string,
-        data: Record<string, any>,
-    ): Promise<Model<any, any> | null> {
-        return TicketHandler._guildTicket.updateGuildTicket(id, data);
-    }
-
-    public async deleteGuildTicket(id: string): Promise<Model<any, any>> {
-        return TicketHandler._guildTicket.deleteGuildTicket(id);
-    }
-
-    public async deleteGuildTicketByCategoryId(
-        categoryId: string,
-        guildId: string,
-    ): Promise<Model<any, any>> {
-        return TicketHandler._guildTicket.deleteGuildTicketByCategoryId(
-            categoryId,
-            guildId,
-        );
-    }
-
-    public async updateGuildTicketStatus(
-        guild: Guild,
-        category: CategoryChannel,
-        status: boolean,
-    ): Promise<Model<any, any> | null> {
-        const guildTicket =
-            await TicketHandler._guildTicket.getGuildTicketByCategoryAndGuildId(
-                category.id,
-                guild.id,
-            );
-        if (!guildTicket) {
-            return TicketHandler._guildTicket.updateGuildTicketStatus(
-                guildTicket!.get('id') as string,
-                status,
-            );
-        }
-        return null;
-    }
-
-    public async getLastPanelCreated(
-        guildId: string,
-    ): Promise<Model<any, any> | null> {
-        return TicketHandler._guildTicket.getLastPanelCreated(guildId);
-    }
-
-    public async createIfLastPanelActive(
-        guildId: string,
-        model: Model<any, any> | null,
-    ): Promise<Model<any, any>> {
-        if (!model || model.get('status') !== 2) {
-            return await TicketHandler._guildTicket.createGuildTicket(guildId);
-        }
-        return model;
     }
 }

@@ -22,7 +22,7 @@ export class CategoryTicketSelect extends BaseSelectInteraction {
         const ticketHandler = TicketHandler.getInstance();
         const lastPanel = await ticketHandler.createIfLastPanelActive(
             interaction.guildId!,
-            await ticketHandler.getLastPanelCreated(interaction.guild!.id),
+            await ticketHandler.getLatestPanel(interaction.guild!.id),
         );
         let page =
             title && title.startsWith('Setup ')

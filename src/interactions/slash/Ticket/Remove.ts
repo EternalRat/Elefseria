@@ -80,12 +80,12 @@ export class TicketRemoveUserSlashCommand extends BaseSlashCommand {
             .removeUserFromTicket(interaction.channel!, [user])
             .then(() => {
                 interaction.reply({
-                    content: `The user ${user} has been added to the ticket for the reason \`${reason}\``,
+                    content: `The user ${user} has been removed from this ticket for the reason \`${reason}\``,
                 });
             })
             .catch((err) => {
                 interaction.reply({
-                    content: `An error occurred while adding the user to the ticket: \`${err}\``,
+                    content: `An error occurred while removing the user from this ticket: \`${err}\``,
                     ephemeral: true,
                 });
                 return;

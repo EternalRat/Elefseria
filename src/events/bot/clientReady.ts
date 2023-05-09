@@ -109,17 +109,11 @@ export class ReadyEvent extends BaseEvent {
                 if (!tickets) {
                     return;
                 }
-                for (const ticketId of tickets) {
-                    const ticket = await this._ticketHandler.getTicketById(
-                        ticketId.get('id') as string,
-                    );
-                    if (!ticket) {
-                        continue;
-                    }
+                for (const ticket of tickets) {
                     let channel;
                     try {
                         channel = await guild.channels.fetch(
-                            (ticket.get('id') as string).toString(),
+                            (ticket.get('channelId') as string).toString(),
                         );
                     } catch (e) {
                         console.info(`Ticket ${ticket.get('id')} deleted`);

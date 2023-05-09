@@ -1,4 +1,4 @@
-import { Message, TextChannel } from 'discord.js';
+import { Collection, Message, TextChannel } from 'discord.js';
 import fs from 'fs';
 
 async function loadStyles() {
@@ -82,10 +82,7 @@ function messageHtmlCreator(message: Message) {
 
 export default async function buildTranscript(
     channel: TextChannel,
-    messages: {
-        id: string;
-        content: string;
-    }[],
+    messages: Collection<string, Message<true>>,
 ) {
     let transcript = '<body>';
     transcript += '<head><style>' + (await loadStyles()) + '</style></head>';
@@ -95,8 +92,7 @@ export default async function buildTranscript(
     let lastUser = 'none';
     let lastTime = '-1:-1';
     let lastDate = '-1/-1/-1';
-    messages.forEach(async (msgFromDB) => {
-        const message = await channel.messages.fetch(msgFromDB.id);
+    messages.forEach(async (message) => {
         const date = new Date(message.createdTimestamp);
         const dateFormatted = date.toLocaleDateString();
         const timeFormatted = date.getHours() + ':' + date.getMinutes();

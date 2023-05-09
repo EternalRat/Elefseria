@@ -26,7 +26,7 @@ export class NamePanelInteraction extends BaseButtonInteraction {
         const ticketHandler = TicketHandler.getInstance();
         const lastPanel = await ticketHandler.createIfLastPanelActive(
             interaction.guildId!,
-            await ticketHandler.getLastPanelCreated(interaction.guild!.id),
+            await ticketHandler.getLatestPanel(interaction.guild!.id),
         );
         const modals = new ModalBuilder();
 

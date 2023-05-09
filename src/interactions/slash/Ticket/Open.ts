@@ -53,5 +53,9 @@ export class TicketOpenSlashCommand extends BaseSlashCommand {
             return;
         }
         await ticketInstance.reopenTicket(interaction.channel!);
+        await interaction.reply({
+            content: 'Ticket reopened!',
+            ephemeral: true,
+        });
     }
 }

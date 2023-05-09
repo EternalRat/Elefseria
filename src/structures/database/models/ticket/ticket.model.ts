@@ -5,7 +5,7 @@ import { GuildModel } from '../guild/guild.model';
 import { UserModel } from '../user/user.model';
 const sequelize = DBConnection.getInstance().sequelize;
 
-export const GuildTicketModel = sequelize.define('guildTickets', {
+export const PanelModel = sequelize.define('panels', {
     guildId: {
         type: Sequelize.STRING,
         references: {
@@ -54,7 +54,7 @@ export const TicketModel = sequelize.define('tickets', {
     panelId: {
         type: Sequelize.INTEGER,
         references: {
-            model: GuildTicketModel,
+            model: PanelModel,
             key: 'id',
         },
     },

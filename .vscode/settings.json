@@ -18,4 +18,10 @@
     "[jsonc]": {
         "editor.defaultFormatter": "vscode.json-language-features"
     },
+    "vscord.status.buttons.button1.active.enabled": false,
+    "vscord.status.buttons.button1.git.active.enabled": false,
+    "vscord.status.buttons.button1.git.idle.enabled": false,
+    "vscord.status.buttons.button1.git.inactive.enabled": false,
+    "vscord.status.details.text.editing": "In {workspace} {problems}",
+    "vscord.app.name": "Visual Studio Code",
 }

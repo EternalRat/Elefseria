@@ -50,9 +50,11 @@ export class TicketCreateSlashCommand extends BaseSlashCommand {
             return;
         }
         let ticket = await ticketInstance.createTicket(
+            '',
             interaction.guild!,
             interaction.user,
             [],
+            undefined,
         );
         if (ticket) {
             await interaction.reply({

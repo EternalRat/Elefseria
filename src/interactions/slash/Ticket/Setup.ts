@@ -30,7 +30,7 @@ export class SetupTicketSlashCommand extends BaseSlashCommand {
         interaction: ChatInputCommandInteraction,
     ): Promise<void> {
         const ticketHandler = TicketHandler.getInstance();
-        const allPanels = await ticketHandler.getGuildTicketByGuildId(
+        const allPanels = await ticketHandler.getPanelsByGuildId(
             interaction.guildId!,
         );
         const activePanelNumber = allPanels.filter(

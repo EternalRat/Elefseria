@@ -18,7 +18,7 @@ export class RemovePanelInteraction extends BaseButtonInteraction {
 
     async execute(_client: DiscordClient, interaction: ButtonInteraction) {
         const ticketHandler = TicketHandler.getInstance();
-        const allPanels = await ticketHandler.getGuildTicketByGuildId(
+        const allPanels = await ticketHandler.getPanelsByGuildId(
             interaction.guildId!,
         );
         const stringOptionInput = new StringSelectMenuBuilder()

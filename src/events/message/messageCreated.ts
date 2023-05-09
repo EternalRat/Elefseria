@@ -1,3 +1,4 @@
+import { TicketHandler } from '@src/class/ticket/TicketHandler.class';
 import { BaseEvent, DiscordClient } from '@src/structures';
 import { EmbedBuilder, Events, Message } from 'discord.js';
 import { Colors } from 'discord.js';
@@ -16,7 +17,6 @@ export class MessageCreatedEvent extends BaseEvent {
     async execute(client: DiscordClient, message: Message) {
         // SKIP IF AUTHOR IS BOT
         if (message.author.bot) return;
-
         if (
             message.mentions.has(client.user!) &&
             message.author.id !== client.getAuthorId()
@@ -25,7 +25,6 @@ export class MessageCreatedEvent extends BaseEvent {
                 `My prefix is \`${client.getPrefix()}\`, don't forget it!`,
             );
         }
-
         if (
             message.mentions.has(client.user!) &&
             message.author.id === client.getAuthorId()
@@ -115,6 +114,14 @@ export class MessageCreatedEvent extends BaseEvent {
                     }
                 }
             }
+        } else {
+            const ticketHandler = TicketHandler.getInstance();
+            const ticket = await ticketHandler.getTicketByChannelId(
+                message.channel.id,
+            );
+            if (!ticket) return;
+            const ticketId = ticket.get('id') as string;
+            ticketHandler.saveMessage(ticketId, message);
         }
     }
 }

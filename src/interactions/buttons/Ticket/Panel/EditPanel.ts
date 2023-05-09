@@ -2,13 +2,13 @@ import { TicketHandler } from '@src/class/ticket/TicketHandler.class';
 import { DiscordClient } from '@src/structures';
 import { BaseButtonInteraction } from '@src/structures/base/BaseButtonInteraction.class';
 import {
+    ActionRowBuilder,
+    ButtonBuilder,
     ButtonInteraction,
+    ButtonStyle,
+    EmbedBuilder,
     StringSelectMenuBuilder,
     StringSelectMenuOptionBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-    ActionRowBuilder,
-    EmbedBuilder,
 } from 'discord.js';
 
 export class EditPanelInteraction extends BaseButtonInteraction {
@@ -18,7 +18,7 @@ export class EditPanelInteraction extends BaseButtonInteraction {
 
     async execute(_client: DiscordClient, interaction: ButtonInteraction) {
         const ticketHandler = TicketHandler.getInstance();
-        const allPanels = await ticketHandler.getGuildTicketByGuildId(
+        const allPanels = await ticketHandler.getPanelsByGuildId(
             interaction.guildId!,
         );
         if (allPanels.find((panel) => panel.get('status') === 2)) {
@@ -26,7 +26,8 @@ export class EditPanelInteraction extends BaseButtonInteraction {
                 fetchReply: true,
             });
             await interaction.editReply({
-                content: 'There is a panel that is currently being edited/created, please finish it first.',
+                content:
+                    'There is a panel that is currently being edited/created, please finish it first.',
             });
             return;
         }
@@ -62,9 +63,7 @@ export class EditPanelInteraction extends BaseButtonInteraction {
         const btnRow = new ActionRowBuilder<ButtonBuilder>().addComponents(btn);
         const embed = new EmbedBuilder()
             .setTitle('Edit Panel')
-            .setDescription(
-                'Select the panel you want to edit.',
-            )
+            .setDescription('Select the panel you want to edit.')
             .setColor('Red');
         const noPanels = new EmbedBuilder().setDescription(
             "There's no panel to edit",
