@@ -1,9 +1,5 @@
 import { GuildModel, GuildUserModel } from './models/guild/guild.model';
-import {
-    GuildTicketModel,
-    TicketMessageModel,
-    TicketModel,
-} from './models/ticket/ticket.model';
+import { GuildTicketModel, TicketModel } from './models/ticket/ticket.model';
 import { UserModel } from './models/user/user.model';
 
 export default async function databaseSynchronisation(): Promise<void> {
@@ -20,9 +16,6 @@ export default async function databaseSynchronisation(): Promise<void> {
         logging: false,
     });
     await TicketModel.sync({
-        logging: false,
-    });
-    await TicketMessageModel.sync({
         logging: false,
     });
 }

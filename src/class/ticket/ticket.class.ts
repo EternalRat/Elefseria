@@ -1,15 +1,10 @@
-import {
-    TicketMessageModel,
-    TicketModel,
-} from '@src/structures/database/models';
+import { TicketModel } from '@src/structures/database/models';
 import { User } from 'discord.js';
 import { Model, ModelStatic } from 'sequelize';
 
 export class Ticket {
     private static _instance: Ticket;
     private static _ticket: ModelStatic<Model<any, any>> = TicketModel;
-    private static _ticketMessage: ModelStatic<Model<any, any>> =
-        TicketMessageModel;
 
     private constructor() {}
 
@@ -202,33 +197,5 @@ export class Ticket {
         ticket.set('status', 0);
         await ticket.save();
         return ticket;
-    }
-
-    public async saveMessage(
-        channelId: string,
-        guildId: string,
-        messageId: string,
-        messageContent: string = '',
-    ): Promise<Model<any, any> | null> {
-        const ticket = await Ticket._ticket.findOne({
-            where: { channelId, guildId },
-        });
-        if (!ticket) {
-            throw new Error('Ticket not found');
-        }
-        await Ticket._ticketMessage.create({
-            ticketId: ticket.get('id'),
-            message: messageContent,
-            messageId,
-        });
-        return ticket;
-    }
-
-    public async getMessagesByTicketId(
-        ticketId: string,
-    ): Promise<Model<any, any>[]> {
-        return await Ticket._ticketMessage.findAll({
-            where: { ticketId },
-        });
     }
 }

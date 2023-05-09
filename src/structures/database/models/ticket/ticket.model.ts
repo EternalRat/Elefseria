@@ -78,21 +78,3 @@ export const TicketModel = sequelize.define('tickets', {
         type: Sequelize.INTEGER,
     },
 });
-
-export const TicketMessageModel = sequelize.define('ticketMessages', {
-    ticketId: {
-        type: Sequelize.INTEGER,
-        references: {
-            model: TicketModel,
-            key: 'id',
-        },
-    },
-    message: {
-        type: Sequelize.STRING,
-        defaultValue: '',
-    },
-    messageId: {
-        type: Sequelize.STRING, // Only used to get the message if it's an image, embed, ...
-        defaultValue: '',
-    },
-});

@@ -12,7 +12,7 @@ import {
 import { Model } from 'sequelize';
 
 import { GuildTicket } from './GuildTicket.class';
-import { Ticket } from './Ticket.class';
+import { Ticket } from './ticket.class';
 
 export class TicketHandler {
     private static instance: TicketHandler;
@@ -429,6 +429,21 @@ export class TicketHandler {
         return ticket;
     }
 
+    private async getChannelMessage(channel: TextChannel, after = '') {
+        let messages = await channel.messages.fetch({
+            cache: true,
+            after,
+        });
+        if (messages.size === 100) {
+            const nextMessages = await this.getChannelMessage(
+                channel,
+                messages.last()?.id,
+            );
+            messages = messages.concat(nextMessages);
+        }
+        return messages;
+    }
+
     public async transcriptTicket(
         channel: TextChannel,
         guild: Guild,
@@ -444,12 +459,10 @@ export class TicketHandler {
                 if (!ticket) {
                     return Promise.reject('Ticket not found');
                 }
-                const messages = TicketHandler._ticket.getMessagesByTicketId(
-                    ticket.get('id') as string,
-                );
+                const messages = await this.getChannelMessage(channel);
                 const transcript = await buildTranscript(
                     channel,
-                    (await messages).map((m) => m.toJSON()),
+                    messages.toJSON(),
                 );
                 const bufferResolvable = Buffer.from(transcript);
                 const attachment = new AttachmentBuilder(bufferResolvable, {
