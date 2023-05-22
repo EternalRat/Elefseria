@@ -1,16 +1,16 @@
 import { TicketHandler } from '@src/class/ticket/TicketHandler.class';
 import { DiscordClient } from '@src/structures';
 import { BaseButtonInteraction } from '@src/structures/base/BaseButtonInteraction.class';
-import { ButtonInteraction, TextChannel } from 'discord.js';
+import { ButtonInteraction } from 'discord.js';
 
 /**
- * @description TicketSave button interaction
- * @class TicketSaveButtonInteraction
+ * @description TicketOpen button interaction
+ * @class TicketOpenButtonInteraction
  * @extends BaseInteraction
  */
-export class TicketSaveButtonInteraction extends BaseButtonInteraction {
+export class TicketOpenButtonInteraction extends BaseButtonInteraction {
     constructor() {
-        super('saveTicket', 'Save transcript of a ticket', 'Ticket', 0);
+        super('openTicket', 'Open a ticket', 'Ticket', 0);
     }
 
     /**
@@ -42,13 +42,9 @@ export class TicketSaveButtonInteraction extends BaseButtonInteraction {
             );
             return;
         }
-        await ticketHandler.transcriptTicket(
-            interaction.channel as TextChannel,
-            interaction.guild!,
-            interaction.user,
-        );
+        await ticketHandler.reopenTicket(interaction.channel!);
         await interaction.reply({
-            content: 'Transcript saved and sent to you!',
+            content: 'Ticket has been reopened',
             ephemeral: true,
         });
     }

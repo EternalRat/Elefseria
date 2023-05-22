@@ -23,14 +23,13 @@ export class TicketAddUserCommand extends BaseCommand {
 
     /**
      * @description Executes the command
-     * @param {DiscordClient} client
+     * @param {DiscordClient} _client
      * @param {Message} message
      * @param {string[]} args
      * @returns {Promise<void>}
      */
-
     async execute(
-        client: DiscordClient,
+        _client: DiscordClient,
         message: Message,
         args: string[],
     ): Promise<void> {

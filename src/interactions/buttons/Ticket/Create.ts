@@ -38,7 +38,12 @@ export class CreateTicketInteraction extends BaseButtonInteraction {
         );
         const embed = new EmbedBuilder()
             .setTitle('Ticket n°' + ticket.get('id'))
-            .setDescription(panel.get('message') as string)
+            .setDescription(
+                (panel.get('message') as string).length > 0
+                    ? (panel.get('message') as string)
+                    : `Support will be with you shortly.
+To close this ticket react with 🔒`,
+            )
             .setColor('Green')
             .setTimestamp();
         const btn = new ButtonBuilder()

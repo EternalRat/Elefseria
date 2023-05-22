@@ -25,7 +25,7 @@ export class Ticket {
         const ticket = await Ticket._ticket.create({
             panelId,
             creatorId: creatorId,
-            users: '',
+            users: null,
             guildId,
             channelId,
             status: 1,

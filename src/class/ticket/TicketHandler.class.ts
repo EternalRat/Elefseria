@@ -213,34 +213,46 @@ export class TicketHandler {
         );
         if (ticket) {
             await TicketHandler._ticket.reopenTicket(ticket);
+            await (channel as TextChannel).permissionOverwrites.set([
+                {
+                    id: (channel as TextChannel).guild.roles.everyone.id,
+                    deny: [PermissionFlagsBits.ViewChannel],
+                },
+                {
+                    id: ticket.get('creatorId') as string,
+                    allow: [
+                        PermissionFlagsBits.ViewChannel,
+                        PermissionFlagsBits.SendMessages,
+                    ],
+                },
+            ]);
+            if (
+                ticket.get('owner') &&
+                (ticket.get('owner') as string).length > 0
+            ) {
+                await (channel as TextChannel).permissionOverwrites.create(
+                    ticket.get('owner') as string,
+                    {
+                        ViewChannel: true,
+                        SendMessages: true,
+                    },
+                );
+            }
+            if (
+                ticket.get('users') &&
+                (ticket.get('users') as string).length > 0
+            ) {
+                for (const user of (ticket.get('users') as string).split(',')) {
+                    await (channel as TextChannel).permissionOverwrites.create(
+                        user,
+                        {
+                            ViewChannel: true,
+                            SendMessages: true,
+                        },
+                    );
+                }
+            }
         }
-        await (channel as TextChannel).permissionOverwrites.set([
-            {
-                id: (channel as TextChannel).guild.roles.everyone,
-                deny: [PermissionFlagsBits.ViewChannel],
-            },
-            {
-                id: ticket!.get('creatorId') as string,
-                allow: [
-                    PermissionFlagsBits.ViewChannel,
-                    PermissionFlagsBits.SendMessages,
-                ],
-            },
-            ...((ticket!.get('users') as string[]) || []).map((u) => ({
-                id: u,
-                allow: [
-                    PermissionFlagsBits.ViewChannel,
-                    PermissionFlagsBits.SendMessages,
-                ],
-            })),
-            {
-                id: ticket!.get('owner') as string,
-                allow: [
-                    PermissionFlagsBits.ViewChannel,
-                    PermissionFlagsBits.SendMessages,
-                ],
-            },
-        ]);
     }
 
     public async addUserToTicket(
