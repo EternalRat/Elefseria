@@ -85,13 +85,13 @@ export class DiscordClient extends Client {
      * @throws {Error} If the module is not an instance of BaseModule
      */
     public addModule(module: BaseModule): void {
-        if (this.modules.has(module.getName()))
-            throw new Error(`The module ${module.getName()} already exists`);
+        if (this.modules.has(module.name))
+            throw new Error(`The module ${module.name} already exists`);
         if (!(module instanceof BaseModule))
             throw new Error(
                 `The module ${module} is not an instance of BaseModule`,
             );
-        this.modules.set(module.getName(), module);
+        this.modules.set(module.name, module);
     }
 
     /**
@@ -136,12 +136,24 @@ export class DiscordClient extends Client {
             for (const response of restResponse) {
                 addedSlashCommands.push(response);
             }
-            await module.loadCommands(`src/commands/${module.getName()}`);
-            await module.loadInteractions(
-                `src/interactions/buttons/${module.getName()}`,
+            await module.loadCommands(`src/commands/${module.name}`);
+            await module.loadButtonInteractions(
+                `src/interactions/buttons/${module.name}`,
+            );
+            await module.loadModalInteractions(
+                `src/interactions/modals/${module.name}`,
+            );
+            await module.loadSelectChannelMenuInteractions(
+                `src/interactions/selectMenu/channel/${module.name}`,
+            );
+            await module.loadSelectRoleMenuInteractions(
+                `src/interactions/selectMenu/role/${module.name}`,
+            );
+            await module.loadSelectStringMenuInteractions(
+                `src/interactions/selectMenu/string/${module.name}`,
             );
             await module.loadSlashCommands(
-                `src/interactions/slash/${module.getName()}`,
+                `src/interactions/slash/${module.name}`,
             );
             await module.registerSlashCommands(
                 this,

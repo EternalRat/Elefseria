@@ -15,9 +15,9 @@ export const GuildModel = sequelize.define('guilds', {
 });
 
 export const GuildUserModel = sequelize.define(
-    'guild_users',
+    'guildUsers',
     {
-        fkUser: {
+        id: {
             type: Sequelize.STRING,
             references: {
                 model: UserModel,

@@ -28,3 +28,18 @@ services:
             - ./src:/app/src
         depends_on:
             - db
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        restart: always
+        environment:
+            PMA_HOST: ${DB_HOST}
+            PMA_PORT: ${DB_PORT}
+            PMA_USER: ${DB_USER}
+            PMA_PASSWORD: ${DB_PASS}
+        ports:
+            - 8080:80
+        links:
+            - db
+        depends_on:
+            - db

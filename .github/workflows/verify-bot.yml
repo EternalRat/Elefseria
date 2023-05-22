@@ -70,7 +70,7 @@ jobs:
         needs: [typings]
         runs-on: ubuntu-latest
         if: github.event.pull_request.draft == false
-        name: Building front
+        name: Building the bot
         steps:
             - name: Checkout Repository
               uses: actions/checkout@v3
@@ -81,7 +81,7 @@ jobs:
                   key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
                   restore-keys: |
                       ${{ runner.os }}-node-modules-
-            - name: Build the front
+            - name: Build the bot
               uses: borales/actions-yarn@v4
               with:
                   cmd: build

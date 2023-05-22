@@ -5,11 +5,45 @@ import { GuildModel } from '../guild/guild.model';
 import { UserModel } from '../user/user.model';
 const sequelize = DBConnection.getInstance().sequelize;
 
-export const TicketModel = sequelize.define('tickets', {
-    id: {
+export const PanelModel = sequelize.define('panels', {
+    guildId: {
         type: Sequelize.STRING,
-        primaryKey: true,
+        references: {
+            model: GuildModel,
+            key: 'id',
+        },
     },
+    name: {
+        type: Sequelize.STRING,
+        defaultValue: '',
+    },
+    rolesId: {
+        type: Sequelize.STRING,
+        defaultValue: '',
+    },
+    categoryId: {
+        type: Sequelize.STRING,
+        defaultValue: '',
+    },
+    message: {
+        type: Sequelize.STRING,
+        defaultValue: '',
+    },
+    transcriptChannelId: {
+        type: Sequelize.STRING,
+        defaultValue: '',
+    },
+    channelId: {
+        type: Sequelize.STRING,
+        defaultValue: '',
+    },
+    status: {
+        type: Sequelize.INTEGER,
+        defaultValue: 2,
+    },
+});
+
+export const TicketModel = sequelize.define('tickets', {
     owner: {
         type: Sequelize.STRING,
         references: {
@@ -17,65 +51,30 @@ export const TicketModel = sequelize.define('tickets', {
             key: 'id',
         },
     },
-    permissions: {
-        type: Sequelize.JSON,
+    panelId: {
+        type: Sequelize.INTEGER,
+        references: {
+            model: PanelModel,
+            key: 'id',
+        },
     },
-    embedMessage: {
+    creatorId: {
         type: Sequelize.STRING,
     },
+    users: {
+        type: Sequelize.STRING,
+    },
+    guildId: {
+        type: Sequelize.STRING,
+        references: {
+            model: GuildModel,
+            key: 'id',
+        },
+    },
+    channelId: {
+        type: Sequelize.STRING,
+    },
+    status: {
+        type: Sequelize.INTEGER,
+    },
 });
-
-export const GuildTicketModel = sequelize.define(
-    'guild_tickets',
-    {
-        fkTicket: {
-            type: Sequelize.STRING,
-            references: {
-                model: TicketModel,
-                key: 'id',
-            },
-            allowNull: false,
-            primaryKey: true,
-        },
-        fkGuild: {
-            type: Sequelize.STRING,
-            references: {
-                model: GuildModel,
-                key: 'id',
-            },
-            primaryKey: true,
-        },
-    },
-    {
-        timestamps: false,
-        createdAt: false,
-        updatedAt: false,
-    },
-);
-
-export const UserTicketModel = sequelize.define(
-    'users_tickets',
-    {
-        fkTicket: {
-            type: Sequelize.STRING,
-            references: {
-                model: TicketModel,
-                key: 'id',
-            },
-            allowNull: false,
-        },
-        fkUser: {
-            type: Sequelize.STRING,
-            references: {
-                model: UserModel,
-                key: 'id',
-            },
-            allowNull: false,
-        },
-    },
-    {
-        timestamps: false,
-        createdAt: false,
-        updatedAt: false,
-    },
-);

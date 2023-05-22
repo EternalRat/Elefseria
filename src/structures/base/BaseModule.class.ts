@@ -10,18 +10,28 @@ import {
 } from 'discord.js';
 import fs from 'fs';
 
+import { BaseButtonInteraction } from './BaseButtonInteraction.class';
+import { BaseModalInteraction } from './BaseModalInteraction.class';
+import { BaseSelectInteraction } from './BaseSelectInteraction.class';
+
 /**
  * @description Base class for modules
  * @category BaseClass
  */
 export abstract class BaseModule {
-    private name: string;
+    private _name: string;
     private slashCommands: Map<string, BaseSlashCommand> = new Map();
-    private interactions: Map<string, BaseInteraction> = new Map();
+    private buttonButtonInteractions: Map<string, BaseButtonInteraction> =
+        new Map();
+    private modalInteractions: Map<string, BaseModalInteraction> = new Map();
+    private selectChannelInteractions: Map<string, BaseSelectInteraction> =
+        new Map();
+    private selectRoleInteractions: Map<string, BaseSelectInteraction> =
+        new Map();
+    private selectStringInteractions: Map<string, BaseSelectInteraction> =
+        new Map();
     private aliases: Map<string, BaseCommand> = new Map();
     private enabled: boolean;
-    // May need to change this to a Collection<string, BaseCommand> if we want to add more properties to the commands same goes the aliases
-    // private commands: Collection<string, BaseCommand> = new Collection();
     private commands: Map<string, BaseCommand> = new Map();
 
     /**
@@ -30,19 +40,42 @@ export abstract class BaseModule {
      * @param isEnabled
      */
     constructor(name: string, isEnabled?: boolean) {
-        this.name = name;
+        this._name = name;
         this.enabled = isEnabled || true;
     }
 
     /**
-     * @description Return interactions of the module
+     * @description Return buttonButtonInteractions of the module
      * @returns {Map<string, BaseInteraction>}
      * @example
      * // returns Map(1) { 'ping' => [Function: Ping] }
-     * module.getInteractions();
+     * module.getButtonInteractions();
      */
-    public getInteractions(): Map<string, BaseInteraction> {
-        return this.interactions;
+    public getButtonInteractions(): Map<string, BaseInteraction> {
+        return this.buttonButtonInteractions;
+    }
+
+    public getSelectChannelInteractions(): Map<string, BaseInteraction> {
+        return this.selectChannelInteractions;
+    }
+
+    public getSelectRoleInteractions(): Map<string, BaseInteraction> {
+        return this.selectRoleInteractions;
+    }
+
+    public getSelectStringInteractions(): Map<string, BaseInteraction> {
+        return this.selectStringInteractions;
+    }
+
+    /**
+     * @description Return modalInteractions of the module
+     * @returns {Map<string, BaseInteraction>}
+     * @example
+     * // returns Map(1) { 'ping' => [Function: Ping] }
+     * module.getModalInteractions();
+     */
+    public getModalInteractions(): Map<string, BaseInteraction> {
+        return this.modalInteractions;
     }
 
     public getSlashCommands(): Map<string, BaseInteraction> {
@@ -53,8 +86,8 @@ export abstract class BaseModule {
      * @description Returns the name of the module
      * @returns {string}
      */
-    public getName(): string {
-        return this.name;
+    public get name(): string {
+        return this._name;
     }
 
     /**
@@ -64,7 +97,7 @@ export abstract class BaseModule {
      * // returns true
      * module.isEnabled();
      */
-    public isEnabled(): boolean {
+    public get isEnabled(): boolean {
         return this.enabled;
     }
 
@@ -138,7 +171,7 @@ export abstract class BaseModule {
                 const value = Object.values(Command)[kVal];
                 try {
                     const command = new (value as any)();
-                    if (command.module !== this.name) continue;
+                    if (command.module !== this._name) continue;
                     this.commands.set(command.name, command);
                     if (!command.aliases) continue;
                     for (const alias of command.aliases) {
@@ -171,7 +204,7 @@ export abstract class BaseModule {
                 const value = Object.values(Interaction)[kVal];
                 try {
                     const interaction = new (value as any)();
-                    if (interaction.module !== this.name) continue;
+                    if (interaction.module !== this._name) continue;
                     this.slashCommands.set(interaction.name, interaction);
                 } catch (error) {
                     console.error(
@@ -182,13 +215,13 @@ export abstract class BaseModule {
         }
     }
 
-    async loadInteractions(path: string): Promise<void> {
+    async loadButtonInteractions(path: string): Promise<void> {
         if (!fs.existsSync(path)) return;
-        let commandFiles = await fs.promises.readdir(path);
-        for (const file of commandFiles) {
+        let buttonInteractionFiles = await fs.promises.readdir(path);
+        for (const file of buttonInteractionFiles) {
             const lstat = await fs.promises.lstat(`${path}/${file}`);
             if (lstat.isDirectory()) {
-                await this.loadSlashCommands(`${path}/${file}`);
+                await this.loadButtonInteractions(`${path}/${file}`);
                 continue;
             }
             const Interaction = await import(`${path}/${file}`);
@@ -196,11 +229,129 @@ export abstract class BaseModule {
                 const value = Object.values(Interaction)[kVal];
                 try {
                     const interaction = new (value as any)();
-                    if (interaction.module !== this.name) continue;
-                    this.interactions.set(interaction.name, interaction);
+                    if (interaction.module !== this._name) continue;
+                    this.buttonButtonInteractions.set(
+                        interaction.name,
+                        interaction,
+                    );
                 } catch (error) {
                     console.error(error);
-                    console.error(`Could not load interaction ${path}/${file}`);
+                    console.error(
+                        `Could not load button interaction ${path}/${file}`,
+                    );
+                }
+            }
+        }
+    }
+
+    async loadModalInteractions(path: string): Promise<void> {
+        if (!fs.existsSync(path)) return;
+        let modalInteractionFiles = await fs.promises.readdir(path);
+        for (const file of modalInteractionFiles) {
+            const lstat = await fs.promises.lstat(`${path}/${file}`);
+            if (lstat.isDirectory()) {
+                await this.loadModalInteractions(`${path}/${file}`);
+                continue;
+            }
+            const Interaction = await import(`${path}/${file}`);
+            for (const kVal in Object.keys(Interaction)) {
+                const value = Object.values(Interaction)[kVal];
+                try {
+                    const interaction = new (value as any)();
+                    if (interaction.module !== this._name) continue;
+                    this.modalInteractions.set(interaction.name, interaction);
+                } catch (error) {
+                    console.error(error);
+                    console.error(
+                        `Could not load modal interaction ${path}/${file}`,
+                    );
+                }
+            }
+        }
+    }
+
+    async loadSelectChannelMenuInteractions(path: string): Promise<void> {
+        if (!fs.existsSync(path)) return;
+        let selectInteractionFiles = await fs.promises.readdir(path);
+        for (const file of selectInteractionFiles) {
+            const lstat = await fs.promises.lstat(`${path}/${file}`);
+            if (lstat.isDirectory()) {
+                await this.loadSelectChannelMenuInteractions(`${path}/${file}`);
+                continue;
+            }
+            const Interaction = await import(`${path}/${file}`);
+            for (const kVal in Object.keys(Interaction)) {
+                const value = Object.values(Interaction)[kVal];
+                try {
+                    const interaction = new (value as any)();
+                    if (interaction.module !== this._name) continue;
+                    this.selectChannelInteractions.set(
+                        interaction.name,
+                        interaction,
+                    );
+                } catch (error) {
+                    console.error(error);
+                    console.error(
+                        `Could not load modal interaction ${path}/${file}`,
+                    );
+                }
+            }
+        }
+    }
+
+    async loadSelectRoleMenuInteractions(path: string): Promise<void> {
+        if (!fs.existsSync(path)) return;
+        let selectInteractionFiles = await fs.promises.readdir(path);
+        for (const file of selectInteractionFiles) {
+            const lstat = await fs.promises.lstat(`${path}/${file}`);
+            if (lstat.isDirectory()) {
+                await this.loadSelectRoleMenuInteractions(`${path}/${file}`);
+                continue;
+            }
+            const Interaction = await import(`${path}/${file}`);
+            for (const kVal in Object.keys(Interaction)) {
+                const value = Object.values(Interaction)[kVal];
+                try {
+                    const interaction = new (value as any)();
+                    if (interaction.module !== this._name) continue;
+                    this.selectRoleInteractions.set(
+                        interaction.name,
+                        interaction,
+                    );
+                } catch (error) {
+                    console.error(error);
+                    console.error(
+                        `Could not load modal interaction ${path}/${file}`,
+                    );
+                }
+            }
+        }
+    }
+
+    async loadSelectStringMenuInteractions(path: string): Promise<void> {
+        if (!fs.existsSync(path)) return;
+        let selectInteractionFiles = await fs.promises.readdir(path);
+        for (const file of selectInteractionFiles) {
+            const lstat = await fs.promises.lstat(`${path}/${file}`);
+            if (lstat.isDirectory()) {
+                await this.loadSelectStringMenuInteractions(`${path}/${file}`);
+                continue;
+            }
+            const Interaction = await import(`${path}/${file}`);
+            for (const kVal in Object.keys(Interaction)) {
+                const value = Object.values(Interaction)[kVal];
+                try {
+                    const interaction = new (value as any)();
+                    if (interaction.module !== this._name) continue;
+                    this.selectStringInteractions.set(
+                        interaction.name,
+                        interaction,
+                    );
+                } catch (error) {
+                    console.error(error);
+                    console.error(
+                        `Could not load modal interaction ${path}/${file}`,
+                    );
                 }
             }
         }
@@ -217,17 +368,26 @@ export abstract class BaseModule {
             if (added.name !== newOption.name) return false;
             if (added.description !== newOption.description) return false;
             if (added.type !== newOption.type) return false;
-            if (added.required !== newOption.required) return false;
             if (
-                (added.choices && !newOption.choices) ||
-                (!added.choices && newOption.choices)
+                (added.required === false && // true
+                    newOption.required !== undefined) || // false
+                (added.required === true &&
+                    added.required !== newOption.required)
             )
                 return false;
-            for (let j = 0; j < added.choices.length; j++) {
-                const addedChoice = added.choices[j];
-                const newChoice = newOption.choices[j];
-                if (addedChoice.name !== newChoice.name) return false;
-                if (addedChoice.value !== newChoice.value) return false;
+            if (added.choices || newOption.choices) {
+                if (
+                    (added.choices && !newOption.choices) ||
+                    (!added.choices && newOption.choices) ||
+                    added.choices.length !== newOption.choices.length
+                )
+                    return false;
+                for (let j = 0; j < added.choices.length; j++) {
+                    const addedChoice = added.choices[j];
+                    const newChoice = newOption.choices[j];
+                    if (addedChoice.name !== newChoice.name) return false;
+                    if (addedChoice.value !== newChoice.value) return false;
+                }
             }
         }
         return true;
@@ -277,37 +437,46 @@ export abstract class BaseModule {
     ): Promise<void> {
         const commands = Array.from(this.slashCommands.values());
         const commandsToRegister = commands.filter((command) => {
-            const slashedCommand = command.getSlashCommandJSON();
-            if (
-                alreadyAdded.find((addedCommand) => {
-                    return slashedCommand.name === addedCommand.name;
-                })
-            ) {
+            try {
+                const slashedCommand = command.getSlashCommandJSON();
+                if (
+                    alreadyAdded.find((addedCommand) => {
+                        return slashedCommand.name === addedCommand.name;
+                    })
+                ) {
+                    return false;
+                }
+                return true;
+            } catch {
                 return false;
             }
-            return true;
         });
         const commandsToRefresh = commands.filter((command) => {
-            if (
-                this.isCommandRegistered(
-                    alreadyAdded,
-                    command.getSlashCommandJSON(),
-                )
-            )
+            try {
+                const slashedCommand = command.getSlashCommandJSON();
+                if (this.isCommandRegistered(alreadyAdded, slashedCommand))
+                    return false;
+                return true;
+            } catch {
                 return false;
-            return true;
+            }
         });
         const allCommands = commandsToRegister.concat(commandsToRefresh);
         const commandsToUnregister = alreadyAdded.filter((addedCommand) => {
-            if (
-                commands.find((command) => {
-                    return (
-                        command.getSlashCommandJSON().name === addedCommand.name
-                    );
-                })
-            )
+            try {
+                if (
+                    commands.find((command) => {
+                        return (
+                            command.getSlashCommandJSON().name ===
+                            addedCommand.name
+                        );
+                    })
+                )
+                    return false;
+                return true;
+            } catch {
                 return false;
-            return true;
+            }
         });
 
         console.info(

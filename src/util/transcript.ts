@@ -1,5 +1,4 @@
-import { DiscordClient } from '@src/structures/';
-import { Message, TextChannel } from 'discord.js';
+import { Collection, Message } from 'discord.js';
 import fs from 'fs';
 
 async function loadStyles() {
@@ -82,13 +81,8 @@ function messageHtmlCreator(message: Message) {
 }
 
 export default async function buildTranscript(
-    guildId: string,
-    client: DiscordClient,
-    channel: TextChannel,
+    messages: Collection<string, Message<true>>,
 ) {
-    const _guild = client.guilds.cache.get(guildId);
-    const messages = (await channel.messages.fetch({ cache: true })).reverse();
-
     let transcript = '<body>';
     transcript += '<head><style>' + (await loadStyles()) + '</style></head>';
 
@@ -97,8 +91,7 @@ export default async function buildTranscript(
     let lastUser = 'none';
     let lastTime = '-1:-1';
     let lastDate = '-1/-1/-1';
-
-    messages.forEach((message) => {
+    messages.forEach(async (message) => {
         const date = new Date(message.createdTimestamp);
         const dateFormatted = date.toLocaleDateString();
         const timeFormatted = date.getHours() + ':' + date.getMinutes();
@@ -135,8 +128,9 @@ export default async function buildTranscript(
         lastUser = message.author.id;
         lastTime = timeFormatted;
         lastDate = dateFormatted;
+
+        transcript += '</div></body>';
     });
 
-    transcript += '</div></body>';
     return transcript;
 }
