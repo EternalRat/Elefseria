@@ -5,6 +5,7 @@ import { GatewayIntentBits, Partials, REST } from 'discord.js';
 import { DBConnection } from './class/database/dbConnection.db.class';
 import { TicketModule } from './modules/Ticket.module';
 import databaseSynchronisation from './structures/database/sync.db';
+import { ModerationModule } from './modules/Moderation.module';
 
 const config = {
     intents: [
@@ -58,7 +59,7 @@ async function main() {
             );
             // Loading every modules the bot has
             console.info('Loading modules...');
-            const allModules = [TicketModule];
+            const allModules = [TicketModule, ModerationModule];
             for (const module of allModules) {
                 baseClient.addModule(new module());
             }

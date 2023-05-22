@@ -124,18 +124,18 @@ export class DiscordClient extends Client {
      * client.loadModules();
      */
     async loadModules(): Promise<void> {
-        this.modules.forEach(async (module: BaseModule) => {
-            const restResponse = (await this.baseRest.get(
-                Routes.applicationGuildCommands(
-                    this.clientId,
-                    '1093194368531312700',
-                ),
-            )) as Array<any>;
+        const restResponse = (await this.baseRest.get(
+            Routes.applicationGuildCommands(
+                this.clientId,
+                '1093194368531312700',
+            ),
+        )) as Array<any>;
 
-            let addedSlashCommands: any[] = [];
-            for (const response of restResponse) {
-                addedSlashCommands.push(response);
-            }
+        const addedSlashCommands: any[] = [];
+        for (const response of restResponse) {
+            addedSlashCommands.push(response);
+        }
+        this.modules.forEach(async (module: BaseModule) => {
             await module.loadCommands(`src/commands/${module.name}`);
             await module.loadButtonInteractions(
                 `src/interactions/buttons/${module.name}`,

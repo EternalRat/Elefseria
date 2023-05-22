@@ -191,6 +191,7 @@ export abstract class BaseModule {
      * @param path
      */
     async loadSlashCommands(path: string): Promise<void> {
+        console.log(path);
         if (!fs.existsSync(path)) return;
         let commandFiles = await fs.promises.readdir(path);
         for (const file of commandFiles) {
@@ -436,51 +437,59 @@ export abstract class BaseModule {
         guildId?: string,
     ): Promise<void> {
         const commands = Array.from(this.slashCommands.values());
-        const commandsToRegister = commands.filter((command) => {
+        const commandsToRegister = commands.reduce((acc, command) => {
             try {
                 const slashedCommand = command.getSlashCommandJSON();
                 if (
-                    alreadyAdded.find((addedCommand) => {
+                    !alreadyAdded.find((addedCommand) => {
                         return slashedCommand.name === addedCommand.name;
                     })
                 ) {
-                    return false;
+                    acc.add(command);
                 }
-                return true;
             } catch {
-                return false;
+                /* empty */
             }
-        });
-        const commandsToRefresh = commands.filter((command) => {
+            return acc;
+        }, new Set<BaseSlashCommand>());
+        const commandsToRefresh = commands.reduce((acc, command) => {
             try {
                 const slashedCommand = command.getSlashCommandJSON();
-                if (this.isCommandRegistered(alreadyAdded, slashedCommand))
-                    return false;
-                return true;
+                if (this.isCommandRegistered(alreadyAdded, slashedCommand)) {
+                    acc.add(command);
+                }
             } catch {
-                return false;
+                /* empty */
             }
-        });
-        const allCommands = commandsToRegister.concat(commandsToRefresh);
-        const commandsToUnregister = alreadyAdded.filter((addedCommand) => {
-            try {
-                if (
-                    commands.find((command) => {
-                        return (
-                            command.getSlashCommandJSON().name ===
-                            addedCommand.name
-                        );
-                    })
-                )
-                    return false;
-                return true;
-            } catch {
-                return false;
-            }
-        });
+            return acc;
+        }, new Set<BaseSlashCommand>());
+        const allCommands = new Set([
+            ...commandsToRegister,
+            ...commandsToRefresh,
+        ]);
+        const commandsToUnregister = alreadyAdded.reduce(
+            (acc, addedCommand) => {
+                try {
+                    if (
+                        commands.find((command) => {
+                            return (
+                                command.getSlashCommandJSON().name ===
+                                addedCommand.name
+                            );
+                        })
+                    )
+                        return acc;
+                    acc.add(addedCommand);
+                } catch {
+                    /* empty */
+                }
+                return acc;
+            },
+            new Set<BaseSlashCommand>(),
+        );
 
         console.info(
-            `Started unregistering ${commandsToUnregister.length} application (/) commands.`,
+            `Started unregistering ${commandsToUnregister.size} application (/) commands.`,
         );
 
         for (const command of commandsToUnregister) {
@@ -499,11 +508,11 @@ export abstract class BaseModule {
         }
 
         console.info(
-            `Successfully unregistered ${commandsToUnregister.length} application (/) commands.`,
+            `Successfully unregistered ${commandsToUnregister.size} application (/) commands.`,
         );
 
         console.info(
-            `Started adding/refreshing ${allCommands.length} application (/) commands.`,
+            `Started adding/refreshing ${allCommands.size} application (/) commands.`,
         );
 
         let addedOrRefreshed = 0;
