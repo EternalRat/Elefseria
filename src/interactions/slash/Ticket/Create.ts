@@ -1,15 +1,25 @@
 import { TicketHandler } from '@src/class/ticket/TicketHandler.class';
-import { BaseSlashCommand, DiscordClient } from '@src/structures';
-import { ChatInputCommandInteraction } from 'discord.js';
+import {
+	BaseSlashCommand,
+	DiscordClient,
+	SlashCommandOptionType,
+} from '@src/structures';
+import { ChatInputCommandInteraction, EmbedBuilder } from 'discord.js';
 
 /**
  * @description TicketOpen slash command
  * @class TicketOpen
  * @extends BaseSlashCommand
  */
-export class TicketDeleteSlashCommand extends BaseSlashCommand {
+export class TicketCreateSlashCommand extends BaseSlashCommand {
 	constructor() {
-		super('delete', 'Delete this ticket', 'Ticket');
+		super('create', 'Create a new ticket', 'Ticket', [
+			{
+				name: 'reason',
+				description: 'The reason for creating the ticket',
+				type: SlashCommandOptionType.STRING,
+			},
+		]);
 	}
 
 	/**
@@ -23,6 +33,7 @@ export class TicketDeleteSlashCommand extends BaseSlashCommand {
 		interaction: ChatInputCommandInteraction,
 	): Promise<void> {
 		const ticketInstance = TicketHandler.getInstance();
+		const reason = interaction.options.getString('reason');
 		if (!interaction.guildId) {
 			await interaction.reply({
 				content: 'This command can only be used in a server',
@@ -38,20 +49,30 @@ export class TicketDeleteSlashCommand extends BaseSlashCommand {
 			});
 			return;
 		}
-		if (!(await ticketInstance.isTicket(interaction.channelId))) {
+		let ticket = await ticketInstance.createTicket(
+			'',
+			interaction.guild!,
+			interaction.user,
+			[],
+			undefined,
+		);
+		if (ticket) {
 			await interaction.reply({
-				content: 'This channel is not a ticket',
+				content: `Ticket created: <#${ticket.channel}>`,
 				ephemeral: true,
 			});
-			return;
-		}
-		if (!(await ticketInstance.isTicketClosed(interaction.channel!))) {
-			await interaction.reply({
-				content: "This ticket isn't closed. Close it first",
-				ephemeral: true,
+			let embed = new EmbedBuilder()
+				.setTitle('Ticket Created')
+				.setDescription(
+					`Ticket created by ${interaction.user} for : ${
+						reason ? reason : 'No reason provided'
+					}`,
+				)
+				.setColor('Random')
+				.setTimestamp();
+			ticket.channel.send({
+				embeds: [embed],
 			});
-			return;
 		}
-		await ticketInstance.deleteTicketByChannel(interaction.channel!);
 	}
 }
