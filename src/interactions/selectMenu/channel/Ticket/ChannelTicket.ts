@@ -5,53 +5,53 @@ import { BaseSelectInteraction } from '@src/structures/base/BaseSelectInteractio
 import { ChannelSelectMenuInteraction } from 'discord.js';
 
 export class ChannelTicketSelect extends BaseSelectInteraction {
-    constructor() {
-        super(
-            'channelName',
-            'Select a channel to send the ticket to',
-            'Ticket',
-        );
-    }
+	constructor() {
+		super(
+			'channelName',
+			'Select a channel to send the ticket to',
+			'Ticket',
+		);
+	}
 
-    async execute(
-        _client: DiscordClient,
-        interaction: ChannelSelectMenuInteraction,
-    ) {
-        const val = interaction.values[0];
-        const title = interaction.message.embeds[0].title;
-        const isChannelTicket = title?.includes('Channel To Send');
-        const isTranscriptTicket = title?.includes('Transcript Channel');
-        const ticketHandler = TicketHandler.getInstance();
-        const lastPanel = await ticketHandler.createIfLastPanelActive(
-            interaction.guildId!,
-            await ticketHandler.getLatestPanel(interaction.guild!.id),
-        );
-        let page =
-            title && title.startsWith('Setup ')
-                ? parseInt(
-                      title.slice(
-                          title.indexOf('Setup ') + 'Setup '.length,
-                          title.indexOf('/'),
-                      ),
-                  ) - 1
-                : 0;
-        await interaction.deferUpdate({
-            fetchReply: true,
-        });
+	async execute(
+		_client: DiscordClient,
+		interaction: ChannelSelectMenuInteraction,
+	) {
+		const val = interaction.values[0];
+		const title = interaction.message.embeds[0].title;
+		const isChannelTicket = title?.includes('Channel To Send');
+		const isTranscriptTicket = title?.includes('Transcript Channel');
+		const ticketHandler = TicketHandler.getInstance();
+		const lastPanel = await ticketHandler.createIfLastPanelActive(
+			interaction.guildId!,
+			await ticketHandler.getLatestPanel(interaction.guild!.id),
+		);
+		let page =
+			title && title.startsWith('Setup ')
+				? parseInt(
+						title.slice(
+							title.indexOf('Setup ') + 'Setup '.length,
+							title.indexOf('/'),
+						),
+					) - 1
+				: 0;
+		await interaction.deferUpdate({
+			fetchReply: true,
+		});
 
-        const replyComponent = await AddPanelButtonInteraction.buildReply(
-            lastPanel,
-            page,
-            isChannelTicket
-                ? { channelId: val }
-                : isTranscriptTicket
-                ? { transcriptChannelId: val }
-                : undefined,
-        );
-        await interaction.editReply({
-            content: '',
-            embeds: [...replyComponent.embeds],
-            components: [...replyComponent.components],
-        });
-    }
+		const replyComponent = await AddPanelButtonInteraction.buildReply(
+			lastPanel,
+			page,
+			isChannelTicket
+				? { channelId: val }
+				: isTranscriptTicket
+					? { transcriptChannelId: val }
+					: undefined,
+		);
+		await interaction.editReply({
+			content: '',
+			embeds: [...replyComponent.embeds],
+			components: [...replyComponent.components],
+		});
+	}
 }
